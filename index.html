@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Калькулятор відтермінування</title>
+  <style>
+    :root {
+      --bg: #f3f6fb;
+      --card: #ffffff;
+      --text: #132238;
+      --muted: #5f6f86;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --danger: #dc2626;
+      --border: #dbe4f0;
+      --shadow: 0 12px 30px rgba(17, 24, 39, 0.08);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(180deg, #eef3ff 0%, var(--bg) 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    main {
+      width: 100%;
+      max-width: 760px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.35rem, 2vw, 1.9rem);
+      line-height: 1.25;
+    }
+
+    .subtitle {
+      margin: 0 0 22px;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    form {
+      display: grid;
+      gap: 16px;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    label {
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 1rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      background: #fff;
+    }
+
+    input:focus {
+      border-color: #9ab8ff;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .hint {
+      margin: 0;
+      font-size: 0.84rem;
+      color: var(--muted);
+      background: #f8faff;
+      border: 1px dashed #c7d6f8;
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 11px 16px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.06s ease, filter 0.2s ease;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: #eef2ff;
+      color: #223248;
+    }
+
+    .btn-secondary:hover {
+      filter: brightness(0.96);
+    }
+
+    .btn-copy {
+      background: #e8f8ef;
+      color: #0f5132;
+    }
+
+    .btn-copy:hover {
+      filter: brightness(0.96);
+    }
+
+    .result {
+      margin-top: 6px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fbfdff;
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .result h2 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .result-line {
+      margin: 0;
+      font-size: 0.98rem;
+    }
+
+    .status {
+      min-height: 20px;
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    .status.error {
+      color: var(--danger);
+    }
+
+    .status.ok {
+      color: #1f7a3f;
+    }
+
+    @media (max-width: 700px) {
+      .card {
+        padding: 18px;
+      }
+
+      .fields {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="card" aria-labelledby="title">
+      <h1 id="title">Калькулятор середнього відтермінування</h1>
+      <p class="subtitle">Розрахунок коефіцієнта та середнього строку відтермінування в днях.</p>
+
+      <form id="calcForm" novalidate>
+        <div class="fields">
+          <div class="field">
+            <label for="debt">Борг</label>
+            <input id="debt" name="debt" type="number" min="0" step="any" value="58617" inputmode="decimal" required />
+          </div>
+          <div class="field">
+            <label for="turnover">Сума оборота</label>
+            <input id="turnover" name="turnover" type="number" min="0" step="any" value="155775" inputmode="decimal" required />
+          </div>
+          <div class="field">
+            <label for="days">Кількість днів</label>
+            <input id="days" name="days" type="number" min="1" step="1" value="31" inputmode="numeric" required />
+          </div>
+        </div>
+
+        <p class="hint">Формула: <strong>коефіцієнт = борг / сума оборота</strong>, <strong>дні відтермінування = коефіцієнт × кількість днів</strong>.</p>
+
+        <div class="actions">
+          <button type="submit" class="btn-primary">Розрахувати</button>
+          <button type="button" id="clearBtn" class="btn-secondary">Очистити</button>
+          <button type="button" id="copyBtn" class="btn-copy">Скопіювати результат</button>
+        </div>
+
+        <section class="result" aria-live="polite" aria-atomic="true">
+          <h2>Результат</h2>
+          <p id="coefOut" class="result-line">Коефіцієнт: —</p>
+          <p id="daysOut" class="result-line">Середнє відтермінування: —</p>
+          <p id="status" class="status" role="status"></p>
+        </section>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const form = document.getElementById('calcForm');
+      const debtInput = document.getElementById('debt');
+      const turnoverInput = document.getElementById('turnover');
+      const daysInput = document.getElementById('days');
+      const coefOut = document.getElementById('coefOut');
+      const daysOut = document.getElementById('daysOut');
+      const status = document.getElementById('status');
+      const clearBtn = document.getElementById('clearBtn');
+      const copyBtn = document.getElementById('copyBtn');
+
+      let lastResult = '';
+
+      function setStatus(message, type) {
+        status.textContent = message || '';
+        status.className = 'status' + (type ? ' ' + type : '');
+      }
+
+      function parseNumber(value) {
+        return Number(String(value).replace(',', '.'));
+      }
+
+      function validate(debt, turnover, days) {
+        if ([debt, turnover, days].some((v) => Number.isNaN(v))) {
+          return 'Будь ласка, заповніть усі поля коректними числами.';
+        }
+        if (debt === null || turnover === null || days === null) {
+          return 'Усі поля обовʼязкові для заповнення.';
+        }
+        if (turnover === 0) {
+          return 'Сума оборота не може дорівнювати нулю (ділення на нуль неможливе).';
+        }
+        if (days <= 0) {
+          return 'Кількість днів має бути більшою за нуль.';
+        }
+        if (debt < 0 || turnover < 0) {
+          return 'Борг і сума оборота не можуть бути відʼємними.';
+        }
+        return '';
+      }
+
+      function calculate() {
+        const debt = parseNumber(debtInput.value.trim());
+        const turnover = parseNumber(turnoverInput.value.trim());
+        const days = parseNumber(daysInput.value.trim());
+
+        if (!debtInput.value.trim() || !turnoverInput.value.trim() || !daysInput.value.trim()) {
+          setStatus('Будь ласка, заповніть усі поля.', 'error');
+          return;
+        }
+
+        const error = validate(debt, turnover, days);
+        if (error) {
+          coefOut.textContent = 'Коефіцієнт: —';
+          daysOut.textContent = 'Середнє відтермінування: —';
+          setStatus(error, 'error');
+          return;
+        }
+
+        const coefficient = debt / turnover;
+        const delayDays = coefficient * days;
+
+        const coefficientText = coefficient.toFixed(4);
+        const delayDaysText = delayDays.toFixed(2);
+
+        coefOut.textContent = `Коефіцієнт: ${coefficientText}`;
+        daysOut.textContent = `Середнє відтермінування: ${delayDaysText} днів`;
+
+        lastResult = `Коефіцієнт: ${coefficientText}\nСереднє відтермінування: ${delayDaysText} днів`;
+        setStatus('Розрахунок виконано успішно.', 'ok');
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        calculate();
+      });
+
+      form.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          calculate();
+        }
+      });
+
+      clearBtn.addEventListener('click', function () {
+        debtInput.value = '';
+        turnoverInput.value = '';
+        daysInput.value = '';
+        coefOut.textContent = 'Коефіцієнт: —';
+        daysOut.textContent = 'Середнє відтермінування: —';
+        lastResult = '';
+        setStatus('Поля очищено.', 'ok');
+        debtInput.focus();
+      });
+
+      copyBtn.addEventListener('click', async function () {
+        if (!lastResult) {
+          setStatus('Немає результату для копіювання. Спочатку виконайте розрахунок.', 'error');
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(lastResult);
+          setStatus('Результат скопійовано в буфер обміну.', 'ok');
+        } catch (error) {
+          setStatus('Не вдалося скопіювати автоматично. Скопіюйте текст вручну.', 'error');
+        }
+      });
+
+      calculate();
+    })();
+  </script>
+</body>
+</html>
