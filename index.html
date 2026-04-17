@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Калькулятор відтермінування | Cargo Parts</title>
+  <title>Калькулятори | Cargo Parts</title>
   <style>
     :root {
       --bg: #eef1f5;
-      --panel: #ffffff;
+      --panel: #fff;
       --header: #102741;
       --header-border: #0b1d30;
       --text: #15263d;
@@ -16,301 +16,87 @@
       --line-strong: #bbc6d7;
       --accent: #ffc400;
       --accent-hover: #efb800;
-      --accent-active: #e2ac00;
       --focus: #2e5e98;
       --ok: #1f7f43;
       --error: #c53535;
       --radius: 8px;
     }
-
     * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: "Segoe UI", Roboto, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    .topbar {
-      background: var(--header);
-      color: #fff;
-      border-bottom: 1px solid var(--header-border);
-    }
-
-    .topbar-inner {
-      width: min(1100px, 100%);
-      margin: 0 auto;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      min-width: 0;
-    }
-
-    .logo-mark {
-      width: 34px;
-      height: 34px;
-      border-radius: 6px;
-      background: var(--accent);
-      display: grid;
-      place-items: center;
-      color: #0f223a;
-      flex: 0 0 auto;
-    }
-
+    body { margin: 0; font-family: "Segoe UI", Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); }
+    .topbar { background: var(--header); color: #fff; border-bottom: 1px solid var(--header-border); }
+    .topbar-inner { width: min(1200px, 100%); margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
+    .logo-mark { width: 34px; height: 34px; border-radius: 6px; background: var(--accent); display: grid; place-items: center; color: #0f223a; }
     .logo-mark svg { width: 20px; height: 20px; }
-
-    .logo-text {
-      font-weight: 800;
-      letter-spacing: 0.4px;
-      line-height: 1;
-      text-transform: uppercase;
-      font-size: 0.75rem;
-    }
-
-    .page {
-      width: min(1100px, 100%);
-      margin: 0 auto;
-      padding: 16px;
-    }
-
-    .screen {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-
-    .screen-head {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--line);
-      background: #f9fafc;
-    }
-
-    .screen-head h1 {
-      margin: 0;
-      font-size: clamp(1.05rem, 2vw, 1.25rem);
-      line-height: 1.25;
-    }
-
-    .screen-head p {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 0.88rem;
-    }
-
-    .workspace {
-      display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
-      gap: 0;
-    }
-
-    .form-col {
-      padding: 16px;
-      border-right: 1px solid var(--line);
-    }
-
-    .result-col {
-      padding: 16px;
-      background: #fcfdff;
-    }
-
-    .fields {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .field {
-      display: grid;
-      gap: 6px;
-    }
-
-    label {
-      font-size: 0.86rem;
-      font-weight: 700;
-      color: #1c3150;
-    }
-
-    input {
-      width: 100%;
-      min-height: 46px;
-      border: 1px solid var(--line-strong);
-      border-radius: 7px;
-      background: #fff;
-      padding: 10px 12px;
-      font-size: 1.02rem;
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    input.is-example { color: rgba(21, 38, 61, 0.54); }
-    input.is-example:focus { color: rgba(21, 38, 61, 0.72); }
-
-    input:focus {
-      border-color: var(--focus);
-      box-shadow: 0 0 0 3px rgba(46, 94, 152, 0.15);
-    }
-
-    .hint {
-      margin: 12px 0 0;
-      padding: 10px 12px;
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      font-size: 0.83rem;
-      color: #39506f;
-      background: #f7f9fc;
-      line-height: 1.45;
-    }
-
-    .actions {
-      margin-top: 12px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .btn {
-      appearance: none;
-      border-radius: 7px;
-      border: 1px solid transparent;
-      min-height: 42px;
-      padding: 0 14px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.06s ease;
-    }
-
-    .btn:active { transform: translateY(1px); }
-
-    .btn:focus-visible {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(46, 94, 152, 0.2);
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: #1b2f4b;
-      border-color: #e8b500;
-    }
-
+    .logo-text { font-weight: 800; text-transform: uppercase; letter-spacing: .4px; line-height: 1; font-size: .75rem; }
+    .page { width: min(1200px, 100%); margin: 0 auto; padding: 16px; display: grid; gap: 14px; }
+    .screen { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+    .screen-head { padding: 12px 14px; border-bottom: 1px solid var(--line); background: #f9fafc; }
+    .screen-head h1,.screen-head h2 { margin: 0; font-size: 1.1rem; }
+    .screen-head p { margin: 6px 0 0; color: var(--muted); font-size: .86rem; }
+    .workspace { display: grid; grid-template-columns: minmax(0,2fr) minmax(280px,1fr); }
+    .form-col,.result-col { padding: 14px; }
+    .form-col { border-right: 1px solid var(--line); }
+    .result-col { background: #fcfdff; }
+    .section-grid { display: grid; gap: 12px; }
+    .fields-3 { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
+    .fields-2 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+    .field { display: grid; gap: 6px; }
+    label { font-size: .84rem; font-weight: 700; color: #1c3150; }
+    input, select { width: 100%; min-height: 42px; border: 1px solid var(--line-strong); border-radius: 7px; padding: 9px 11px; font-size: .97rem; color: var(--text); background: #fff; outline: none; }
+    input:focus, select:focus { border-color: var(--focus); box-shadow: 0 0 0 3px rgba(46,94,152,.14); }
+    input.is-example { color: rgba(21,38,61,.54); }
+    .hint { margin: 0; padding: 9px 11px; border: 1px solid var(--line); border-radius: 7px; font-size: .81rem; color: #39506f; background: #f7f9fc; line-height: 1.4; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .btn { border: 1px solid transparent; min-height: 40px; padding: 0 12px; border-radius: 7px; font-weight: 700; font-size: .89rem; cursor: pointer; }
+    .btn-primary { background: var(--accent); color: #1b2f4b; border-color: #e8b500; }
     .btn-primary:hover { background: var(--accent-hover); }
-    .btn-primary:active { background: var(--accent-active); }
-
-    .btn-secondary {
-      background: #eef2f7;
-      color: #203751;
-      border-color: #d4dce8;
-    }
-
+    .btn-secondary { background: #eef2f7; color: #203751; border-color: #d4dce8; }
     .btn-secondary:hover { background: #e4eaf2; }
+    .result-box { border: 1px solid var(--line); border-radius: 7px; background: #fff; padding: 12px; display: grid; gap: 8px; }
+    .result-title { margin: 0; font-size: .93rem; font-weight: 800; text-transform: uppercase; letter-spacing: .3px; }
+    .result-line { margin: 0; font-size: .93rem; }
+    .status { min-height: 18px; font-size: .84rem; font-weight: 600; margin: 0; }
+    .status.ok { color: var(--ok); } .status.error { color: var(--error); }
+    .example { margin: 10px 0 0; color: var(--muted); font-size: .8rem; }
 
-    .result-box {
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      background: #fff;
-      padding: 12px;
-      display: grid;
-      gap: 8px;
-    }
+    .motivation-body { padding: 14px; display: grid; gap: 12px; }
+    .cards { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+    .card { border: 1px solid var(--line); border-radius: 7px; background: #fff; padding: 12px; display: grid; gap: 10px; }
+    .card h3 { margin: 0; font-size: .95rem; }
+    .subtle { color: var(--muted); font-size: .8rem; margin: -4px 0 0; }
+    .group-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px 12px; }
+    .check { display: flex; gap: 8px; align-items: center; font-size: .84rem; }
+    .check input { width: 16px; height: 16px; min-height: auto; }
+    .table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+    .table th,.table td { border-bottom: 1px solid var(--line); padding: 6px 4px; text-align: left; vertical-align: top; }
+    .table th:last-child,.table td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+    .summary-total { border: 1px solid var(--line); border-radius: 7px; padding: 10px 12px; background: #f7f9fc; display: flex; justify-content: space-between; font-weight: 800; }
+    .mono { font-variant-numeric: tabular-nums; }
 
-    .result-title {
-      margin: 0;
-      font-size: 0.95rem;
-      font-weight: 800;
-      color: #1a3455;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-    }
-
-    .result-line {
-      margin: 0;
-      font-size: 0.95rem;
-      line-height: 1.35;
-      color: #1b3150;
-    }
-
-    .status {
-      margin: 2px 0 0;
-      min-height: 20px;
-      font-size: 0.86rem;
-      font-weight: 600;
-    }
-
-    .status.ok { color: var(--ok); }
-    .status.error { color: var(--error); }
-
-    .example {
-      margin: 12px 0 0;
-      color: var(--muted);
-      font-size: 0.8rem;
-      line-height: 1.4;
-    }
-
-    @media (max-width: 980px) {
-      .fields { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 820px) {
-      .workspace { grid-template-columns: 1fr; }
-      .form-col { border-right: 0; border-bottom: 1px solid var(--line); }
-      .actions { display: grid; grid-template-columns: 1fr; }
-      .btn { width: 100%; }
-    }
+    @media (max-width: 1024px) { .workspace { grid-template-columns: 1fr; } .form-col { border-right: 0; border-bottom: 1px solid var(--line);} .cards { grid-template-columns: 1fr; } }
+    @media (max-width: 760px) { .fields-3,.fields-2,.group-grid { grid-template-columns: 1fr; } .actions { display: grid; grid-template-columns: 1fr; } .btn { width: 100%; } }
   </style>
 </head>
 <body>
   <header class="topbar">
     <div class="topbar-inner">
-      <div class="logo" aria-label="Cargo Parts">
-        <div class="logo-mark" aria-hidden="true">
-          <svg viewBox="0 0 64 64">
-            <circle cx="32" cy="32" r="11" fill="#0f223a"></circle>
-            <path d="M32 7v10M32 47v10M7 32h10M47 32h10M14 14l7 7M43 43l7 7M14 50l7-7M43 21l7-7"
-              stroke="#0f223a" stroke-width="4" stroke-linecap="round"></path>
-          </svg>
-        </div>
-        <div class="logo-text">Cargo<br>Parts</div>
-      </div>
+      <div class="logo-mark" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="11" fill="#0f223a"></circle><path d="M32 7v10M32 47v10M7 32h10M47 32h10M14 14l7 7M43 43l7 7M14 50l7-7M43 21l7-7" stroke="#0f223a" stroke-width="4" stroke-linecap="round"></path></svg></div>
+      <div class="logo-text">Cargo<br>Parts</div>
     </div>
   </header>
 
   <main class="page">
-    <section class="screen" aria-labelledby="calcTitle">
-      <div class="screen-head">
-        <h1 id="calcTitle">Калькулятор середнього відтермінування</h1>
-        <p>Розрахунок коефіцієнта відтермінування та середнього строку в днях.</p>
-      </div>
-
+    <section class="screen" aria-labelledby="delayTitle">
+      <div class="screen-head"><h1 id="delayTitle">Калькулятор середнього відтермінування</h1><p>Базовий розрахунок коефіцієнта і строку відтермінування.</p></div>
       <div class="workspace">
         <div class="form-col">
-          <form id="calcForm" novalidate>
-            <div class="fields">
-              <div class="field">
-                <label for="debt">Борг</label>
-                <input id="debt" name="debt" type="number" min="0" step="any" value="58617" data-example="58617" class="is-example" inputmode="decimal" required />
-              </div>
-              <div class="field">
-                <label for="turnover">Сума оборота</label>
-                <input id="turnover" name="turnover" type="number" min="0" step="any" value="155775" data-example="155775" class="is-example" inputmode="decimal" required />
-              </div>
-              <div class="field">
-                <label for="days">Кількість днів</label>
-                <input id="days" name="days" type="number" min="1" step="1" value="31" data-example="31" class="is-example" inputmode="numeric" required />
-              </div>
+          <form id="calcForm" class="section-grid" novalidate>
+            <div class="fields-3">
+              <div class="field"><label for="debt">Борг</label><input id="debt" type="number" value="58617" data-example="58617" class="is-example" /></div>
+              <div class="field"><label for="turnover">Сума оборота</label><input id="turnover" type="number" value="155775" data-example="155775" class="is-example" /></div>
+              <div class="field"><label for="days">Кількість днів</label><input id="days" type="number" value="31" data-example="31" class="is-example" /></div>
             </div>
-
             <p class="hint">Формула: <strong>коефіцієнт = борг / сума оборота</strong>, <strong>дні відтермінування = коефіцієнт × кількість днів у місяці</strong>.</p>
-
             <div class="actions">
               <button type="submit" class="btn btn-primary">Розрахувати</button>
               <button type="button" id="clearBtn" class="btn btn-secondary">Очистити</button>
@@ -318,7 +104,6 @@
             </div>
           </form>
         </div>
-
         <aside class="result-col" aria-live="polite" aria-atomic="true">
           <section class="result-box">
             <h2 class="result-title">Результат</h2>
@@ -326,14 +111,87 @@
             <p id="daysOut" class="result-line">Середнє відтермінування: —</p>
             <p id="status" class="status" role="status"></p>
           </section>
-          <p class="example">Приклад: борг 58 617, оборот 155 775, днів 31 → коефіцієнт 0.3763, відтермінування 11.67 днів.</p>
+          <p class="example">Приклад: борг 58 617, оборот 155 775, днів 31 → 0.3763 та 11.67 днів.</p>
         </aside>
+      </div>
+    </section>
+
+    <section class="screen" aria-labelledby="motivationTitle">
+      <div class="screen-head"><h2 id="motivationTitle">Розрахунок мотивації / ЗП</h2><p>Місячний + квартальний блоки з детальною розшифровкою.</p></div>
+      <div class="motivation-body">
+        <div class="cards">
+          <section class="card">
+            <h3>Місячна мотивація</h3>
+            <div class="fields-2">
+              <div class="field"><label for="planTurnover">Плановий оборот</label><input id="planTurnover" type="number" value="0" /></div>
+              <div class="field"><label for="planPercent">Виконання плану продажів, %</label><input id="planPercent" type="number" value="0" /></div>
+              <div class="field"><label for="crmCalls">CRM: дзвінки</label><input id="crmCalls" type="number" value="0" /></div>
+              <div class="field"><label for="crmMeets">CRM: зустрічі</label><input id="crmMeets" type="number" value="0" /></div>
+              <div class="field"><label for="avgDiscount">Середня знижка, %</label><input id="avgDiscount" type="number" value="0" step="0.1" /></div>
+              <div class="field"><label for="avgDelayFact">Середнє відтермінування (факт), днів</label><input id="avgDelayFact" type="number" value="0" step="0.01" /></div>
+              <div class="field"><label for="overdueDebt">Прострочений борг</label><input id="overdueDebt" type="number" value="0" /></div>
+              <div class="field"><label for="overdueRange">Діапазон прострочки</label><select id="overdueRange"><option value="0">Немає</option><option value="1-10">1–10 днів</option><option value="11-20">11–20 днів</option><option value=">20">Понад 20 днів</option></select></div>
+            </div>
+          </section>
+
+          <section class="card">
+            <h3>Квартальна мотивація</h3>
+            <div class="fields-2">
+              <div class="field"><label for="dcTurnover">Оборот по клієнтах ДЦ (квартал)</label><input id="dcTurnover" type="number" value="0" /></div>
+              <div class="field"><label for="tiresOver">Шин понад мінімальний план, шт</label><input id="tiresOver" type="number" value="0" /></div>
+              <label class="check"><input id="tiresMinMet" type="checkbox" checked /> Мінімальний план шин виконано</label>
+              <label class="check"><input id="jokerDone" type="checkbox" /> Joker / Profit виконано</label>
+              <div class="field"><label for="jokerBase">База Joker / Profit</label><input id="jokerBase" type="number" value="0" /></div>
+            </div>
+            <p class="subtle">Для Joker/Profit використовується ручна база, бонус = 9% при активному чекбоксі.</p>
+            <div>
+              <strong style="font-size:.86rem;">Групи ГТ ДЦ (95%+)</strong>
+              <div id="groupContainer" class="group-grid"></div>
+            </div>
+          </section>
+        </div>
+
+        <section class="card">
+          <h3>Підсумок та розшифровка</h3>
+          <table class="table" id="breakdownTable">
+            <tbody></tbody>
+          </table>
+          <div class="summary-total"><span>Загальна мотивація</span><span id="motivationTotal" class="mono">0 ₴</span></div>
+          <div class="actions">
+            <button type="button" id="recalcMotivation" class="btn btn-primary">Перерахувати мотивацію</button>
+            <button type="button" id="copyMotivation" class="btn btn-secondary">Скопіювати розрахунок</button>
+            <button type="button" id="clearAll" class="btn btn-secondary">Очистити все</button>
+          </div>
+          <p id="motivationStatus" class="status" role="status"></p>
+        </section>
       </div>
     </section>
   </main>
 
   <script>
     (function () {
+      const groups = [
+        { key: 'autoChem', name: 'АВТОХІМІЯ І ОЛИВИ', pct: 0.10 },
+        { key: 'amort', name: 'АМОРТИЗАЦІЯ', pct: 0.04 },
+        { key: 'brake', name: 'ГАЛЬМІВНА СИСТЕМА', pct: 0.10 },
+        { key: 'engine', name: 'ДВИГУН', pct: 0.10 },
+        { key: 'electric', name: 'ЕЛЕКТРИКА', pct: 0.06 },
+        { key: 'cooling', name: 'ОХОЛОДЖЕННЯ', pct: 0.04 },
+        { key: 'susp', name: 'ПІДВІСКА', pct: 0.11 },
+        { key: 'pneuma', name: 'ПНЕВМАТИКА', pct: 0.09 },
+        { key: 'clutch', name: 'СИСТЕМА ЗЧЕПЛЕННЯ', pct: 0.06 },
+        { key: 'trans', name: 'ТРАНСМІСІЯ', pct: 0.04 },
+        { key: 'filter', name: 'ФІЛЬТР', pct: 0.09 }
+      ];
+
+      const groupContainer = document.getElementById('groupContainer');
+      groups.forEach((g) => {
+        const label = document.createElement('label');
+        label.className = 'check';
+        label.innerHTML = `<input type="checkbox" data-group="${g.key}" /> ${g.name} (${Math.round(g.pct * 100)}%)`;
+        groupContainer.appendChild(label);
+      });
+
       const form = document.getElementById('calcForm');
       const debtInput = document.getElementById('debt');
       const turnoverInput = document.getElementById('turnover');
@@ -344,123 +202,160 @@
       const clearBtn = document.getElementById('clearBtn');
       const copyBtn = document.getElementById('copyBtn');
       const exampleInputs = [debtInput, turnoverInput, daysInput];
-
       let lastResult = '';
 
-      function setStatus(message, type) {
-        status.textContent = message || '';
-        status.className = 'status' + (type ? ' ' + type : '');
-      }
-
-      function parseNumber(value) {
-        return Number(String(value).replace(',', '.'));
-      }
-
-      function refreshExampleState(input) {
-        const isExample = input.dataset.example && input.value.trim() === input.dataset.example;
-        input.classList.toggle('is-example', Boolean(isExample));
-      }
-
+      function setStatus(message, type) { status.textContent = message || ''; status.className = 'status' + (type ? ' ' + type : ''); }
+      function parseNumber(value) { return Number(String(value).replace(',', '.')); }
+      function refreshExampleState(input) { input.classList.toggle('is-example', Boolean(input.dataset.example && input.value.trim() === input.dataset.example)); }
       function validate(debt, turnover, days) {
-        if ([debt, turnover, days].some((v) => Number.isNaN(v))) {
-          return 'Будь ласка, заповніть усі поля коректними числами.';
-        }
-        if (turnover === 0) {
-          return 'Сума оборота не може дорівнювати нулю (ділення на нуль неможливе).';
-        }
-        if (days <= 0) {
-          return 'Кількість днів має бути більшою за нуль.';
-        }
-        if (debt < 0 || turnover < 0) {
-          return 'Борг і сума оборота не можуть бути відʼємними.';
-        }
+        if ([debt, turnover, days].some((v) => Number.isNaN(v))) return 'Будь ласка, заповніть усі поля коректними числами.';
+        if (turnover === 0) return 'Сума оборота не може дорівнювати нулю (ділення на нуль неможливе).';
+        if (days <= 0) return 'Кількість днів має бути більшою за нуль.';
+        if (debt < 0 || turnover < 0) return 'Борг і сума оборота не можуть бути відʼємними.';
         return '';
       }
-
       function calculate() {
-        const debtValue = debtInput.value.trim();
-        const turnoverValue = turnoverInput.value.trim();
-        const daysValue = daysInput.value.trim();
-
-        if (!debtValue || !turnoverValue || !daysValue) {
-          coefOut.textContent = 'Коефіцієнт: —';
-          daysOut.textContent = 'Середнє відтермінування: —';
-          setStatus('Будь ласка, заповніть усі поля.', 'error');
-          return;
-        }
-
-        const debt = parseNumber(debtValue);
-        const turnover = parseNumber(turnoverValue);
-        const days = parseNumber(daysValue);
-
+        const debtValue = debtInput.value.trim(); const turnoverValue = turnoverInput.value.trim(); const daysValue = daysInput.value.trim();
+        if (!debtValue || !turnoverValue || !daysValue) { coefOut.textContent = 'Коефіцієнт: —'; daysOut.textContent = 'Середнє відтермінування: —'; setStatus('Будь ласка, заповніть усі поля.', 'error'); return; }
+        const debt = parseNumber(debtValue); const turnover = parseNumber(turnoverValue); const days = parseNumber(daysValue);
         const error = validate(debt, turnover, days);
-        if (error) {
-          coefOut.textContent = 'Коефіцієнт: —';
-          daysOut.textContent = 'Середнє відтермінування: —';
-          setStatus(error, 'error');
-          return;
-        }
-
-        const coefficient = debt / turnover;
-        const delayDays = coefficient * days;
-
-        const coefficientText = coefficient.toFixed(4);
-        const delayDaysText = delayDays.toFixed(2);
-
-        coefOut.textContent = `Коефіцієнт: ${coefficientText}`;
-        daysOut.textContent = `Середнє відтермінування: ${delayDaysText} днів`;
-        lastResult = `Коефіцієнт: ${coefficientText}\nСереднє відтермінування: ${delayDaysText} днів`;
-        setStatus('Розрахунок виконано успішно.', 'ok');
+        if (error) { coefOut.textContent = 'Коефіцієнт: —'; daysOut.textContent = 'Середнє відтермінування: —'; setStatus(error, 'error'); return; }
+        const coefficient = debt / turnover; const delayDays = coefficient * days;
+        const coefficientText = coefficient.toFixed(4); const delayDaysText = delayDays.toFixed(2);
+        coefOut.textContent = `Коефіцієнт: ${coefficientText}`; daysOut.textContent = `Середнє відтермінування: ${delayDaysText} днів`;
+        lastResult = `Коефіцієнт: ${coefficientText}\nСереднє відтермінування: ${delayDaysText} днів`; setStatus('Розрахунок виконано успішно.', 'ok');
       }
 
-      form.addEventListener('submit', function (event) {
-        event.preventDefault();
-        calculate();
-      });
+      form.addEventListener('submit', (e) => { e.preventDefault(); calculate(); });
+      form.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); calculate(); } });
+      exampleInputs.forEach((input) => input.addEventListener('input', () => refreshExampleState(input)));
+      clearBtn.addEventListener('click', function () { debtInput.value = ''; turnoverInput.value = ''; daysInput.value = ''; exampleInputs.forEach((i) => i.classList.remove('is-example')); coefOut.textContent = 'Коефіцієнт: —'; daysOut.textContent = 'Середнє відтермінування: —'; lastResult = ''; setStatus('Поля очищено.', 'ok'); debtInput.focus(); });
+      copyBtn.addEventListener('click', async function () { if (!lastResult) return setStatus('Немає результату для копіювання. Спочатку виконайте розрахунок.', 'error'); try { await navigator.clipboard.writeText(lastResult); setStatus('Результат скопійовано в буфер обміну.', 'ok'); } catch (_) { setStatus('Не вдалося скопіювати автоматично. Скопіюйте текст вручну.', 'error'); } });
 
-      form.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') {
-          event.preventDefault();
-          calculate();
-        }
-      });
+      const mIds = ['planTurnover','planPercent','crmCalls','crmMeets','avgDiscount','avgDelayFact','overdueDebt','dcTurnover','tiresOver','jokerBase'];
+      const mInputs = Object.fromEntries(mIds.map((id) => [id, document.getElementById(id)]));
+      const tiresMinMet = document.getElementById('tiresMinMet');
+      const jokerDone = document.getElementById('jokerDone');
+      const overdueRange = document.getElementById('overdueRange');
+      const breakdownBody = document.querySelector('#breakdownTable tbody');
+      const totalEl = document.getElementById('motivationTotal');
+      const motivationStatus = document.getElementById('motivationStatus');
+      const copyMotivation = document.getElementById('copyMotivation');
+      const recalcMotivation = document.getElementById('recalcMotivation');
+      const clearAll = document.getElementById('clearAll');
 
-      exampleInputs.forEach(function (input) {
-        input.addEventListener('input', function () {
-          refreshExampleState(input);
+      function n(id) { const v = parseFloat(mInputs[id].value); return Number.isFinite(v) ? v : 0; }
+      function money(v) { return `${new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 2 }).format(v)} ₴`; }
+      function setMStatus(msg, type) { motivationStatus.textContent = msg || ''; motivationStatus.className = 'status' + (type ? ' ' + type : ''); }
+      function groupCountBonus(count) {
+        if (count < 7) return 0;
+        if (count === 7) return 12000;
+        if (count === 8) return 16000;
+        if (count === 9) return 22000;
+        if (count === 10) return 30000;
+        return 40000;
+      }
+
+      function planBonusByPercent(percent) {
+        if (percent <= 90) return 0;
+        const p1 = Math.max(0, Math.min(percent, 100) - 90) * 1000;
+        const p2 = Math.max(0, Math.min(percent, 110) - 100) * 1500;
+        const p3 = Math.max(0, percent - 110) * 500;
+        return p1 + p2 + p3;
+      }
+
+      function overduePenalty(debt, range) {
+        if (debt <= 0) return 0;
+        if (range === '1-10') return debt * 0.005;
+        if (range === '11-20') return debt * 0.01;
+        if (range === '>20') return debt * 0.02;
+        return 0;
+      }
+
+      function calculateMotivation() {
+        const planTurnover = n('planTurnover');
+        const planPercent = n('planPercent');
+        const crmCalls = n('crmCalls');
+        const crmMeets = n('crmMeets');
+        const avgDiscount = n('avgDiscount');
+        const avgDelayFact = n('avgDelayFact');
+        const overdueDebt = n('overdueDebt');
+        const dcTurnover = n('dcTurnover');
+        const tiresOver = Math.max(0, n('tiresOver'));
+        const jokerBase = n('jokerBase');
+
+        const tpBonus = planTurnover < 50000 ? 10000 : planTurnover > 150000 ? 25000 : 20000;
+        const crmBonus = (crmCalls >= 20 || crmMeets >= 5) ? 10000 : 0;
+        const planBonusBase = planBonusByPercent(planPercent);
+        const discountAdjustment = avgDiscount >= 27.5 ? -planBonusBase * 0.5 : 0;
+        const planBonusFinal = planBonusBase + discountAdjustment;
+        const delayBonus = avgDelayFact <= 7 ? 6000 : avgDelayFact <= 14 ? 3000 : 0;
+        const overdueFine = overduePenalty(overdueDebt, overdueRange.value);
+
+        const tiresBlock = (tiresMinMet.checked ? 0 : -5000) + tiresOver * 300;
+        let groupCount = 0;
+        const groupLines = groups.map((g) => {
+          const checked = document.querySelector(`input[data-group="${g.key}"]`).checked;
+          const value = checked ? dcTurnover * g.pct : 0;
+          if (checked) groupCount += 1;
+          return { label: `ГТ ДЦ: ${g.name}`, value };
         });
-      });
+        const groupsSum = groupLines.reduce((s, x) => s + x.value, 0);
+        const jokerBonus = jokerDone.checked ? jokerBase * 0.09 : 0;
+        const groupsCountBonus = groupCountBonus(groupCount);
 
-      clearBtn.addEventListener('click', function () {
-        debtInput.value = '';
-        turnoverInput.value = '';
-        daysInput.value = '';
-        exampleInputs.forEach(function (input) {
-          input.classList.remove('is-example');
+        const monthly = tpBonus + crmBonus + planBonusFinal + delayBonus - overdueFine;
+        const total = monthly + tiresBlock + groupsSum + jokerBonus + groupsCountBonus;
+
+        const lines = [
+          ['Бонус ТП', tpBonus],
+          ['Бонус CRM', crmBonus],
+          ['Бонус за виконання плану (база)', planBonusBase],
+          ['Коригування за середню знижку', discountAdjustment],
+          ['Бонус за середнє відтермінування', delayBonus],
+          ['Штраф за прострочку', -overdueFine],
+          ['Квартальний блок шин', tiresBlock],
+          ...groupLines.map((x) => [x.label, x.value]),
+          ['Joker/Profit бонус', jokerBonus],
+          [`Бонус за кількість виконаних груп (${groupCount})`, groupsCountBonus],
+          ['Проміжний підсумок (місяць)', monthly]
+        ];
+
+        breakdownBody.innerHTML = lines.map((l) => `<tr><td>${l[0]}</td><td class="mono">${money(l[1])}</td></tr>`).join('');
+        totalEl.textContent = money(total);
+
+        return { total, lines };
+      }
+
+      function copyMotivationText() {
+        const rows = Array.from(breakdownBody.querySelectorAll('tr')).map((tr) => {
+          const tds = tr.querySelectorAll('td');
+          return `${tds[0].textContent}: ${tds[1].textContent}`;
         });
-        coefOut.textContent = 'Коефіцієнт: —';
-        daysOut.textContent = 'Середнє відтермінування: —';
-        lastResult = '';
-        setStatus('Поля очищено.', 'ok');
-        debtInput.focus();
+        return ['Розрахунок мотивації', ...rows, `Загальна мотивація: ${totalEl.textContent}`].join('\n');
+      }
+
+      function recalcAll() { calculateMotivation(); setMStatus('Розрахунок мотивації оновлено.', 'ok'); }
+      recalcMotivation.addEventListener('click', recalcAll);
+      Object.values(mInputs).forEach((el) => el.addEventListener('input', calculateMotivation));
+      document.querySelectorAll('[data-group], #tiresMinMet, #jokerDone, #overdueRange').forEach((el) => el.addEventListener('change', calculateMotivation));
+
+      copyMotivation.addEventListener('click', async function () {
+        try { await navigator.clipboard.writeText(copyMotivationText()); setMStatus('Розрахунок мотивації скопійовано.', 'ok'); }
+        catch (_) { setMStatus('Не вдалося скопіювати автоматично. Скопіюйте вручну.', 'error'); }
       });
 
-      copyBtn.addEventListener('click', async function () {
-        if (!lastResult) {
-          setStatus('Немає результату для копіювання. Спочатку виконайте розрахунок.', 'error');
-          return;
-        }
-
-        try {
-          await navigator.clipboard.writeText(lastResult);
-          setStatus('Результат скопійовано в буфер обміну.', 'ok');
-        } catch (error) {
-          setStatus('Не вдалося скопіювати автоматично. Скопіюйте текст вручну.', 'error');
-        }
+      clearAll.addEventListener('click', function () {
+        debtInput.value = '58617'; turnoverInput.value = '155775'; daysInput.value = '31';
+        exampleInputs.forEach((i) => refreshExampleState(i));
+        Object.values(mInputs).forEach((el) => { el.value = '0'; });
+        tiresMinMet.checked = true; jokerDone.checked = false; overdueRange.value = '0';
+        document.querySelectorAll('[data-group]').forEach((cb) => { cb.checked = false; });
+        calculate(); calculateMotivation(); setMStatus('Усі поля очищено.', 'ok');
       });
 
       exampleInputs.forEach(refreshExampleState);
-      calculate();
+      calculate(); calculateMotivation();
     })();
   </script>
 </body>
