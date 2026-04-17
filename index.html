@@ -51,17 +51,35 @@
       box-shadow: 0 10px 25px rgba(10, 28, 51, 0.25);
     }
 
-    .brand-badge {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
-      display: grid;
-      place-items: center;
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 10px 4px 4px;
+      border-radius: 11px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .brand-logo svg {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 auto;
+      border-radius: 9px;
       background: var(--cp-yellow);
-      color: var(--cp-dark);
+      padding: 6px;
+    }
+
+    .brand-logo-words {
+      line-height: 1.05;
       font-weight: 800;
-      font-size: 1.1rem;
-      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-size: 0.72rem;
+    }
+
+    .brand-logo-words span {
+      display: block;
     }
 
     .brand p {
@@ -138,6 +156,14 @@
       background: #fff;
       outline: none;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input.is-example {
+      color: rgba(17, 37, 63, 0.52);
+    }
+
+    input.is-example:focus {
+      color: rgba(17, 37, 63, 0.72);
     }
 
     input:focus {
@@ -247,7 +273,18 @@
 <body>
   <main class="page">
     <header class="brand" aria-label="Стиль Cargo Parts">
-      <div class="brand-badge">CP</div>
+      <div class="brand-logo" aria-label="Cargo Parts logo">
+        <svg viewBox="0 0 64 64" role="img" aria-hidden="true">
+          <circle cx="32" cy="32" r="17" fill="#0f223d"></circle>
+          <circle cx="32" cy="32" r="7" fill="#ffc107"></circle>
+          <path d="M32 6v11M32 47v11M6 32h11M47 32h11M13 13l8 8M43 43l8 8M13 51l8-8M43 21l8-8"
+            stroke="#0f223d" stroke-width="4" stroke-linecap="round"></path>
+        </svg>
+        <div class="brand-logo-words">
+          <span>Cargo</span>
+          <span>Parts</span>
+        </div>
+      </div>
       <div>
         <h1>Калькулятор середнього відтермінування</h1>
         <p>UI у стилі Cargo Parts: темно-синя база + жовті акценти.</p>
@@ -265,15 +302,15 @@
           <div class="fields">
             <div class="field">
               <label for="debt">Борг</label>
-              <input id="debt" name="debt" type="number" min="0" step="any" value="58617" inputmode="decimal" required />
+              <input id="debt" name="debt" type="number" min="0" step="any" value="58617" data-example="58617" class="is-example" inputmode="decimal" required />
             </div>
             <div class="field">
               <label for="turnover">Сума оборота</label>
-              <input id="turnover" name="turnover" type="number" min="0" step="any" value="155775" inputmode="decimal" required />
+              <input id="turnover" name="turnover" type="number" min="0" step="any" value="155775" data-example="155775" class="is-example" inputmode="decimal" required />
             </div>
             <div class="field">
               <label for="days">Кількість днів</label>
-              <input id="days" name="days" type="number" min="1" step="1" value="31" inputmode="numeric" required />
+              <input id="days" name="days" type="number" min="1" step="1" value="31" data-example="31" class="is-example" inputmode="numeric" required />
             </div>
           </div>
 
@@ -312,6 +349,7 @@
       const status = document.getElementById('status');
       const clearBtn = document.getElementById('clearBtn');
       const copyBtn = document.getElementById('copyBtn');
+      const exampleInputs = [debtInput, turnoverInput, daysInput];
 
       let lastResult = '';
 
@@ -322,6 +360,11 @@
 
       function parseNumber(value) {
         return Number(String(value).replace(',', '.'));
+      }
+
+      function refreshExampleState(input) {
+        const isExample = input.dataset.example && input.value.trim() === input.dataset.example;
+        input.classList.toggle('is-example', Boolean(isExample));
       }
 
       function validate(debt, turnover, days) {
@@ -388,10 +431,19 @@
         }
       });
 
+      exampleInputs.forEach(function (input) {
+        input.addEventListener('input', function () {
+          refreshExampleState(input);
+        });
+      });
+
       clearBtn.addEventListener('click', function () {
         debtInput.value = '';
         turnoverInput.value = '';
         daysInput.value = '';
+        exampleInputs.forEach(function (input) {
+          input.classList.remove('is-example');
+        });
         coefOut.textContent = 'Коефіцієнт: —';
         daysOut.textContent = 'Середнє відтермінування: —';
         lastResult = '';
@@ -413,6 +465,7 @@
         }
       });
 
+      exampleInputs.forEach(refreshExampleState);
       calculate();
     })();
   </script>
