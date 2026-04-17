@@ -6,43 +6,33 @@
   <title>Калькулятори | Cargo Parts</title>
   <style>
     :root {
-      --bg: #eef1f5;
-      --panel: #fff;
-      --header: #102741;
-      --header-border: #0b1d30;
-      --text: #15263d;
-      --muted: #58687f;
-      --line: #cfd7e3;
-      --line-strong: #bbc6d7;
-      --accent: #ffc400;
-      --accent-hover: #efb800;
-      --focus: #2e5e98;
-      --ok: #1f7f43;
-      --error: #c53535;
-      --radius: 8px;
+      --bg: #eef1f5; --panel: #fff; --header: #102741; --header-border: #0b1d30; --text: #15263d;
+      --muted: #58687f; --line: #cfd7e3; --line-strong: #bbc6d7; --accent: #ffc400; --accent-hover: #efb800;
+      --focus: #2e5e98; --ok: #1f7f43; --error: #c53535; --radius: 8px;
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: "Segoe UI", Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); }
     .topbar { background: var(--header); color: #fff; border-bottom: 1px solid var(--header-border); }
-    .topbar-inner { width: min(1200px, 100%); margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
+    .topbar-inner { width: min(1240px, 100%); margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
     .logo-mark { width: 34px; height: 34px; border-radius: 6px; background: var(--accent); display: grid; place-items: center; color: #0f223a; }
     .logo-mark svg { width: 20px; height: 20px; }
     .logo-text { font-weight: 800; text-transform: uppercase; letter-spacing: .4px; line-height: 1; font-size: .75rem; }
-    .page { width: min(1200px, 100%); margin: 0 auto; padding: 16px; display: grid; gap: 14px; }
+    .page { width: min(1240px, 100%); margin: 0 auto; padding: 16px; display: grid; gap: 14px; }
     .screen { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
     .screen-head { padding: 12px 14px; border-bottom: 1px solid var(--line); background: #f9fafc; }
     .screen-head h1,.screen-head h2 { margin: 0; font-size: 1.1rem; }
     .screen-head p { margin: 6px 0 0; color: var(--muted); font-size: .86rem; }
-    .workspace { display: grid; grid-template-columns: minmax(0,2fr) minmax(280px,1fr); }
+    .workspace { display: grid; grid-template-columns: minmax(0,2fr) minmax(300px,1fr); }
     .form-col,.result-col { padding: 14px; }
     .form-col { border-right: 1px solid var(--line); }
     .result-col { background: #fcfdff; }
     .section-grid { display: grid; gap: 12px; }
     .fields-3 { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
     .fields-2 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+    .fields-4 { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; }
     .field { display: grid; gap: 6px; }
     label { font-size: .84rem; font-weight: 700; color: #1c3150; }
-    input, select { width: 100%; min-height: 42px; border: 1px solid var(--line-strong); border-radius: 7px; padding: 9px 11px; font-size: .97rem; color: var(--text); background: #fff; outline: none; }
+    input, select { width: 100%; min-height: 40px; border: 1px solid var(--line-strong); border-radius: 7px; padding: 8px 10px; font-size: .94rem; color: var(--text); background: #fff; outline: none; }
     input:focus, select:focus { border-color: var(--focus); box-shadow: 0 0 0 3px rgba(46,94,152,.14); }
     input.is-example { color: rgba(21,38,61,.54); }
     .hint { margin: 0; padding: 9px 11px; border: 1px solid var(--line); border-radius: 7px; font-size: .81rem; color: #39506f; background: #f7f9fc; line-height: 1.4; }
@@ -52,311 +42,304 @@
     .btn-primary:hover { background: var(--accent-hover); }
     .btn-secondary { background: #eef2f7; color: #203751; border-color: #d4dce8; }
     .btn-secondary:hover { background: #e4eaf2; }
-    .result-box { border: 1px solid var(--line); border-radius: 7px; background: #fff; padding: 12px; display: grid; gap: 8px; }
-    .result-title { margin: 0; font-size: .93rem; font-weight: 800; text-transform: uppercase; letter-spacing: .3px; }
+    .result-box,.card { border: 1px solid var(--line); border-radius: 7px; background: #fff; padding: 12px; display: grid; gap: 8px; }
+    .result-title,.card h3 { margin: 0; font-size: .93rem; font-weight: 800; text-transform: uppercase; letter-spacing: .3px; }
     .result-line { margin: 0; font-size: .93rem; }
     .status { min-height: 18px; font-size: .84rem; font-weight: 600; margin: 0; }
     .status.ok { color: var(--ok); } .status.error { color: var(--error); }
     .example { margin: 10px 0 0; color: var(--muted); font-size: .8rem; }
-
     .motivation-body { padding: 14px; display: grid; gap: 12px; }
     .cards { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
-    .card { border: 1px solid var(--line); border-radius: 7px; background: #fff; padding: 12px; display: grid; gap: 10px; }
-    .card h3 { margin: 0; font-size: .95rem; }
-    .subtle { color: var(--muted); font-size: .8rem; margin: -4px 0 0; }
-    .group-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px 12px; }
-    .check { display: flex; gap: 8px; align-items: center; font-size: .84rem; }
+    .check { display: flex; align-items: center; gap: 8px; font-size: .84rem; }
     .check input { width: 16px; height: 16px; min-height: auto; }
     .table { width: 100%; border-collapse: collapse; font-size: .84rem; }
-    .table th,.table td { border-bottom: 1px solid var(--line); padding: 6px 4px; text-align: left; vertical-align: top; }
-    .table th:last-child,.table td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
-    .summary-total { border: 1px solid var(--line); border-radius: 7px; padding: 10px 12px; background: #f7f9fc; display: flex; justify-content: space-between; font-weight: 800; }
+    .table th,.table td { border-bottom: 1px solid var(--line); padding: 6px 4px; text-align: left; }
+    .table th { background: #f7f9fc; position: sticky; top: 0; }
+    .table td:last-child,.table th:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+    .table-wrap { overflow: auto; max-height: 380px; border: 1px solid var(--line); border-radius: 7px; }
+    .pill-ok,.pill-no { padding: 2px 6px; border-radius: 999px; font-size: .75rem; font-weight: 700; }
+    .pill-ok { background: #e8f5ec; color: #1f7f43; }
+    .pill-no { background: #fdeeee; color: #b23939; }
+    .summary-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
+    .summary-item { border: 1px solid var(--line); border-radius: 7px; background: #fff; padding: 10px; }
+    .summary-item h4 { margin: 0 0 8px; font-size: .88rem; text-transform: uppercase; }
+    .mini-table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+    .mini-table td { border-bottom: 1px solid var(--line); padding: 5px 0; }
+    .mini-table td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+    .total { margin-top: 6px; display: flex; justify-content: space-between; font-weight: 800; }
     .mono { font-variant-numeric: tabular-nums; }
-
-    @media (max-width: 1024px) { .workspace { grid-template-columns: 1fr; } .form-col { border-right: 0; border-bottom: 1px solid var(--line);} .cards { grid-template-columns: 1fr; } }
-    @media (max-width: 760px) { .fields-3,.fields-2,.group-grid { grid-template-columns: 1fr; } .actions { display: grid; grid-template-columns: 1fr; } .btn { width: 100%; } }
+    @media (max-width: 1080px){ .workspace,.cards,.summary-grid { grid-template-columns: 1fr; } .form-col { border-right: 0; border-bottom: 1px solid var(--line);} }
+    @media (max-width: 760px){ .fields-2,.fields-3,.fields-4 { grid-template-columns: 1fr; } .actions { display:grid; grid-template-columns:1fr; } .btn { width:100%; } }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="logo-mark" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="11" fill="#0f223a"></circle><path d="M32 7v10M32 47v10M7 32h10M47 32h10M14 14l7 7M43 43l7 7M14 50l7-7M43 21l7-7" stroke="#0f223a" stroke-width="4" stroke-linecap="round"></path></svg></div>
-      <div class="logo-text">Cargo<br>Parts</div>
-    </div>
-  </header>
-
-  <main class="page">
-    <section class="screen" aria-labelledby="delayTitle">
-      <div class="screen-head"><h1 id="delayTitle">Калькулятор середнього відтермінування</h1><p>Базовий розрахунок коефіцієнта і строку відтермінування.</p></div>
-      <div class="workspace">
-        <div class="form-col">
-          <form id="calcForm" class="section-grid" novalidate>
-            <div class="fields-3">
-              <div class="field"><label for="debt">Борг</label><input id="debt" type="number" value="58617" data-example="58617" class="is-example" /></div>
-              <div class="field"><label for="turnover">Сума оборота</label><input id="turnover" type="number" value="155775" data-example="155775" class="is-example" /></div>
-              <div class="field"><label for="days">Кількість днів</label><input id="days" type="number" value="31" data-example="31" class="is-example" /></div>
-            </div>
-            <p class="hint">Формула: <strong>коефіцієнт = борг / сума оборота</strong>, <strong>дні відтермінування = коефіцієнт × кількість днів у місяці</strong>.</p>
-            <div class="actions">
-              <button type="submit" class="btn btn-primary">Розрахувати</button>
-              <button type="button" id="clearBtn" class="btn btn-secondary">Очистити</button>
-              <button type="button" id="copyBtn" class="btn btn-secondary">Скопіювати результат</button>
-            </div>
-          </form>
-        </div>
-        <aside class="result-col" aria-live="polite" aria-atomic="true">
-          <section class="result-box">
-            <h2 class="result-title">Результат</h2>
-            <p id="coefOut" class="result-line">Коефіцієнт: —</p>
-            <p id="daysOut" class="result-line">Середнє відтермінування: —</p>
-            <p id="status" class="status" role="status"></p>
-          </section>
-          <p class="example">Приклад: борг 58 617, оборот 155 775, днів 31 → 0.3763 та 11.67 днів.</p>
-        </aside>
+<header class="topbar"><div class="topbar-inner"><div class="logo-mark" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="11" fill="#0f223a"></circle><path d="M32 7v10M32 47v10M7 32h10M47 32h10M14 14l7 7M43 43l7 7M14 50l7-7M43 21l7-7" stroke="#0f223a" stroke-width="4" stroke-linecap="round"></path></svg></div><div class="logo-text">Cargo<br>Parts</div></div></header>
+<main class="page">
+  <section class="screen" aria-labelledby="delayTitle">
+    <div class="screen-head"><h1 id="delayTitle">Калькулятор середнього відтермінування</h1><p>Базовий розрахунок коефіцієнта і строку відтермінування.</p></div>
+    <div class="workspace">
+      <div class="form-col">
+        <form id="calcForm" class="section-grid" novalidate>
+          <div class="fields-3">
+            <div class="field"><label for="debt">Борг</label><input id="debt" type="number" value="58617" data-example="58617" class="is-example" /></div>
+            <div class="field"><label for="turnover">Сума оборота</label><input id="turnover" type="number" value="155775" data-example="155775" class="is-example" /></div>
+            <div class="field"><label for="days">Кількість днів</label><input id="days" type="number" value="31" data-example="31" class="is-example" /></div>
+          </div>
+          <p class="hint">Формула: <strong>коефіцієнт = борг / сума оборота</strong>, <strong>дні відтермінування = коефіцієнт × кількість днів у місяці</strong>.</p>
+          <div class="actions"><button type="submit" class="btn btn-primary">Розрахувати</button><button type="button" id="clearBtn" class="btn btn-secondary">Очистити</button><button type="button" id="copyBtn" class="btn btn-secondary">Скопіювати результат</button></div>
+        </form>
       </div>
-    </section>
+      <aside class="result-col" aria-live="polite" aria-atomic="true"><section class="result-box"><h2 class="result-title">Результат</h2><p id="coefOut" class="result-line">Коефіцієнт: —</p><p id="daysOut" class="result-line">Середнє відтермінування: —</p><p id="status" class="status" role="status"></p></section><p class="example">Приклад: борг 58 617, оборот 155 775, днів 31 → 0.3763 та 11.67 днів.</p></aside>
+    </div>
+  </section>
 
-    <section class="screen" aria-labelledby="motivationTitle">
-      <div class="screen-head"><h2 id="motivationTitle">Розрахунок мотивації / ЗП</h2><p>Місячний + квартальний блоки з детальною розшифровкою.</p></div>
-      <div class="motivation-body">
-        <div class="cards">
-          <section class="card">
-            <h3>Місячна мотивація</h3>
-            <div class="fields-2">
-              <div class="field"><label for="planTurnover">Плановий оборот</label><input id="planTurnover" type="number" value="0" /></div>
-              <div class="field"><label for="planPercent">Виконання плану продажів, %</label><input id="planPercent" type="number" value="0" /></div>
-              <div class="field"><label for="crmCalls">CRM: дзвінки</label><input id="crmCalls" type="number" value="0" /></div>
-              <div class="field"><label for="crmMeets">CRM: зустрічі</label><input id="crmMeets" type="number" value="0" /></div>
-              <div class="field"><label for="avgDiscount">Середня знижка, %</label><input id="avgDiscount" type="number" value="0" step="0.1" /></div>
-              <div class="field"><label for="avgDelayFact">Середнє відтермінування (факт), днів</label><input id="avgDelayFact" type="number" value="0" step="0.01" /></div>
-              <div class="field"><label for="overdueDebt">Прострочений борг</label><input id="overdueDebt" type="number" value="0" /></div>
-              <div class="field"><label for="overdueRange">Діапазон прострочки</label><select id="overdueRange"><option value="0">Немає</option><option value="1-10">1–10 днів</option><option value="11-20">11–20 днів</option><option value=">20">Понад 20 днів</option></select></div>
-            </div>
-          </section>
-
-          <section class="card">
-            <h3>Квартальна мотивація</h3>
-            <div class="fields-2">
-              <div class="field"><label for="dcTurnover">Оборот по клієнтах ДЦ (квартал)</label><input id="dcTurnover" type="number" value="0" /></div>
-              <div class="field"><label for="tiresOver">Шин понад мінімальний план, шт</label><input id="tiresOver" type="number" value="0" /></div>
-              <label class="check"><input id="tiresMinMet" type="checkbox" checked /> Мінімальний план шин виконано</label>
-              <label class="check"><input id="jokerDone" type="checkbox" /> Joker / Profit виконано</label>
-              <div class="field"><label for="jokerBase">База Joker / Profit</label><input id="jokerBase" type="number" value="0" /></div>
-            </div>
-            <p class="subtle">Для Joker/Profit використовується ручна база, бонус = 9% при активному чекбоксі.</p>
-            <div>
-              <strong style="font-size:.86rem;">Групи ГТ ДЦ (95%+)</strong>
-              <div id="groupContainer" class="group-grid"></div>
-            </div>
-          </section>
-        </div>
+  <section class="screen" aria-labelledby="motivationTitle">
+    <div class="screen-head"><h2 id="motivationTitle">Розрахунок мотивації / ЗП</h2><p>Окремо: місячна мотивація, квартальний бонус, загальний підсумок.</p></div>
+    <div class="motivation-body">
+      <div class="cards">
+        <section class="card">
+          <h3>Місячна мотивація</h3>
+          <div class="fields-3">
+            <div class="field"><label for="planTurnover">Плановий оборот</label><input id="planTurnover" type="number" value="0" /></div>
+            <div class="field"><label for="planPercent">Виконання плану продажів, %</label><input id="planPercent" type="number" value="0" min="0" max="200" /></div>
+            <div class="field"><label for="avgDiscount">Середня знижка, %</label><input id="avgDiscount" type="number" value="0" step="0.1" /></div>
+            <div class="field"><label for="avgDelayFact">Середнє відтермінування (факт), днів</label><input id="avgDelayFact" type="number" value="0" step="0.1" /></div>
+            <div class="field"><label for="overdue1">Прострочка 1–10 днів (EUR)</label><input id="overdue1" type="number" value="0" /></div>
+            <div class="field"><label for="overdue2">Прострочка 11–20 днів (EUR)</label><input id="overdue2" type="number" value="0" /></div>
+            <div class="field"><label for="overdue3">Прострочка 20+ днів (EUR)</label><input id="overdue3" type="number" value="0" /></div>
+            <div class="field"><label for="eurRate">Курс EUR → бонусна валюта</label><input id="eurRate" type="number" value="45" step="0.01" /></div>
+            <div class="field"><label>&nbsp;</label><button type="button" id="refreshRate" class="btn btn-secondary">Оновити курс</button></div>
+          </div>
+          <label class="check"><input id="crmDone" type="checkbox" /> CRM виконано на 100% (20 дзвінків або 5 зустрічей)</label>
+          <p id="rateStatus" class="status"></p>
+        </section>
 
         <section class="card">
-          <h3>Підсумок та розшифровка</h3>
-          <table class="table" id="breakdownTable">
-            <tbody></tbody>
-          </table>
-          <div class="summary-total"><span>Загальна мотивація</span><span id="motivationTotal" class="mono">0 ₴</span></div>
-          <div class="actions">
-            <button type="button" id="recalcMotivation" class="btn btn-primary">Перерахувати мотивацію</button>
-            <button type="button" id="copyMotivation" class="btn btn-secondary">Скопіювати розрахунок</button>
-            <button type="button" id="clearAll" class="btn btn-secondary">Очистити все</button>
+          <h3>Квартальна мотивація</h3>
+          <div class="fields-2">
+            <label class="check"><input id="tiresMinMet" type="checkbox" checked /> Мінімальний план шин виконано</label>
+            <div class="field"><label for="tiresOver">Шин понад мінімальний план, шт</label><input id="tiresOver" type="number" value="0" /></div>
           </div>
-          <p id="motivationStatus" class="status" role="status"></p>
+          <div class="table-wrap">
+            <table class="table" id="groupsTable"><thead><tr><th>Група</th><th>М1 %</th><th>М2 %</th><th>М3 %</th><th>Середнє</th><th>Статус</th></tr></thead><tbody></tbody></table>
+          </div>
         </section>
       </div>
-    </section>
-  </main>
 
-  <script>
-    (function () {
-      const groups = [
-        { key: 'autoChem', name: 'АВТОХІМІЯ І ОЛИВИ', pct: 0.10 },
-        { key: 'amort', name: 'АМОРТИЗАЦІЯ', pct: 0.04 },
-        { key: 'brake', name: 'ГАЛЬМІВНА СИСТЕМА', pct: 0.10 },
-        { key: 'engine', name: 'ДВИГУН', pct: 0.10 },
-        { key: 'electric', name: 'ЕЛЕКТРИКА', pct: 0.06 },
-        { key: 'cooling', name: 'ОХОЛОДЖЕННЯ', pct: 0.04 },
-        { key: 'susp', name: 'ПІДВІСКА', pct: 0.11 },
-        { key: 'pneuma', name: 'ПНЕВМАТИКА', pct: 0.09 },
-        { key: 'clutch', name: 'СИСТЕМА ЗЧЕПЛЕННЯ', pct: 0.06 },
-        { key: 'trans', name: 'ТРАНСМІСІЯ', pct: 0.04 },
-        { key: 'filter', name: 'ФІЛЬТР', pct: 0.09 }
-      ];
+      <section class="card">
+        <h3>Підсумки</h3>
+        <div class="summary-grid">
+          <div class="summary-item"><h4>Місячна мотивація</h4><table class="mini-table" id="monthlyBreakdown"></table><div class="total"><span>Підсумок місяця</span><span id="monthTotal" class="mono">0 ₴</span></div></div>
+          <div class="summary-item"><h4>Квартальний бонус</h4><table class="mini-table" id="quarterBreakdown"></table><div class="total"><span>Підсумок кварталу</span><span id="quarterTotal" class="mono">0 ₴</span></div></div>
+          <div class="summary-item"><h4>Загальний підсумок</h4><table class="mini-table" id="totalBreakdown"></table><div class="total"><span>Загальна сума</span><span id="allTotal" class="mono">0 ₴</span></div></div>
+        </div>
+        <div class="actions"><button type="button" id="recalcMotivation" class="btn btn-primary">Перерахувати</button><button type="button" id="copyMotivation" class="btn btn-secondary">Скопіювати розрахунок</button><button type="button" id="clearAll" class="btn btn-secondary">Очистити все</button></div>
+        <p id="motivationStatus" class="status"></p>
+      </section>
+    </div>
+  </section>
+</main>
 
-      const groupContainer = document.getElementById('groupContainer');
-      groups.forEach((g) => {
-        const label = document.createElement('label');
-        label.className = 'check';
-        label.innerHTML = `<input type="checkbox" data-group="${g.key}" /> ${g.name} (${Math.round(g.pct * 100)}%)`;
-        groupContainer.appendChild(label);
-      });
+<script>
+(function () {
+  const groupNames = ['АВТОХІМІЯ І ОЛИВИ','АМОРТИЗАЦІЯ','ГАЛЬМІВНА СИСТЕМА','ДВИГУН','ЕЛЕКТРИКА','ОХОЛОДЖЕННЯ','ПІДВІСКА','ПНЕВМАТИКА','СИСТЕМА ЗЧЕПЛЕННЯ','ТРАНСМІСІЯ','ФІЛЬТР','PROFIT / JOKER'];
+  const groupsBody = document.querySelector('#groupsTable tbody');
+  groupNames.forEach((name, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${name}</td>
+      <td><input type="number" min="0" max="200" step="0.1" data-g="${i}" data-m="1" value="0"></td>
+      <td><input type="number" min="0" max="200" step="0.1" data-g="${i}" data-m="2" value="0"></td>
+      <td><input type="number" min="0" max="200" step="0.1" data-g="${i}" data-m="3" value="0"></td>
+      <td class="mono" data-avg="${i}">0.00%</td>
+      <td data-ok="${i}"><span class="pill-no">Не виконано</span></td>`;
+    groupsBody.appendChild(tr);
+  });
 
-      const form = document.getElementById('calcForm');
-      const debtInput = document.getElementById('debt');
-      const turnoverInput = document.getElementById('turnover');
-      const daysInput = document.getElementById('days');
-      const coefOut = document.getElementById('coefOut');
-      const daysOut = document.getElementById('daysOut');
-      const status = document.getElementById('status');
-      const clearBtn = document.getElementById('clearBtn');
-      const copyBtn = document.getElementById('copyBtn');
-      const exampleInputs = [debtInput, turnoverInput, daysInput];
-      let lastResult = '';
+  const byId = (id) => document.getElementById(id);
+  const money = (v) => `${new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(v)} ₴`;
+  const eur = (v) => `${new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(v)} EUR`;
+  const num = (id) => { const v = parseFloat(byId(id).value); return Number.isFinite(v) ? v : 0; };
+  const clamp = (n,min,max) => Math.max(min, Math.min(max, n));
 
-      function setStatus(message, type) { status.textContent = message || ''; status.className = 'status' + (type ? ' ' + type : ''); }
-      function parseNumber(value) { return Number(String(value).replace(',', '.')); }
-      function refreshExampleState(input) { input.classList.toggle('is-example', Boolean(input.dataset.example && input.value.trim() === input.dataset.example)); }
-      function validate(debt, turnover, days) {
-        if ([debt, turnover, days].some((v) => Number.isNaN(v))) return 'Будь ласка, заповніть усі поля коректними числами.';
-        if (turnover === 0) return 'Сума оборота не може дорівнювати нулю (ділення на нуль неможливе).';
-        if (days <= 0) return 'Кількість днів має бути більшою за нуль.';
-        if (debt < 0 || turnover < 0) return 'Борг і сума оборота не можуть бути відʼємними.';
-        return '';
-      }
-      function calculate() {
-        const debtValue = debtInput.value.trim(); const turnoverValue = turnoverInput.value.trim(); const daysValue = daysInput.value.trim();
-        if (!debtValue || !turnoverValue || !daysValue) { coefOut.textContent = 'Коефіцієнт: —'; daysOut.textContent = 'Середнє відтермінування: —'; setStatus('Будь ласка, заповніть усі поля.', 'error'); return; }
-        const debt = parseNumber(debtValue); const turnover = parseNumber(turnoverValue); const days = parseNumber(daysValue);
-        const error = validate(debt, turnover, days);
-        if (error) { coefOut.textContent = 'Коефіцієнт: —'; daysOut.textContent = 'Середнє відтермінування: —'; setStatus(error, 'error'); return; }
-        const coefficient = debt / turnover; const delayDays = coefficient * days;
-        const coefficientText = coefficient.toFixed(4); const delayDaysText = delayDays.toFixed(2);
-        coefOut.textContent = `Коефіцієнт: ${coefficientText}`; daysOut.textContent = `Середнє відтермінування: ${delayDaysText} днів`;
-        lastResult = `Коефіцієнт: ${coefficientText}\nСереднє відтермінування: ${delayDaysText} днів`; setStatus('Розрахунок виконано успішно.', 'ok');
-      }
+  // Delay calculator (existing)
+  const form = byId('calcForm'), debtInput = byId('debt'), turnoverInput = byId('turnover'), daysInput = byId('days');
+  const coefOut = byId('coefOut'), daysOut = byId('daysOut'), status = byId('status'), clearBtn = byId('clearBtn'), copyBtn = byId('copyBtn');
+  const exampleInputs = [debtInput, turnoverInput, daysInput];
+  let lastResult = '';
+  function setStatus(msg, type){ status.textContent = msg || ''; status.className = 'status' + (type ? ' ' + type : ''); }
+  function parseNumber(v){ return Number(String(v).replace(',', '.')); }
+  function refreshExampleState(input){ input.classList.toggle('is-example', Boolean(input.dataset.example && input.value.trim() === input.dataset.example)); }
+  function calculateDelay(){
+    const debt = parseNumber(debtInput.value.trim()), turnover = parseNumber(turnoverInput.value.trim()), days = parseNumber(daysInput.value.trim());
+    if (!debtInput.value.trim() || !turnoverInput.value.trim() || !daysInput.value.trim()) return setStatus('Будь ласка, заповніть усі поля.', 'error');
+    if ([debt, turnover, days].some(Number.isNaN) || turnover === 0 || days <= 0 || debt < 0 || turnover < 0) { coefOut.textContent='Коефіцієнт: —'; daysOut.textContent='Середнє відтермінування: —'; return setStatus('Перевірте значення полів.', 'error'); }
+    const c = debt / turnover, d = c * days;
+    coefOut.textContent = `Коефіцієнт: ${c.toFixed(4)}`; daysOut.textContent = `Середнє відтермінування: ${d.toFixed(2)} днів`;
+    lastResult = `${coefOut.textContent}\n${daysOut.textContent}`; setStatus('Розрахунок виконано успішно.', 'ok');
+  }
+  form.addEventListener('submit', (e)=>{ e.preventDefault(); calculateDelay(); });
+  form.addEventListener('keydown', (e)=>{ if (e.key==='Enter'){ e.preventDefault(); calculateDelay(); }});
+  exampleInputs.forEach((i)=>i.addEventListener('input', ()=>refreshExampleState(i)));
+  clearBtn.addEventListener('click', ()=>{ debtInput.value=''; turnoverInput.value=''; daysInput.value=''; exampleInputs.forEach(i=>i.classList.remove('is-example')); coefOut.textContent='Коефіцієнт: —'; daysOut.textContent='Середнє відтермінування: —'; setStatus('Поля очищено.','ok'); });
+  copyBtn.addEventListener('click', async ()=>{ if(!lastResult) return setStatus('Немає результату для копіювання.','error'); try{ await navigator.clipboard.writeText(lastResult); setStatus('Результат скопійовано.','ok'); } catch { setStatus('Не вдалося скопіювати.', 'error'); }});
 
-      form.addEventListener('submit', (e) => { e.preventDefault(); calculate(); });
-      form.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); calculate(); } });
-      exampleInputs.forEach((input) => input.addEventListener('input', () => refreshExampleState(input)));
-      clearBtn.addEventListener('click', function () { debtInput.value = ''; turnoverInput.value = ''; daysInput.value = ''; exampleInputs.forEach((i) => i.classList.remove('is-example')); coefOut.textContent = 'Коефіцієнт: —'; daysOut.textContent = 'Середнє відтермінування: —'; lastResult = ''; setStatus('Поля очищено.', 'ok'); debtInput.focus(); });
-      copyBtn.addEventListener('click', async function () { if (!lastResult) return setStatus('Немає результату для копіювання. Спочатку виконайте розрахунок.', 'error'); try { await navigator.clipboard.writeText(lastResult); setStatus('Результат скопійовано в буфер обміну.', 'ok'); } catch (_) { setStatus('Не вдалося скопіювати автоматично. Скопіюйте текст вручну.', 'error'); } });
+  // Motivation calculator
+  const monthlyTable = byId('monthlyBreakdown'), quarterTable = byId('quarterBreakdown'), totalTable = byId('totalBreakdown');
+  const monthTotalEl = byId('monthTotal'), quarterTotalEl = byId('quarterTotal'), allTotalEl = byId('allTotal');
+  const motivationStatus = byId('motivationStatus'), rateStatus = byId('rateStatus');
 
-      const mIds = ['planTurnover','planPercent','crmCalls','crmMeets','avgDiscount','avgDelayFact','overdueDebt','dcTurnover','tiresOver','jokerBase'];
-      const mInputs = Object.fromEntries(mIds.map((id) => [id, document.getElementById(id)]));
-      const tiresMinMet = document.getElementById('tiresMinMet');
-      const jokerDone = document.getElementById('jokerDone');
-      const overdueRange = document.getElementById('overdueRange');
-      const breakdownBody = document.querySelector('#breakdownTable tbody');
-      const totalEl = document.getElementById('motivationTotal');
-      const motivationStatus = document.getElementById('motivationStatus');
-      const copyMotivation = document.getElementById('copyMotivation');
-      const recalcMotivation = document.getElementById('recalcMotivation');
-      const clearAll = document.getElementById('clearAll');
+  function row(label, value){ return `<tr><td>${label}</td><td class="mono">${value}</td></tr>`; }
+  function setMStatus(msg, type){ motivationStatus.textContent = msg || ''; motivationStatus.className = 'status' + (type ? ' ' + type : ''); }
+  function setRateStatus(msg, type){ rateStatus.textContent = msg || ''; rateStatus.className = 'status' + (type ? ' ' + type : ''); }
 
-      function n(id) { const v = parseFloat(mInputs[id].value); return Number.isFinite(v) ? v : 0; }
-      function money(v) { return `${new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 2 }).format(v)} ₴`; }
-      function setMStatus(msg, type) { motivationStatus.textContent = msg || ''; motivationStatus.className = 'status' + (type ? ' ' + type : ''); }
-      function groupCountBonus(count) {
-        if (count < 7) return 0;
-        if (count === 7) return 12000;
-        if (count === 8) return 16000;
-        if (count === 9) return 22000;
-        if (count === 10) return 30000;
-        return 40000;
-      }
+  function planBonusByPercent(percent){
+    const p = clamp(percent,0,200);
+    if (p <= 90) return 0;
+    return Math.max(0, Math.min(p,100)-90)*1000 + Math.max(0, Math.min(p,110)-100)*1500 + Math.max(0, p-110)*500;
+  }
 
-      function planBonusByPercent(percent) {
-        if (percent <= 90) return 0;
-        const p1 = Math.max(0, Math.min(percent, 100) - 90) * 1000;
-        const p2 = Math.max(0, Math.min(percent, 110) - 100) * 1500;
-        const p3 = Math.max(0, percent - 110) * 500;
-        return p1 + p2 + p3;
-      }
+  function calcMonthly(){
+    const planTurnover = num('planTurnover');
+    const crmBonus = byId('crmDone').checked ? 10000 : 0;
+    const planPercent = clamp(num('planPercent'),0,200);
+    const avgDiscount = num('avgDiscount');
+    const avgDelay = num('avgDelayFact');
+    const overdue1 = Math.max(0, num('overdue1'));
+    const overdue2 = Math.max(0, num('overdue2'));
+    const overdue3 = Math.max(0, num('overdue3'));
+    const rate = Math.max(0, num('eurRate'));
 
-      function overduePenalty(debt, range) {
-        if (debt <= 0) return 0;
-        if (range === '1-10') return debt * 0.005;
-        if (range === '11-20') return debt * 0.01;
-        if (range === '>20') return debt * 0.02;
-        return 0;
-      }
+    const tpBonus = planTurnover < 50000 ? 10000 : planTurnover > 150000 ? 25000 : 20000;
+    const planBase = planBonusByPercent(planPercent);
+    const discountReduce = avgDiscount >= 27.5 ? planBase * 0.5 : 0;
+    const planFinal = planBase - discountReduce;
+    const delayBonus = avgDelay <= 7 ? 6000 : avgDelay <= 14 ? 3000 : 0;
 
-      function calculateMotivation() {
-        const planTurnover = n('planTurnover');
-        const planPercent = n('planPercent');
-        const crmCalls = n('crmCalls');
-        const crmMeets = n('crmMeets');
-        const avgDiscount = n('avgDiscount');
-        const avgDelayFact = n('avgDelayFact');
-        const overdueDebt = n('overdueDebt');
-        const dcTurnover = n('dcTurnover');
-        const tiresOver = Math.max(0, n('tiresOver'));
-        const jokerBase = n('jokerBase');
+    const overdueEur = overdue1*0.005 + overdue2*0.01 + overdue3*0.02;
+    const overdueLocal = overdueEur * rate;
 
-        const tpBonus = planTurnover < 50000 ? 10000 : planTurnover > 150000 ? 25000 : 20000;
-        const crmBonus = (crmCalls >= 20 || crmMeets >= 5) ? 10000 : 0;
-        const planBonusBase = planBonusByPercent(planPercent);
-        const discountAdjustment = avgDiscount >= 27.5 ? -planBonusBase * 0.5 : 0;
-        const planBonusFinal = planBonusBase + discountAdjustment;
-        const delayBonus = avgDelayFact <= 7 ? 6000 : avgDelayFact <= 14 ? 3000 : 0;
-        const overdueFine = overduePenalty(overdueDebt, overdueRange.value);
+    const total = tpBonus + crmBonus + planFinal + delayBonus - overdueLocal;
 
-        const tiresBlock = (tiresMinMet.checked ? 0 : -5000) + tiresOver * 300;
-        let groupCount = 0;
-        const groupLines = groups.map((g) => {
-          const checked = document.querySelector(`input[data-group="${g.key}"]`).checked;
-          const value = checked ? dcTurnover * g.pct : 0;
-          if (checked) groupCount += 1;
-          return { label: `ГТ ДЦ: ${g.name}`, value };
-        });
-        const groupsSum = groupLines.reduce((s, x) => s + x.value, 0);
-        const jokerBonus = jokerDone.checked ? jokerBase * 0.09 : 0;
-        const groupsCountBonus = groupCountBonus(groupCount);
+    return { tpBonus, crmBonus, planBase, discountReduce, planFinal, delayBonus, overdueEur, rate, overdueLocal, total };
+  }
 
-        const monthly = tpBonus + crmBonus + planBonusFinal + delayBonus - overdueFine;
-        const total = monthly + tiresBlock + groupsSum + jokerBonus + groupsCountBonus;
+  function groupsBonusByCount(count){ if (count===7) return 12000; if(count===8) return 16000; if(count===9) return 22000; if(count===10) return 30000; return 0; }
 
-        const lines = [
-          ['Бонус ТП', tpBonus],
-          ['Бонус CRM', crmBonus],
-          ['Бонус за виконання плану (база)', planBonusBase],
-          ['Коригування за середню знижку', discountAdjustment],
-          ['Бонус за середнє відтермінування', delayBonus],
-          ['Штраф за прострочку', -overdueFine],
-          ['Квартальний блок шин', tiresBlock],
-          ...groupLines.map((x) => [x.label, x.value]),
-          ['Joker/Profit бонус', jokerBonus],
-          [`Бонус за кількість виконаних груп (${groupCount})`, groupsCountBonus],
-          ['Проміжний підсумок (місяць)', monthly]
-        ];
+  function calcQuarter(){
+    const tiresOver = Math.max(0, num('tiresOver'));
+    const tiresAdj = (byId('tiresMinMet').checked ? 0 : -5000) + tiresOver*300;
 
-        breakdownBody.innerHTML = lines.map((l) => `<tr><td>${l[0]}</td><td class="mono">${money(l[1])}</td></tr>`).join('');
-        totalEl.textContent = money(total);
+    const results = groupNames.map((name, idx)=>{
+      const m1 = clamp(parseFloat(document.querySelector(`input[data-g="${idx}"][data-m="1"]`).value) || 0,0,200);
+      const m2 = clamp(parseFloat(document.querySelector(`input[data-g="${idx}"][data-m="2"]`).value) || 0,0,200);
+      const m3 = clamp(parseFloat(document.querySelector(`input[data-g="${idx}"][data-m="3"]`).value) || 0,0,200);
+      const avg = (m1+m2+m3)/3;
+      const done = avg >= 95;
+      return { name, avg, done };
+    });
 
-        return { total, lines };
-      }
+    const doneCount = results.filter(r=>r.done).length;
+    const doneNames = results.filter(r=>r.done).map(r=>r.name);
+    const groupBonus = groupsBonusByCount(doneCount);
+    const allGroupsBonus = doneCount === groupNames.length ? 10000 : 0;
+    const total = tiresAdj + groupBonus + allGroupsBonus;
 
-      function copyMotivationText() {
-        const rows = Array.from(breakdownBody.querySelectorAll('tr')).map((tr) => {
-          const tds = tr.querySelectorAll('td');
-          return `${tds[0].textContent}: ${tds[1].textContent}`;
-        });
-        return ['Розрахунок мотивації', ...rows, `Загальна мотивація: ${totalEl.textContent}`].join('\n');
-      }
+    results.forEach((r, idx)=>{
+      document.querySelector(`[data-avg="${idx}"]`).textContent = `${r.avg.toFixed(2)}%`;
+      document.querySelector(`[data-ok="${idx}"]`).innerHTML = r.done ? '<span class="pill-ok">Виконано</span>' : '<span class="pill-no">Не виконано</span>';
+    });
 
-      function recalcAll() { calculateMotivation(); setMStatus('Розрахунок мотивації оновлено.', 'ok'); }
-      recalcMotivation.addEventListener('click', recalcAll);
-      Object.values(mInputs).forEach((el) => el.addEventListener('input', calculateMotivation));
-      document.querySelectorAll('[data-group], #tiresMinMet, #jokerDone, #overdueRange').forEach((el) => el.addEventListener('change', calculateMotivation));
+    return { tiresAdj, doneCount, doneNames, groupBonus, allGroupsBonus, total };
+  }
 
-      copyMotivation.addEventListener('click', async function () {
-        try { await navigator.clipboard.writeText(copyMotivationText()); setMStatus('Розрахунок мотивації скопійовано.', 'ok'); }
-        catch (_) { setMStatus('Не вдалося скопіювати автоматично. Скопіюйте вручну.', 'error'); }
-      });
+  function renderBreakdown(monthly, quarter){
+    monthlyTable.innerHTML = [
+      row('Бонус ТП', money(monthly.tpBonus)),
+      row('Бонус CRM', money(monthly.crmBonus)),
+      row('Бонус за виконання плану', money(monthly.planBase)),
+      row('Зменшення через знижку', `- ${money(monthly.discountReduce)}`),
+      row('Бонус за відтермінування', money(monthly.delayBonus)),
+      row('Штраф за прострочку (EUR)', eur(monthly.overdueEur)),
+      row('Курс EUR', monthly.rate.toFixed(4)),
+      row('Штраф в бонусній валюті', `- ${money(monthly.overdueLocal)}`)
+    ].join('');
 
-      clearAll.addEventListener('click', function () {
-        debtInput.value = '58617'; turnoverInput.value = '155775'; daysInput.value = '31';
-        exampleInputs.forEach((i) => refreshExampleState(i));
-        Object.values(mInputs).forEach((el) => { el.value = '0'; });
-        tiresMinMet.checked = true; jokerDone.checked = false; overdueRange.value = '0';
-        document.querySelectorAll('[data-group]').forEach((cb) => { cb.checked = false; });
-        calculate(); calculateMotivation(); setMStatus('Усі поля очищено.', 'ok');
-      });
+    quarterTable.innerHTML = [
+      row('Штраф/бонус по шинам', money(quarter.tiresAdj)),
+      row('Кількість виконаних груп', String(quarter.doneCount)),
+      row('Бонус за групи', money(quarter.groupBonus)),
+      row('Додатковий бонус за всі групи', money(quarter.allGroupsBonus)),
+      row('Виконані групи', quarter.doneNames.length ? quarter.doneNames.join(', ') : '—')
+    ].join('');
 
-      exampleInputs.forEach(refreshExampleState);
-      calculate(); calculateMotivation();
-    })();
-  </script>
+    totalTable.innerHTML = [
+      row('Місячна мотивація', money(monthly.total)),
+      row('Квартальний бонус', money(quarter.total))
+    ].join('');
+
+    monthTotalEl.textContent = money(monthly.total);
+    quarterTotalEl.textContent = money(quarter.total);
+    allTotalEl.textContent = money(monthly.total + quarter.total);
+  }
+
+  function calculateMotivation(){
+    const monthly = calcMonthly();
+    const quarter = calcQuarter();
+    renderBreakdown(monthly, quarter);
+    return { monthly, quarter, total: monthly.total + quarter.total };
+  }
+
+  async function refreshRate(){
+    try {
+      const res = await fetch('https://api.frankfurter.app/latest?from=EUR&to=UAH', { cache: 'no-store' });
+      if (!res.ok) throw new Error('bad status');
+      const data = await res.json();
+      const rate = data && data.rates && data.rates.UAH;
+      if (!rate) throw new Error('no rate');
+      byId('eurRate').value = Number(rate).toFixed(4);
+      setRateStatus(`Курс оновлено: 1 EUR = ${Number(rate).toFixed(4)}`, 'ok');
+      calculateMotivation();
+    } catch (e) {
+      setRateStatus('Автокурс недоступний. Введіть курс вручну.', 'error');
+    }
+  }
+
+  function copyMotivationText(){
+    const lines = ['Розрахунок мотивації'];
+    lines.push('--- Місячна мотивація ---');
+    monthlyTable.querySelectorAll('tr').forEach(tr=>{ const t=tr.querySelectorAll('td'); lines.push(`${t[0].textContent}: ${t[1].textContent}`); });
+    lines.push(`Підсумок місяця: ${monthTotalEl.textContent}`);
+    lines.push('--- Квартальний бонус ---');
+    quarterTable.querySelectorAll('tr').forEach(tr=>{ const t=tr.querySelectorAll('td'); lines.push(`${t[0].textContent}: ${t[1].textContent}`); });
+    lines.push(`Підсумок кварталу: ${quarterTotalEl.textContent}`);
+    lines.push(`--- Загальна сума: ${allTotalEl.textContent} ---`);
+    return lines.join('\n');
+  }
+
+  function bindRecalc(){
+    const ids = ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','eurRate','tiresOver'];
+    ids.forEach(id=>byId(id).addEventListener('input', calculateMotivation));
+    ['crmDone','tiresMinMet'].forEach(id=>byId(id).addEventListener('change', calculateMotivation));
+    groupsBody.querySelectorAll('input').forEach(input=>input.addEventListener('input', calculateMotivation));
+  }
+
+  byId('refreshRate').addEventListener('click', refreshRate);
+  byId('recalcMotivation').addEventListener('click', ()=>{ calculateMotivation(); setMStatus('Розрахунок оновлено.', 'ok'); });
+  byId('copyMotivation').addEventListener('click', async ()=>{ try { await navigator.clipboard.writeText(copyMotivationText()); setMStatus('Розрахунок скопійовано.', 'ok'); } catch { setMStatus('Не вдалося скопіювати.', 'error'); } });
+  byId('clearAll').addEventListener('click', ()=>{
+    debtInput.value='58617'; turnoverInput.value='155775'; daysInput.value='31'; exampleInputs.forEach(refreshExampleState);
+    ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','tiresOver'].forEach(id=>byId(id).value='0');
+    byId('eurRate').value='45'; byId('crmDone').checked=false; byId('tiresMinMet').checked=true;
+    groupsBody.querySelectorAll('input').forEach(i=>i.value='0');
+    calculateDelay(); calculateMotivation(); setMStatus('Усі поля очищено.', 'ok');
+  });
+
+  bindRecalc();
+  exampleInputs.forEach(refreshExampleState);
+  calculateDelay();
+  calculateMotivation();
+  refreshRate();
+})();
+</script>
 </body>
 </html>
