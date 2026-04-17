@@ -18,9 +18,10 @@
     .logo-mark svg { width: 20px; height: 20px; }
     .logo-text { font-weight: 800; text-transform: uppercase; letter-spacing: .4px; line-height: 1; font-size: .75rem; }
     .page { width: min(1240px, 100%); margin: 0 auto; padding: 16px; display: grid; gap: 14px; }
-    .screen { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
-    .screen-head { padding: 12px 14px; border-bottom: 1px solid var(--line); background: #f9fafc; }
-    .screen-head h1,.screen-head h2 { margin: 0; font-size: 1.1rem; }
+    .screen { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; box-shadow: 0 8px 20px rgba(16,39,65,.05); }
+    .screen-head { padding: 12px 14px; border-bottom: 1px solid var(--line); background: #f9fafc; position: relative; }
+    .screen-head::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent); }
+    .screen-head h1,.screen-head h2 { margin: 0; font-size: 1.1rem; letter-spacing: .1px; }
     .screen-head p { margin: 6px 0 0; color: var(--muted); font-size: .86rem; }
     .workspace { display: grid; grid-template-columns: minmax(0,2fr) minmax(300px,1fr); }
     .form-col,.result-col { padding: 14px; }
@@ -37,12 +38,15 @@
     input.is-example { color: rgba(21,38,61,.54); }
     .hint { margin: 0; padding: 9px 11px; border: 1px solid var(--line); border-radius: 7px; font-size: .81rem; color: #39506f; background: #f7f9fc; line-height: 1.4; }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; }
-    .btn { border: 1px solid transparent; min-height: 40px; padding: 0 12px; border-radius: 7px; font-weight: 700; font-size: .89rem; cursor: pointer; }
+    .btn { border: 1px solid transparent; min-height: 40px; padding: 0 12px; border-radius: 7px; font-weight: 700; font-size: .89rem; cursor: pointer; transition: transform .14s ease, box-shadow .18s ease, background-color .18s ease, border-color .18s ease; }
     .btn-primary { background: var(--accent); color: #1b2f4b; border-color: #e8b500; }
-    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 6px 14px rgba(255,196,0,.25); }
     .btn-secondary { background: #eef2f7; color: #203751; border-color: #d4dce8; }
-    .btn-secondary:hover { background: #e4eaf2; }
-    .result-box,.card { border: 1px solid var(--line); border-radius: 7px; background: #fff; padding: 12px; display: grid; gap: 8px; }
+    .btn-secondary:hover { background: #e4eaf2; box-shadow: 0 4px 10px rgba(16,39,65,.08); }
+    .btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(46,94,152,.18); }
+    .btn:active { transform: translateY(1px); }
+    .btn.copied { background: #dff4e6; border-color: #92d3a4; color: #1d6f3d; }
+    .result-box,.card { border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 12px; display: grid; gap: 8px; }
     .result-title,.card h3 { margin: 0; font-size: .93rem; font-weight: 800; text-transform: uppercase; letter-spacing: .3px; }
     .result-line { margin: 0; font-size: .93rem; }
     .status { min-height: 18px; font-size: .84rem; font-weight: 600; margin: 0; }
@@ -51,7 +55,7 @@
     .motivation-body { padding: 14px; display: grid; gap: 12px; }
     .cards { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
     .check { display: flex; align-items: center; gap: 8px; font-size: .84rem; }
-    .check input { width: 16px; height: 16px; min-height: auto; }
+    .check input { width: 16px; height: 16px; min-height: auto; accent-color: #1f4f89; }
     .table { width: 100%; border-collapse: collapse; font-size: .84rem; }
     .table th,.table td { border-bottom: 1px solid var(--line); padding: 6px 4px; text-align: left; }
     .table th { background: #f7f9fc; position: sticky; top: 0; }
@@ -61,15 +65,29 @@
     .pill-ok { background: #e8f5ec; color: #1f7f43; }
     .pill-no { background: #fdeeee; color: #b23939; }
     .summary-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
-    .summary-item { border: 1px solid var(--line); border-radius: 7px; background: #fff; padding: 10px; }
+    .summary-item { border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 10px; transition: box-shadow .25s ease, border-color .25s ease; }
+    .summary-item.flash { box-shadow: 0 0 0 3px rgba(46,94,152,.14); border-color: #aac0de; }
+    .summary-item--total { border-color: #c7d3e5; background: #fbfcff; }
     .summary-item h4 { margin: 0 0 8px; font-size: .88rem; text-transform: uppercase; }
     .mini-table { width: 100%; border-collapse: collapse; font-size: .83rem; }
     .mini-table td { border-bottom: 1px solid var(--line); padding: 5px 0; }
     .mini-table td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
-    .total { margin-top: 6px; display: flex; justify-content: space-between; font-weight: 800; }
+    .total { margin-top: 6px; display: flex; justify-content: space-between; font-weight: 800; font-size: 1.02rem; }
+    .total .mono { color: #102741; }
+    .is-positive { color: #1f7f43; }
+    .is-negative { color: #b23939; }
+    .is-neutral { color: #4d617c; }
+    .row-changed { animation: rowPulse .55s ease; }
+    .disclaimer { margin: 2px 2px 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 7px; background: #f9fafc; color: #5f7088; font-size: .78rem; line-height: 1.45; }
+    @keyframes rowPulse { from { background: #fff9dc; } to { background: transparent; } }
+    @keyframes fadeInFast { from { opacity: .4; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
     .mono { font-variant-numeric: tabular-nums; }
+    @media (min-width: 1081px){ .summary-item--total { position: sticky; top: 14px; } }
     @media (max-width: 1080px){ .workspace,.cards,.summary-grid { grid-template-columns: 1fr; } .form-col { border-right: 0; border-bottom: 1px solid var(--line);} }
     @media (max-width: 760px){ .fields-2,.fields-3,.fields-4 { grid-template-columns: 1fr; } .actions { display:grid; grid-template-columns:1fr; } .btn { width:100%; } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+    }
   </style>
 </head>
 <body>
@@ -131,10 +149,11 @@
         <div class="summary-grid">
           <div class="summary-item"><h4>Місячна мотивація</h4><table class="mini-table" id="monthlyBreakdown"></table><div class="total"><span>Підсумок місяця</span><span id="monthTotal" class="mono">0 ₴</span></div></div>
           <div class="summary-item"><h4>Квартальний бонус</h4><table class="mini-table" id="quarterBreakdown"></table><div class="total"><span>Підсумок кварталу</span><span id="quarterTotal" class="mono">0 ₴</span></div></div>
-          <div class="summary-item"><h4>Загальний підсумок</h4><table class="mini-table" id="totalBreakdown"></table><div class="total"><span>Загальна сума</span><span id="allTotal" class="mono">0 ₴</span></div></div>
+          <div class="summary-item summary-item--total"><h4>Загальний підсумок</h4><table class="mini-table" id="totalBreakdown"></table><div class="total"><span>Загальна сума</span><span id="allTotal" class="mono">0 ₴</span></div></div>
         </div>
         <div class="actions"><button type="button" id="recalcMotivation" class="btn btn-primary">Перерахувати</button><button type="button" id="copyMotivation" class="btn btn-secondary">Скопіювати розрахунок</button><button type="button" id="clearAll" class="btn btn-secondary">Очистити все</button></div>
         <p id="motivationStatus" class="status"></p>
+        <p class="disclaimer">Увага: розрахунок має інформаційний характер і може відрізнятися від фактичного нарахування. Підсумкові значення залежать від внутрішніх правил компанії, актуального курсу валют і фінального підтвердження.</p>
       </section>
     </div>
   </section>
@@ -187,10 +206,29 @@
   const monthlyTable = byId('monthlyBreakdown'), quarterTable = byId('quarterBreakdown'), totalTable = byId('totalBreakdown');
   const monthTotalEl = byId('monthTotal'), quarterTotalEl = byId('quarterTotal'), allTotalEl = byId('allTotal');
   const motivationStatus = byId('motivationStatus'), rateStatus = byId('rateStatus');
+  const summaryItems = Array.from(document.querySelectorAll('.summary-item'));
+  let previousSnapshot = null;
 
   function row(label, value){ return `<tr><td>${label}</td><td class="mono">${value}</td></tr>`; }
   function setMStatus(msg, type){ motivationStatus.textContent = msg || ''; motivationStatus.className = 'status' + (type ? ' ' + type : ''); }
   function setRateStatus(msg, type){ rateStatus.textContent = msg || ''; rateStatus.className = 'status' + (type ? ' ' + type : ''); }
+  function toneClass(value){ return value > 0 ? 'is-positive' : value < 0 ? 'is-negative' : 'is-neutral'; }
+  function animateSummaryCards(){
+    summaryItems.forEach((el)=>{ el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'), 360); });
+  }
+  function animateNumber(el, from, to, formatter){
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) { el.textContent = formatter(to); return; }
+    const duration = 280;
+    const start = performance.now();
+    function tick(now){
+      const p = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = formatter(from + (to - from) * eased);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
 
   function planBonusByPercent(percent){
     const p = clamp(percent,0,200);
@@ -282,10 +320,43 @@
       row('Місячна мотивація', money(monthly.total)),
       row('Квартальний бонус', money(quarter.total))
     ].join('');
+    const nextSnapshot = {
+      month: monthly.total,
+      quarter: quarter.total,
+      total: monthly.total + quarter.total
+    };
 
-    monthTotalEl.textContent = money(monthly.total);
-    quarterTotalEl.textContent = money(quarter.total);
-    allTotalEl.textContent = money(monthly.total + quarter.total);
+    const prev = previousSnapshot || nextSnapshot;
+    animateNumber(monthTotalEl, prev.month, nextSnapshot.month, money);
+    animateNumber(quarterTotalEl, prev.quarter, nextSnapshot.quarter, money);
+    animateNumber(allTotalEl, prev.total, nextSnapshot.total, money);
+
+    [monthTotalEl, quarterTotalEl, allTotalEl].forEach((el, idx) => {
+      const value = idx === 0 ? nextSnapshot.month : idx === 1 ? nextSnapshot.quarter : nextSnapshot.total;
+      el.classList.remove('is-positive', 'is-negative', 'is-neutral');
+      el.classList.add(toneClass(value));
+    });
+
+    const tables = [monthlyTable, quarterTable, totalTable];
+    tables.forEach((table) => {
+      table.querySelectorAll('tr').forEach((tr) => {
+        const key = tr.children[0]?.textContent || '';
+        const val = tr.children[1]?.textContent || '';
+        if (previousSnapshot && previousSnapshot.rows && previousSnapshot.rows[key] !== undefined && previousSnapshot.rows[key] !== val) {
+          tr.classList.add('row-changed');
+          setTimeout(() => tr.classList.remove('row-changed'), 620);
+        }
+      });
+    });
+
+    const rowsMap = {};
+    tables.forEach((table) => table.querySelectorAll('tr').forEach((tr) => {
+      const key = tr.children[0]?.textContent || '';
+      const val = tr.children[1]?.textContent || '';
+      if (key) rowsMap[key] = val;
+    }));
+    previousSnapshot = { ...nextSnapshot, rows: rowsMap };
+    animateSummaryCards();
   }
 
   function calculateMotivation(){
@@ -331,7 +402,7 @@
 
   byId('refreshRate').addEventListener('click', refreshRate);
   byId('recalcMotivation').addEventListener('click', ()=>{ calculateMotivation(); setMStatus('Розрахунок оновлено.', 'ok'); });
-  byId('copyMotivation').addEventListener('click', async ()=>{ try { await navigator.clipboard.writeText(copyMotivationText()); setMStatus('Розрахунок скопійовано.', 'ok'); } catch { setMStatus('Не вдалося скопіювати.', 'error'); } });
+  byId('copyMotivation').addEventListener('click', async (e)=>{ try { await navigator.clipboard.writeText(copyMotivationText()); setMStatus('Розрахунок скопійовано.', 'ok'); e.currentTarget.classList.add('copied'); setTimeout(()=>e.currentTarget.classList.remove('copied'), 900); } catch { setMStatus('Не вдалося скопіювати.', 'error'); } });
   byId('clearAll').addEventListener('click', ()=>{
     debtInput.value='58617'; turnoverInput.value='155775'; daysInput.value='31'; exampleInputs.forEach(refreshExampleState);
     ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','tiresOver'].forEach(id=>byId(id).value='0');
