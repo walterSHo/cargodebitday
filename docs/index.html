@@ -223,7 +223,13 @@
     return { tpBonus, crmBonus, planBase, discountReduce, planFinal, delayBonus, overdueEur, rate, overdueLocal, total };
   }
 
-  function groupsBonusByCount(count){ if (count===7) return 12000; if(count===8) return 16000; if(count===9) return 22000; if(count===10) return 30000; return 0; }
+  function groupsBonusByCount(count){
+    if (count < 7) return 0;
+    if (count === 7) return 12000;
+    if (count === 8) return 16000;
+    if (count === 9) return 22000;
+    return 30000;
+  }
 
   function calcQuarter(){
     const tiresOver = Math.max(0, num('tiresOver'));
