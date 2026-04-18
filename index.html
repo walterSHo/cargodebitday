@@ -249,7 +249,12 @@
   form.addEventListener('keydown', (e)=>{ if (e.key==='Enter'){ e.preventDefault(); calculateDelay(); }});
   exampleInputs.forEach((i)=>i.addEventListener('input', ()=>refreshExampleState(i)));
   clearBtn.addEventListener('click', ()=>{ debtInput.value=''; turnoverInput.value=''; daysInput.value=''; exampleInputs.forEach(i=>i.classList.remove('is-example')); coefOut.textContent='Коефіцієнт: —'; daysOut.textContent='Середнє відтермінування: —'; setStatus('Поля очищено.','ok'); });
-  copyBtn.addEventListener('click', async ()=>{ if(!lastResult) return setStatus('Немає результату для копіювання.','error'); try{ await navigator.clipboard.writeText(lastResult); setStatus('Результат скопійовано.','ok'); } catch { setStatus('Не вдалося скопіювати.', 'error'); }});
+  copyBtn.addEventListener('click', async (e)=>{
+    if(!lastResult) return setStatus('Немає результату для копіювання.','error');
+    const ok = await copyToClipboard(lastResult);
+    if (ok) { setStatus('✓ Скопійовано', 'ok'); blinkCopied(e.currentTarget); }
+    else { setStatus('Не вдалося скопіювати. Спробуйте ще раз.', 'error'); }
+  });
 
   // Motivation calculator
   const monthlyTable = byId('monthlyBreakdown'), quarterTable = byId('quarterBreakdown'), totalTable = byId('totalBreakdown');
@@ -266,6 +271,39 @@
   function row(label, value){ return `<tr><td>${label}</td><td class="mono">${value}</td></tr>`; }
   function setMStatus(msg, type){ motivationStatus.textContent = msg || ''; motivationStatus.className = 'status' + (type ? ' ' + type : ''); }
   function setRateStatus(msg, type){ rateStatus.textContent = msg || ''; rateStatus.className = 'status' + (type ? ' ' + type : ''); }
+  async function copyToClipboard(text){
+    if (!text) return false;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (_) {}
+
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '-9999px';
+      ta.style.left = '-9999px';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, ta.value.length);
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return Boolean(ok);
+    } catch (_) {
+      return false;
+    }
+  }
+  function blinkCopied(btn){
+    if (!btn) return;
+    btn.classList.add('copied');
+    setTimeout(() => btn.classList.remove('copied'), 1100);
+  }
   function toneClass(value){ return value > 0 ? 'is-positive' : value < 0 ? 'is-negative' : 'is-neutral'; }
   function setFieldMessage(id, msg, kind){
     const input = byId(id);
@@ -594,8 +632,16 @@
 
   byId('refreshRate').addEventListener('click', refreshRate);
   byId('recalcMotivation').addEventListener('click', ()=>{ if (!validateAllInputs()) { setMStatus('Виправте помилки перед перерахунком.', 'error'); return; } calculateMotivation(); setMStatus('Розрахунок оновлено.', 'ok'); });
-  byId('copyMotivation').addEventListener('click', async (e)=>{ try { await navigator.clipboard.writeText(copyMotivationTextDetailed()); setMStatus('Детальний розрахунок скопійовано.', 'ok'); e.currentTarget.classList.add('copied'); setTimeout(()=>e.currentTarget.classList.remove('copied'), 900); } catch { setMStatus('Не вдалося скопіювати.', 'error'); } });
-  byId('copyMotivationShort').addEventListener('click', async (e)=>{ try { await navigator.clipboard.writeText(copyMotivationTextShort()); setMStatus('Короткий розрахунок скопійовано.', 'ok'); e.currentTarget.classList.add('copied'); setTimeout(()=>e.currentTarget.classList.remove('copied'), 900); } catch { setMStatus('Не вдалося скопіювати.', 'error'); } });
+  byId('copyMotivation').addEventListener('click', async (e)=>{
+    const ok = await copyToClipboard(copyMotivationTextDetailed());
+    if (ok) { setMStatus('✓ Скопійовано', 'ok'); blinkCopied(e.currentTarget); }
+    else { setMStatus('Не вдалося скопіювати. Спробуйте ще раз.', 'error'); }
+  });
+  byId('copyMotivationShort').addEventListener('click', async (e)=>{
+    const ok = await copyToClipboard(copyMotivationTextShort());
+    if (ok) { setMStatus('✓ Скопійовано', 'ok'); blinkCopied(e.currentTarget); }
+    else { setMStatus('Не вдалося скопіювати. Спробуйте ще раз.', 'error'); }
+  });
   byId('downloadPdf').addEventListener('click', ()=>{ printMeta.textContent = `Дата друку: ${new Date().toLocaleString('uk-UA')}`; setMStatus('Відкрито режим друку / PDF.', 'ok'); window.print(); });
   byId('clearAll').addEventListener('click', ()=>{
     debtInput.value='58617'; turnoverInput.value='155775'; daysInput.value='31'; exampleInputs.forEach(refreshExampleState);
