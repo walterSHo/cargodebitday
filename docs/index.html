@@ -97,6 +97,12 @@
     .row-changed { animation: rowPulse .55s ease; }
     .disclaimer { margin: 2px 2px 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 7px; background: #f9fafc; color: #5f7088; font-size: .78rem; line-height: 1.45; }
     .error-summary { border: 1px solid #e7bbbb; background: #fff3f3; color: #8e2a2a; border-radius: 7px; padding: 8px 10px; font-size: .78rem; line-height: 1.35; }
+    .hints { border: 1px solid var(--line); border-radius: 8px; background: #fbfcff; padding: 10px; }
+    .hints h4 { margin: 0 0 6px; font-size: .82rem; text-transform: uppercase; color: #1d3657; }
+    .hint-list { margin: 0; padding-left: 16px; display: grid; gap: 4px; font-size: .78rem; }
+    .hint-list li.info { color: #495f7a; }
+    .hint-list li.success { color: #237348; }
+    .hint-list li.warn { color: #9b5f0c; }
     @keyframes rowPulse { from { background: #fff9dc; } to { background: transparent; } }
     @keyframes fadeInFast { from { opacity: .4; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
     .mono { font-variant-numeric: tabular-nums; }
@@ -105,6 +111,15 @@
     @media (max-width: 760px){ .fields-2,.fields-3,.fields-4 { grid-template-columns: 1fr; } .actions { display:grid; grid-template-columns:1fr; } .btn { width:100%; } }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+    }
+    @media print {
+      body { background: #fff; }
+      .topbar, .actions, #errorSummary, #motivationStatus, #rateStatus, .field-msg, .field-hint { display: none !important; }
+      .page { width: 100%; padding: 0; gap: 8px; }
+      .screen, .card, .summary-item { box-shadow: none; border-color: #d0d0d0; }
+      .table-wrap { max-height: none; overflow: visible; }
+      .disclaimer { border-style: dashed; }
+      #printMeta { display: block !important; }
     }
   </style>
 </head>
@@ -166,14 +181,25 @@
 
       <section class="card">
         <h3>Підсумки</h3>
+        <p id="printMeta" class="field-hint" style="display:none;">Дата друку: —</p>
         <div class="summary-grid">
           <div class="summary-item"><h4>Місячна мотивація</h4><table class="mini-table" id="monthlyBreakdown"></table><div class="total"><span>Підсумок місяця</span><span id="monthTotal" class="mono">0 ₴</span></div></div>
           <div class="summary-item"><h4>Квартальний бонус</h4><table class="mini-table" id="quarterBreakdown"></table><div class="total"><span>Підсумок кварталу</span><span id="quarterTotal" class="mono">0 ₴</span></div></div>
           <div class="summary-item summary-item--total"><h4>Загальний підсумок</h4><table class="mini-table" id="totalBreakdown"></table><div class="total"><span>Загальна сума</span><span id="allTotal" class="mono">0 ₴</span></div></div>
         </div>
         <div id="errorSummary" class="error-summary" role="alert" hidden></div>
-        <div class="actions"><button type="button" id="recalcMotivation" class="btn btn-primary">Перерахувати</button><button type="button" id="copyMotivationShort" class="btn btn-secondary">Скопіювати коротко</button><button type="button" id="copyMotivation" class="btn btn-secondary">Скопіювати детально</button><button type="button" id="clearAll" class="btn btn-secondary">Очистити все</button></div>
+        <div class="actions"><button type="button" id="recalcMotivation" class="btn btn-primary">Перерахувати</button><button type="button" id="copyMotivationShort" class="btn btn-secondary">Скопіювати коротко</button><button type="button" id="copyMotivation" class="btn btn-secondary">Скопіювати детально</button><button type="button" id="downloadPdf" class="btn btn-secondary">Завантажити PDF</button><button type="button" id="clearAll" class="btn btn-secondary">Очистити все</button></div>
         <p id="motivationStatus" class="status" role="status" aria-live="polite"></p>
+        <div class="summary-grid">
+          <section class="hints">
+            <h4>Підказки: місяць</h4>
+            <ul id="monthlyHints" class="hint-list"></ul>
+          </section>
+          <section class="hints">
+            <h4>Підказки: квартал</h4>
+            <ul id="quarterHints" class="hint-list"></ul>
+          </section>
+        </div>
         <p class="disclaimer">Увага: розрахунок має інформаційний характер і може відрізнятися від фактичного нарахування. Підсумкові значення залежать від внутрішніх правил компанії, актуального курсу валют і фінального підтвердження.</p>
       </section>
     </div>
@@ -229,6 +255,8 @@
   const monthlyTable = byId('monthlyBreakdown'), quarterTable = byId('quarterBreakdown'), totalTable = byId('totalBreakdown');
   const monthTotalEl = byId('monthTotal'), quarterTotalEl = byId('quarterTotal'), allTotalEl = byId('allTotal');
   const motivationStatus = byId('motivationStatus'), rateStatus = byId('rateStatus');
+  const monthlyHintsEl = byId('monthlyHints'), quarterHintsEl = byId('quarterHints');
+  const printMeta = byId('printMeta');
   const groupsDoneCount = byId('groupsDoneCount'), groupsNextHint = byId('groupsNextHint');
   const errorSummary = byId('errorSummary');
   const summaryItems = Array.from(document.querySelectorAll('.summary-item'));
@@ -327,7 +355,7 @@
 
     const total = tpBonus + crmBonus + planFinal + delayBonus - overdueLocal;
 
-    return { tpBonus, crmBonus, planBase, discountReduce, planFinal, delayBonus, overdueEur, rate, overdueLocal, total };
+    return { tpBonus, crmBonus, planBase, discountReduce, planFinal, delayBonus, overdueEur, rate, overdueLocal, total, planPercent, avgDelay, avgDiscount, overdue1, overdue2, overdue3 };
   }
 
   function groupsBonusByCount(count){
@@ -376,7 +404,7 @@
       ? (doneCount === groupNames.length ? 'Виконано максимум: діє додатковий бонус за всі групи.' : 'До наступного рівня бонусу за групи залишився статус “10+”.')
       : `Ще ${nextThreshold - doneCount} груп(и) до бонусу ${groupsBonusByCount(nextThreshold)}.`;
 
-    return { tiresAdj, doneCount, doneNames, groupBonus, allGroupsBonus, total };
+    return { tiresAdj, doneCount, doneNames, groupBonus, allGroupsBonus, total, results };
   }
 
   function renderBreakdown(monthly, quarter){
@@ -444,10 +472,66 @@
     animateSummaryCards();
   }
 
+  function renderHints(el, items) {
+    el.innerHTML = items.slice(0, 6).map((i) => `<li class="${i.type}">${i.text}</li>`).join('');
+  }
+
+  function buildMonthlyHints(monthly) {
+    const hints = [];
+    if (monthly.planPercent < 90) hints.push({ type: 'warn', text: `До старту бонусу за план залишилось +${(90 - monthly.planPercent).toFixed(1)}%.` });
+    else if (monthly.planPercent < 100) hints.push({ type: 'info', text: `До наступного порогу 100% залишилось +${(100 - monthly.planPercent).toFixed(1)}%.` });
+    else if (monthly.planPercent < 110) hints.push({ type: 'info', text: `До порогу 110% залишилось +${(110 - monthly.planPercent).toFixed(1)}%.` });
+    else hints.push({ type: 'success', text: 'План перевищує 110% — бонус на максимальному базовому порозі.' });
+
+    if (monthly.avgDelay > 14) hints.push({ type: 'warn', text: `Щоб отримати 3000, зменшіть відтермінування ще на ${(monthly.avgDelay - 14).toFixed(1)} дн.` });
+    else if (monthly.avgDelay > 7) hints.push({ type: 'info', text: `Щоб отримати 6000, зменшіть відтермінування ще на ${(monthly.avgDelay - 7).toFixed(1)} дн.` });
+    else hints.push({ type: 'success', text: 'Максимальний бонус за відтермінування вже досягнуто.' });
+
+    hints.push(byId('crmDone').checked
+      ? { type: 'success', text: 'CRM-бонус активний.' }
+      : { type: 'info', text: 'Виконання CRM на 100% додасть +10000.' });
+
+    hints.push(monthly.avgDiscount >= 27.5
+      ? { type: 'warn', text: 'Середня знижка зменшує бонус за план на 50%.' }
+      : { type: 'info', text: 'Поточна знижка ще не впливає на бонус за план.' });
+
+    const overdueMax = Math.max(monthly.overdue1, monthly.overdue2, monthly.overdue3);
+    if (monthly.overdueEur <= 0) hints.push({ type: 'success', text: 'Прострочення відсутнє — утримання немає.' });
+    else {
+      const worst = overdueMax === monthly.overdue3 ? '20+ днів' : overdueMax === monthly.overdue2 ? '11–20 днів' : '1–10 днів';
+      hints.push({ type: 'warn', text: `Найбільше утримання дає прострочка ${worst}. Загалом: ${eur(monthly.overdueEur)} / ${money(monthly.overdueLocal)}.` });
+    }
+    return hints;
+  }
+
+  function buildQuarterHints(quarter) {
+    const hints = [];
+    if (quarter.doneCount < 7) hints.push({ type: 'warn', text: `До мінімального квартального бонусу не вистачає ${7 - quarter.doneCount} груп(и).` });
+    else if (quarter.doneCount < 8) hints.push({ type: 'info', text: 'Ще 1 група — і бонус зросте до 16000.' });
+    else if (quarter.doneCount < 9) hints.push({ type: 'info', text: 'Ще 1 група — і бонус зросте до 22000.' });
+    else if (quarter.doneCount < 10) hints.push({ type: 'info', text: 'До порогу 30000 залишилась 1 група.' });
+    else hints.push({ type: 'success', text: 'Базовий максимум по групах досягнуто.' });
+
+    if (quarter.doneCount >= 10 && quarter.doneCount < groupNames.length) hints.push({ type: 'info', text: 'Якщо виконати всі 12 груп, додатково буде +10000.' });
+    if (quarter.doneCount === groupNames.length) hints.push({ type: 'success', text: 'Додатковий бонус за всі 12 груп активовано.' });
+
+    hints.push(byId('tiresMinMet').checked
+      ? { type: 'info', text: 'Кожна шина понад мінімум додає +300.' }
+      : { type: 'warn', text: 'Мінімальний план шин не виконано: штраф -5000.' });
+
+    const weakest = quarter.results.filter((r) => !r.done).sort((a, b) => a.avg - b.avg).slice(0, 2);
+    weakest.forEach((r) => hints.push({ type: 'warn', text: `${r.name}: не вистачає +${(95 - r.avg).toFixed(1)}% до 95%.` }));
+    if (!weakest.length) hints.push({ type: 'success', text: 'Усі квартальні групи вже виконуються.' });
+
+    return hints;
+  }
+
   function calculateMotivation(){
     const monthly = calcMonthly();
     const quarter = calcQuarter();
     renderBreakdown(monthly, quarter);
+    renderHints(monthlyHintsEl, buildMonthlyHints(monthly));
+    renderHints(quarterHintsEl, buildQuarterHints(quarter));
     return { monthly, quarter, total: monthly.total + quarter.total };
   }
 
@@ -479,6 +563,7 @@
     quarterTable.querySelectorAll('tr').forEach(tr=>{ const t=tr.querySelectorAll('td'); lines.push(`${t[0].textContent}: ${t[1].textContent}`); });
     lines.push(`Підсумок кварталу: ${quarterTotalEl.textContent}`);
     lines.push(`--- Загальна сума: ${allTotalEl.textContent} ---`);
+    lines.push('Увага: розрахунок має інформаційний характер і може відрізнятися від фактичного нарахування.');
     return lines.join('\n');
   }
   function copyMotivationTextShort(){
@@ -511,6 +596,7 @@
   byId('recalcMotivation').addEventListener('click', ()=>{ if (!validateAllInputs()) { setMStatus('Виправте помилки перед перерахунком.', 'error'); return; } calculateMotivation(); setMStatus('Розрахунок оновлено.', 'ok'); });
   byId('copyMotivation').addEventListener('click', async (e)=>{ try { await navigator.clipboard.writeText(copyMotivationTextDetailed()); setMStatus('Детальний розрахунок скопійовано.', 'ok'); e.currentTarget.classList.add('copied'); setTimeout(()=>e.currentTarget.classList.remove('copied'), 900); } catch { setMStatus('Не вдалося скопіювати.', 'error'); } });
   byId('copyMotivationShort').addEventListener('click', async (e)=>{ try { await navigator.clipboard.writeText(copyMotivationTextShort()); setMStatus('Короткий розрахунок скопійовано.', 'ok'); e.currentTarget.classList.add('copied'); setTimeout(()=>e.currentTarget.classList.remove('copied'), 900); } catch { setMStatus('Не вдалося скопіювати.', 'error'); } });
+  byId('downloadPdf').addEventListener('click', ()=>{ printMeta.textContent = `Дата друку: ${new Date().toLocaleString('uk-UA')}`; setMStatus('Відкрито режим друку / PDF.', 'ok'); window.print(); });
   byId('clearAll').addEventListener('click', ()=>{
     debtInput.value='58617'; turnoverInput.value='155775'; daysInput.value='31'; exampleInputs.forEach(refreshExampleState);
     ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','tiresOver'].forEach(id=>byId(id).value='0');
