@@ -383,106 +383,6 @@
       display: grid;
       gap: 24px;
     }
-    .screen-motivation .quick-start {
-      gap: 10px;
-      border-color: rgba(118,150,197,.28);
-      background:
-        radial-gradient(circle at top right, rgba(110,168,255,.08), transparent 30%),
-        linear-gradient(180deg, rgba(255,255,255,.032), rgba(255,255,255,.012)),
-        var(--surface-contrast);
-    }
-    .quick-start-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
-    }
-    .quick-start-copy {
-      display: grid;
-      gap: 3px;
-      min-width: 0;
-    }
-    .quick-start-copy h3 {
-      font-size: .9rem;
-      letter-spacing: -.01em;
-    }
-    .quick-start-copy p {
-      margin: 0;
-      color: var(--muted);
-      font-size: .72rem;
-      line-height: 1.28;
-      max-width: 70ch;
-    }
-    .quick-start-actions {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 6px;
-    }
-    .quick-start-btn {
-      position: relative;
-      min-height: 46px;
-      padding: 8px 10px;
-      display: grid;
-      grid-template-rows: auto auto;
-      justify-items: start;
-      align-content: center;
-      gap: 2px;
-      text-align: left;
-      border-color: rgba(109,136,178,.24);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.008)),
-        rgba(14,20,31,.92);
-      overflow: hidden;
-      transition: transform .18s ease, border-color .18s ease, box-shadow .24s ease, background-color .2s ease;
-    }
-    .quick-start-btn::after {
-      content: "";
-      position: absolute;
-      left: 10px;
-      right: 10px;
-      top: 0;
-      height: 1px;
-      background: linear-gradient(90deg, rgba(143,190,255,0), rgba(143,190,255,.42), rgba(143,190,255,0));
-      opacity: .36;
-    }
-    .quick-start-btn:hover {
-      transform: translateY(-1px);
-      border-color: rgba(143,190,255,.28);
-      box-shadow: 0 12px 20px rgba(7,13,22,.18);
-    }
-    .quick-start-btn strong {
-      width: 100%;
-      font-size: .76rem;
-      line-height: 1.1;
-      color: #f4f6fb;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .quick-start-btn span {
-      width: 100%;
-      color: var(--muted);
-      font-size: .64rem;
-      line-height: 1.1;
-      display: block;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .quick-start-btn.is-active {
-      border-color: rgba(143,190,255,.44);
-      box-shadow: 0 14px 26px rgba(7,13,22,.22), 0 0 18px rgba(110,168,255,.08);
-      background:
-        linear-gradient(180deg, rgba(110,168,255,.1), rgba(110,168,255,.03)),
-        rgba(14,22,36,.96);
-    }
-    .quick-start-btn.is-active::after {
-      opacity: 1;
-      box-shadow: 0 0 14px rgba(143,190,255,.18);
-    }
-    .quick-start-btn.just-applied {
-      animation: controlPulse .72s cubic-bezier(.2,.8,.2,1);
-    }
     .screen-motivation .motivation-columns {
       display: grid;
       grid-template-columns: repeat(2,minmax(0,1fr));
@@ -1038,6 +938,7 @@
         rgba(15,21,34,.5);
       overflow: hidden;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.015);
+      contain: layout paint;
     }
     .easter-egg-strip::after {
       content: "";
@@ -1061,8 +962,11 @@
       padding: 0;
       cursor: pointer;
       color: inherit;
-      animation: catRoam 16s ease-in-out infinite alternate;
+      animation: catRoam 20s ease-in-out infinite alternate;
       transition: transform .18s ease, filter .18s ease;
+      will-change: transform;
+      transform: translateZ(0);
+      backface-visibility: hidden;
     }
     .easter-cat:hover {
       filter: brightness(1.06);
@@ -1107,7 +1011,8 @@
       border-radius: 22px 24px 16px 18px;
       background: linear-gradient(180deg, #ffbf62, #f49c34);
       box-shadow: 0 8px 18px rgba(244,156,52,.18);
-      animation: softBob 1.9s ease-in-out infinite;
+      animation: softBob 3.2s ease-in-out infinite;
+      will-change: transform;
     }
     .easter-cat-body::before,
     .easter-cat-body::after {
@@ -1180,7 +1085,8 @@
       border-radius: 0 18px 0 0;
       transform: rotate(18deg);
       transform-origin: left bottom;
-      animation: tailWiggle 1.8s ease-in-out infinite;
+      animation: tailWiggle 3.6s ease-in-out infinite;
+      will-change: transform;
     }
     .disclaimer {
       margin: 0;
@@ -1305,16 +1211,16 @@
       50% { transform: translateY(-2px); }
     }
     @keyframes softBob {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-1.5px); }
+      0%, 100% { transform: translate3d(0, 0, 0); }
+      50% { transform: translate3d(0, -1px, 0); }
     }
     @keyframes catRoam {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(min(14vw, 180px)); }
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(min(14vw, 180px), 0, 0); }
     }
     @keyframes tailWiggle {
       0%, 100% { transform: rotate(14deg); }
-      50% { transform: rotate(28deg); }
+      50% { transform: rotate(22deg); }
     }
     @keyframes successGlow {
       0%, 100% { box-shadow: 0 0 0 1px rgba(57,169,107,.14), 0 16px 30px rgba(15,39,27,.18); }
@@ -1350,7 +1256,6 @@
       .workspace,
       .screen-motivation .motivation-columns,
       .summary-grid--hints,
-      .quick-start-actions,
       .pdf-summary-grid,
       .pdf-key-metrics { grid-template-columns: 1fr; }
       .form-col {
@@ -1365,7 +1270,6 @@
       .form-col,
       .result-col,
       .motivation-body { padding-left: 20px; padding-right: 20px; }
-      .quick-start-head { flex-direction: column; }
       .card,
       .result-box,
       .summary-item,
@@ -1453,21 +1357,6 @@
   <section class="screen screen-motivation" aria-labelledby="motivationTitle">
     <div class="screen-head"><h2 id="motivationTitle">Розрахунок мотивації / ЗП</h2><p>Окремо: місячна мотивація, квартальний бонус, загальний підсумок.</p></div>
     <div class="motivation-body">
-      <section class="card quick-start" aria-labelledby="quickStartTitle">
-        <div class="quick-start-head">
-          <div class="quick-start-copy">
-            <h3 id="quickStartTitle">Швидкий старт</h3>
-            <p>Типові сценарії для швидкого старту. Прострочка в пресетах тримається переважно в кошику 1–10 днів.</p>
-          </div>
-          <p id="autosaveStatus" class="status" role="status" aria-live="polite">Збережено</p>
-        </div>
-        <div class="quick-start-actions">
-          <button type="button" class="btn btn-secondary quick-start-btn" data-scenario="warmup"><strong>Теплий старт</strong><span>Обережний плюс, квартал росте.</span></button>
-          <button type="button" class="btn btn-secondary quick-start-btn" data-scenario="steady"><strong>Стабільний ритм</strong><span>CRM є, просрочка коротка.</span></button>
-          <button type="button" class="btn btn-secondary quick-start-btn" data-scenario="quarter"><strong>Фокус на квартал</strong><span>Сильний квартал без зриву.</span></button>
-          <button type="button" class="btn btn-secondary quick-start-btn" data-scenario="max"><strong>Майже максимум</strong><span>Верхня зона під контролем.</span></button>
-        </div>
-      </section>
       <div class="motivation-columns">
         <div class="motivation-column motivation-column--left">
           <section class="card">
@@ -1640,7 +1529,6 @@
   const printMeta = byId('printMeta');
   const easterCat = byId('easterCat');
   const easterCatBubble = byId('easterCatBubble');
-  const autosaveStatus = byId('autosaveStatus');
   const groupsDoneCount = byId('groupsDoneCount'), groupsNextHint = byId('groupsNextHint');
   const errorSummary = byId('errorSummary');
   const summaryItems = Array.from(document.querySelectorAll('.summary-item'));
@@ -1658,11 +1546,14 @@
   const pdfQuarterTotal = byId('pdfQuarterTotal');
   const pdfAllTotal = byId('pdfAllTotal');
   const pdfTimestamp = byId('pdfTimestamp');
-  const quickStartButtons = Array.from(document.querySelectorAll('.quick-start-btn'));
+  const summaryMiniCard = document.querySelector('.summary-mini');
   const touched = new Set();
   const storageKey = 'cargo-calculator-state-v2';
   let previousSnapshot = null;
   let autosaveTimer = null;
+  let catCycleTimer = null;
+  let catResumeTimer = null;
+  let catVisible = true;
   const catLines = [
     'Мрр. Я рахую бонуси лапками.',
     'Якщо що, я за зелені progress bar.',
@@ -1675,28 +1566,6 @@
     'Пухнасто схвалюю: квартал сяє.',
     'Лапками підписую цей зелений результат.'
   ];
-  const quickStartScenarios = {
-    warmup: {
-      planTurnover: 52000, planPercent: 94, crmDone: false, avgDiscount: 16.4, avgDelayFact: 9.6, eurRate: 45,
-      overdue1: 7000, overdue2: 0, overdue3: 0, tiresMinMet: true, tiresOver: 4,
-      groups: [96,97,97, 95,96,96, 95,95,96, 94,95,95, 95,95,95, 94,94,95, 92,93,94, 90,91,93, 89,90,92, 88,90,91, 91,92,93, 87,89,90]
-    },
-    steady: {
-      planTurnover: 96000, planPercent: 102, crmDone: true, avgDiscount: 20.8, avgDelayFact: 6.9, eurRate: 45,
-      overdue1: 7000, overdue2: 0, overdue3: 0, tiresMinMet: true, tiresOver: 10,
-      groups: [98,99,99, 97,98,98, 96,97,98, 95,96,97, 96,96,97, 95,95,96, 94,95,96, 93,94,95, 92,93,94, 91,92,94, 94,95,96, 90,91,93]
-    },
-    quarter: {
-      planTurnover: 118000, planPercent: 104, crmDone: true, avgDiscount: 19.5, avgDelayFact: 7, eurRate: 45,
-      overdue1: 7000, overdue2: 0, overdue3: 0, tiresMinMet: true, tiresOver: 16,
-      groups: [99,99,100, 98,99,99, 97,98,99, 96,97,98, 97,97,98, 96,96,97, 96,96,96, 95,96,96, 95,95,96, 94,95,95, 94,95,95, 93,94,94]
-    },
-    max: {
-      planTurnover: 151000, planPercent: 110, crmDone: true, avgDiscount: 18.8, avgDelayFact: 5.8, eurRate: 45,
-      overdue1: 4000, overdue2: 0, overdue3: 0, tiresMinMet: true, tiresOver: 22,
-      groups: [100,100,100, 99,100,100, 99,99,100, 98,99,99, 99,99,99, 98,99,99, 98,98,99, 99,100,100, 98,99,100, 97,98,99, 97,98,99, 96,97,98]
-    }
-  };
   let catLineIndex = 0;
 
   function row(label, value){ return `<tr><td>${label}</td><td class="mono">${value}</td></tr>`; }
@@ -1758,11 +1627,6 @@
       }
     };
   }
-  function setAutosaveState(msg, type){
-    if (!autosaveStatus) return;
-    autosaveStatus.textContent = msg || '';
-    autosaveStatus.className = 'status' + (type ? ' ' + type : '');
-  }
   function persistCalculatorState(){
     try {
       localStorage.setItem(storageKey, JSON.stringify(collectCalculatorState()));
@@ -1773,13 +1637,10 @@
     clearTimeout(autosaveTimer);
     if (immediate) {
       persistCalculatorState();
-      setAutosaveState('Збережено', 'ok');
       return;
     }
-    setAutosaveState('Чернетка оновлена', 'draft');
     autosaveTimer = setTimeout(() => {
       persistCalculatorState();
-      setAutosaveState('Збережено', 'ok');
     }, 260);
   }
   function restoreCalculatorState(){
@@ -1814,13 +1675,35 @@
     try {
       localStorage.removeItem(storageKey);
     } catch (_) {}
-    setAutosaveState('Збережено', 'ok');
   }
   function setCatLine(nextIndex, paused){
     if (!easterCatBubble) return;
     catLineIndex = nextIndex % catLines.length;
-    easterCatBubble.textContent = catLines[catLineIndex];
+    const nextLine = catLines[catLineIndex];
+    if (easterCatBubble.textContent !== nextLine) easterCatBubble.textContent = nextLine;
     easterCat.classList.toggle('is-paused', Boolean(paused));
+  }
+  function stopCatCycle(){
+    clearTimeout(catCycleTimer);
+    catCycleTimer = null;
+  }
+  function scheduleCatCycle(delay = 12000){
+    if (!easterCat || !catVisible || document.hidden) return;
+    stopCatCycle();
+    catCycleTimer = setTimeout(() => {
+      if (!easterCat.classList.contains('is-paused')) setCatLine(catLineIndex + 1, false);
+      scheduleCatCycle(12000);
+    }, delay);
+  }
+  function pauseCatTemporarily(duration = 1600){
+    if (!easterCat) return;
+    clearTimeout(catResumeTimer);
+    stopCatCycle();
+    easterCat.classList.add('is-paused');
+    catResumeTimer = setTimeout(() => {
+      easterCat.classList.remove('is-paused');
+      scheduleCatCycle();
+    }, duration);
   }
   function toneClass(value){ return value > 0 ? 'is-positive' : value < 0 ? 'is-negative' : 'is-neutral'; }
   function setFieldMessage(id, msg, kind){
@@ -1963,7 +1846,7 @@
     totalSummaryCard.classList.toggle('is-empty', isEmpty);
 
     monthSummaryNote.textContent = isEmpty
-      ? 'Почніть зі сценарію “Швидкий старт” або внесіть фактичні дані, щоб тут зʼявився зрозумілий розклад по важелях.'
+      ? 'Внесіть фактичні дані, щоб тут зʼявився зрозумілий розклад по важелях.'
       : monthly.planPercent < 100
         ? `Найбільший резерв зараз у виконанні плану: до 100% бракує ${(100 - monthly.planPercent).toFixed(1)}%.`
         : monthly.avgDelay > 7
@@ -1991,7 +1874,8 @@
     const miniCard = document.querySelector('.summary-mini');
     if (miniCard) miniCard.classList.toggle('is-celebrating', allGreen);
     if (allGreen && easterCatBubble && !easterCat.classList.contains('is-paused')) {
-      easterCatBubble.textContent = celebrationCatLines[quarter.doneCount % celebrationCatLines.length];
+      const celebrationLine = celebrationCatLines[quarter.doneCount % celebrationCatLines.length];
+      if (easterCatBubble.textContent !== celebrationLine) easterCatBubble.textContent = celebrationLine;
     }
   }
 
@@ -2009,32 +1893,6 @@
     pdfMonthTotal.textContent = money(monthly.total);
     pdfQuarterTotal.textContent = money(quarter.total);
     pdfAllTotal.textContent = money(monthly.total + quarter.total);
-  }
-
-  function applyQuickStart(name){
-    const preset = quickStartScenarios[name];
-    if (!preset) return;
-    byId('planTurnover').value = preset.planTurnover;
-    byId('planPercent').value = preset.planPercent;
-    byId('crmDone').checked = preset.crmDone;
-    byId('avgDiscount').value = preset.avgDiscount;
-    byId('avgDelayFact').value = preset.avgDelayFact;
-    byId('eurRate').value = preset.eurRate;
-    byId('overdue1').value = preset.overdue1;
-    byId('overdue2').value = preset.overdue2;
-    byId('overdue3').value = preset.overdue3;
-    byId('tiresMinMet').checked = preset.tiresMinMet;
-    byId('tiresOver').value = preset.tiresOver;
-    groupsBody.querySelectorAll('input').forEach((input, idx) => {
-      input.value = preset.groups[idx] ?? 0;
-    });
-    quickStartButtons.forEach((button) => button.classList.toggle('is-active', button.dataset.scenario === name));
-    ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','eurRate','tiresOver'].forEach((id) => {
-      touched.add(id);
-      validateField(id);
-    });
-    calculateMotivation();
-    setMStatus('Сценарій застосовано.', 'ok');
   }
 
   function calcMonthly(){
@@ -2338,7 +2196,6 @@
     });
     ['crmDone','tiresMinMet'].forEach(id=>byId(id).addEventListener('change', calculateMotivation));
     groupsBody.querySelectorAll('input').forEach(input=>input.addEventListener('input', calculateMotivation));
-    quickStartButtons.forEach((button) => button.addEventListener('click', () => applyQuickStart(button.dataset.scenario)));
   }
 
   byId('refreshRate').addEventListener('click', refreshRate);
@@ -2349,7 +2206,6 @@
     ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','tiresOver'].forEach(id=>byId(id).value='0');
     byId('eurRate').value='45'; byId('crmDone').checked=false; byId('tiresMinMet').checked=true;
     groupsBody.querySelectorAll('input').forEach(i=>i.value='0');
-    quickStartButtons.forEach((button) => button.classList.remove('is-active'));
     ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','eurRate','tiresOver'].forEach((id)=>{ touched.delete(id); setFieldMessage(id, '', ''); });
     errorSummary.hidden = true;
     clearSavedCalculatorState();
@@ -2358,11 +2214,31 @@
   if (easterCat) {
     easterCat.addEventListener('click', () => {
       setCatLine(catLineIndex + 1, true);
-      setTimeout(() => easterCat.classList.remove('is-paused'), 1600);
+      pauseCatTemporarily(1600);
     });
-    setInterval(() => {
-      if (!easterCat.classList.contains('is-paused')) setCatLine(catLineIndex + 1, false);
-    }, 9000);
+    if ('IntersectionObserver' in window && summaryMiniCard) {
+      const catObserver = new IntersectionObserver(([entry]) => {
+        catVisible = Boolean(entry && entry.isIntersecting);
+        if (!catVisible) {
+          stopCatCycle();
+          easterCat.classList.add('is-paused');
+          return;
+        }
+        easterCat.classList.remove('is-paused');
+        scheduleCatCycle(9000);
+      }, { threshold: 0.15 });
+      catObserver.observe(summaryMiniCard);
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stopCatCycle();
+        easterCat.classList.add('is-paused');
+        return;
+      }
+      easterCat.classList.remove('is-paused');
+      scheduleCatCycle(9000);
+    });
+    scheduleCatCycle(9000);
   }
 
   bindRecalc();
