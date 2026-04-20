@@ -2,6 +2,7 @@
 
 ## 2026-04-20
 
+- Rearranged the actions block so `Умови мотивації` and `Завантажити PDF` now sit side-by-side, giving a clean 2x2 layout for the four main action buttons.
 - Fixed the motivation guide modal wiring (`Умови мотивації`) so the button opens the dialog correctly, and removed stray JS text that was rendered at the page bottom.
 - Added a compact helper hint under `Плановий оборот (факт)` in the monthly block.
 - Added a compact helper text under `Виконання плану продажів, %` to clarify plan-bonus tiers and the 27.5% discount reduction rule without changing formulas.
