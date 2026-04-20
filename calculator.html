@@ -2338,19 +2338,20 @@
   }
 
   function renderBreakdown(monthly, quarter){
+    const penaltyClass = (hasPenalty) => hasPenalty ? 'row-penalty' : '';
     monthlyTable.innerHTML = [
       row('Бонус ТП', money(monthly.tpBonus)),
       row('Бонус CRM', money(monthly.crmBonus)),
       row('Бонус за виконання плану', money(monthly.planBase)),
-      row('Зменшення через знижку', `- ${money(monthly.discountReduce)}`, 'row-penalty'),
+      row('Зменшення через знижку', `- ${money(monthly.discountReduce)}`, penaltyClass(monthly.discountReduce !== 0)),
       row('Бонус за відтермінування', money(monthly.delayBonus)),
-      row('Штраф за прострочку (EUR)', eur(monthly.overdueEur), 'row-penalty'),
+      row('Штраф за прострочку (EUR)', eur(monthly.overdueEur), penaltyClass(monthly.overdueEur !== 0)),
       row('Курс EUR', monthly.rate.toFixed(4)),
-      row('Штраф в бонусній валюті', `- ${money(monthly.overdueLocal)}`, 'row-penalty')
+      row('Штраф в бонусній валюті', `- ${money(monthly.overdueLocal)}`, penaltyClass(monthly.overdueLocal !== 0))
     ].join('');
 
     quarterTable.innerHTML = [
-      row('Штраф/бонус по шинам', money(quarter.tiresAdj)),
+      row('Штраф/бонус по шинам', money(quarter.tiresAdj), penaltyClass(quarter.tiresAdj < 0)),
       row('Кількість виконаних груп', String(quarter.doneCount)),
       row('Бонус за групи', money(quarter.groupBonus)),
       row('Додатковий бонус за всі групи', money(quarter.allGroupsBonus)),
