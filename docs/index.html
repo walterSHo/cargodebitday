@@ -720,6 +720,20 @@
     .screen-motivation .actions-quarter .btn {
       width: 100%;
       min-width: 0;
+      min-height: 42px;
+      padding: 0 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      line-height: 1.2;
+      font-weight: 700;
+    }
+    .screen-motivation .actions-quarter .btn .btn-icon {
+      width: 14px;
+      height: 14px;
+      opacity: .68;
+      flex: 0 0 14px;
     }
     .screen-motivation .hint-list {
       gap: 8px;
@@ -1502,8 +1516,8 @@
               <button type="button" id="clearAll" class="btn btn-secondary">Очистити все</button>
             </div>
             <div class="actions-quarter-bottom">
-              <button type="button" id="openMotivationGuide" class="btn btn-secondary btn-quiet">Умови мотивації</button>
-              <button type="button" id="downloadPdf" class="btn btn-secondary">Завантажити PDF</button>
+              <button type="button" id="openMotivationGuide" class="btn btn-secondary btn-quiet"><svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.8A1.8 1.8 0 0 1 6.8 3h10.4A1.8 1.8 0 0 1 19 4.8v14.4a1.8 1.8 0 0 1-1.8 1.8H6.8A1.8 1.8 0 0 1 5 19.2z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 7.8h8M8 11.8h8M8 15.8h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>Умови мотивації</button>
+              <button type="button" id="downloadPdf" class="btn btn-secondary"><svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10m0 0 3.2-3.2M12 13 8.8 9.8M5 15.5v2.7A1.8 1.8 0 0 0 6.8 20h10.4a1.8 1.8 0 0 0 1.8-1.8v-2.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Завантажити PDF</button>
             </div>
           </div>
         </div>
