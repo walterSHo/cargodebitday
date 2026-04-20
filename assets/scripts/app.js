@@ -1,6 +1,8 @@
 (function () {
   const groupNames = ['АВТОХІМІЯ І ОЛИВИ','АМОРТИЗАЦІЯ','ГАЛЬМІВНА СИСТЕМА','ДВИГУН','ЕЛЕКТРИКА','ОХОЛОДЖЕННЯ','ПІДВІСКА','ПНЕВМАТИКА','СИСТЕМА ЗЧЕПЛЕННЯ','ТРАНСМІСІЯ','ФІЛЬТР','PROFIT / JOKER'];
   const groupsBody = document.querySelector('#groupsTable tbody');
+  const groupCells = [];
+  const groupInputs = [];
   groupNames.forEach((name, i) => {
     const tr = document.createElement('tr');
     tr.className = 'group-row fail';
@@ -12,6 +14,13 @@
       <td data-progress="${i}"><div class="progress-track"><div class="progress-fill" style="width:0%"></div></div></td>
       <td data-ok="${i}"><span class="pill-no">Не виконано</span></td>`;
     groupsBody.appendChild(tr);
+    groupInputs.push(...tr.querySelectorAll('input'));
+    groupCells.push({
+      avg: tr.querySelector(`[data-avg="${i}"]`),
+      ok: tr.querySelector(`[data-ok="${i}"]`),
+      progress: tr.querySelector('.progress-fill'),
+      row: tr
+    });
   });
 
   const byId = (id) => document.getElementById(id);
@@ -74,12 +83,17 @@
   const pdfTimestamp = byId('pdfTimestamp');
   const summaryMiniCard = document.querySelector('.summary-mini');
   const touched = new Set();
+  const priorityFields = new Set();
   const storageKey = 'cargo-calculator-state-v2';
   let previousSnapshot = null;
+  let previousProgressSnapshot = null;
+  let previousPdfSnapshot = '';
   let autosaveTimer = null;
+  let motivationFrameId = 0;
   let catCycleTimer = null;
   let catResumeTimer = null;
   let catVisible = true;
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const catLines = [
     'Мрр. Я рахую бонуси лапками.',
     'Якщо що, я за зелені progress bar.',
@@ -276,10 +290,14 @@
     return true;
   }
   function animateSummaryCards(){
-    summaryItems.forEach((el)=>{ el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'), 360); });
+    summaryItems.forEach((el)=>el.classList.remove('flash'));
+    requestAnimationFrame(() => {
+      summaryItems.forEach((el)=>{ el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'), 360); });
+    });
   }
   function animateNumber(el, from, to, formatter){
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (from === to) { el.textContent = formatter(to); return; }
+    const reduced = prefersReducedMotion.matches;
     if (reduced) { el.textContent = formatter(to); return; }
     const duration = 280;
     const start = performance.now();
@@ -331,37 +349,41 @@
     return `linear-gradient(90deg, ${mixHexColor(midHi, success, blend * .55)} 0%, ${mixHexColor(success, successHi, .35 + blend * .45)} 100%)`;
   }
 
-  function setPriority(id, tone, label){
+  function setPriority(id, tone, label = ''){
     const input = byId(id);
     const field = input && input.closest('.field');
     if (!field) return;
     const fieldLabel = field.querySelector('label');
     field.classList.add('is-priority');
+    priorityFields.add(field);
     field.classList.toggle('is-priority-high', tone === 'high');
     field.classList.toggle('is-priority-soft', tone !== 'high');
-    if (fieldLabel) fieldLabel.dataset.priority = label;
+    if (fieldLabel) {
+      if (label) fieldLabel.dataset.priority = label;
+      else delete fieldLabel.dataset.priority;
+    }
   }
 
   function resetPriorities(){
-    document.querySelectorAll('.field.is-priority').forEach((field) => {
+    priorityFields.forEach((field) => {
       field.classList.remove('is-priority', 'is-priority-high', 'is-priority-soft');
       const fieldLabel = field.querySelector('label');
       if (fieldLabel) delete fieldLabel.dataset.priority;
     });
+    priorityFields.clear();
   }
 
   function updateFieldPriorities(monthly, quarter){
     resetPriorities();
-    if (monthly.planPercent < 110) setPriority('planPercent', monthly.planPercent < 100 ? 'high' : 'soft', 'Фокус');
-    if (monthly.avgDelay > 7) setPriority('avgDelayFact', monthly.avgDelay > 14 ? 'high' : 'soft', 'Впливає');
-    if (monthly.avgDiscount >= 24) setPriority('avgDiscount', monthly.avgDiscount >= 27.5 ? 'high' : 'soft', 'Ризик');
+    if (monthly.avgDelay > 7) setPriority('avgDelayFact', monthly.avgDelay > 14 ? 'high' : 'soft');
+    if (monthly.avgDiscount >= 24) setPriority('avgDiscount', monthly.avgDiscount >= 27.5 ? 'high' : 'soft');
     if (!byId('crmDone').checked) setPriority('planTurnover', 'soft', 'Плече');
     const overdueMap = [
       { id: 'overdue1', value: monthly.overdue1 },
       { id: 'overdue2', value: monthly.overdue2 },
       { id: 'overdue3', value: monthly.overdue3 }
     ].sort((a, b) => b.value - a.value);
-    if (overdueMap[0].value > 0) setPriority(overdueMap[0].id, 'high', 'Штраф');
+    if (overdueMap[0].value > 0) setPriority(overdueMap[0].id, 'high');
     if (!byId('tiresMinMet').checked || quarter.doneCount < 7) setPriority('tiresOver', quarter.doneCount < 7 ? 'high' : 'soft', 'Квартал');
   }
 
@@ -406,12 +428,24 @@
   }
 
   function renderPdfReport(monthly, quarter){
-    pdfKeyMetrics.innerHTML = [
+    const keyMetricsMarkup = [
       `<div class="pdf-metric"><span class="pdf-metric-label">Загальна сума</span><span class="pdf-metric-value mono">${money(monthly.total + quarter.total)}</span></div>`,
       `<div class="pdf-metric"><span class="pdf-metric-label">План продажів</span><span class="pdf-metric-value mono">${monthly.planPercent.toFixed(1)}%</span></div>`,
       `<div class="pdf-metric"><span class="pdf-metric-label">Виконано груп</span><span class="pdf-metric-value mono">${quarter.doneCount} / ${groupNames.length}</span></div>`,
       `<div class="pdf-metric"><span class="pdf-metric-label">Середнє відтермінування</span><span class="pdf-metric-value mono">${monthly.avgDelay.toFixed(1)} дн.</span></div>`
     ].join('');
+    const snapshot = [
+      keyMetricsMarkup,
+      monthlyTable.innerHTML,
+      quarterTable.innerHTML,
+      totalTable.innerHTML,
+      monthly.total,
+      quarter.total,
+      monthly.total + quarter.total
+    ].join('|');
+    if (snapshot === previousPdfSnapshot) return;
+    previousPdfSnapshot = snapshot;
+    pdfKeyMetrics.innerHTML = keyMetricsMarkup;
 
     pdfMonthlyBreakdown.innerHTML = monthlyTable.innerHTML;
     pdfQuarterBreakdown.innerHTML = quarterTable.innerHTML;
@@ -459,9 +493,10 @@
     const tiresAdj = (byId('tiresMinMet').checked ? 0 : -5000) + tiresOver*300;
 
     const results = groupNames.map((name, idx)=>{
-      const m1 = clamp(parseFloat(document.querySelector(`input[data-g="${idx}"][data-m="1"]`).value) || 0,0,200);
-      const m2 = clamp(parseFloat(document.querySelector(`input[data-g="${idx}"][data-m="2"]`).value) || 0,0,200);
-      const m3 = clamp(parseFloat(document.querySelector(`input[data-g="${idx}"][data-m="3"]`).value) || 0,0,200);
+      const inputOffset = idx * 3;
+      const m1 = clamp(parseFloat(groupInputs[inputOffset].value) || 0,0,200);
+      const m2 = clamp(parseFloat(groupInputs[inputOffset + 1].value) || 0,0,200);
+      const m3 = clamp(parseFloat(groupInputs[inputOffset + 2].value) || 0,0,200);
       const avg = (m1+m2+m3)/3;
       const done = avg >= 95;
       return { name, avg, done };
@@ -473,18 +508,29 @@
     const allGroupsBonus = doneCount === groupNames.length ? 10000 : 0;
     const total = tiresAdj + groupBonus + allGroupsBonus;
 
+    const nextProgressSnapshot = [];
     results.forEach((r, idx)=>{
-      document.querySelector(`[data-avg="${idx}"]`).textContent = `${r.avg.toFixed(2)}%`;
+      const ui = groupCells[idx];
+      const avgText = `${r.avg.toFixed(2)}%`;
+      if (ui.avg.textContent !== avgText) ui.avg.textContent = avgText;
       const near = !r.done && r.avg >= 85;
-      const rowEl = groupsBody.children[idx];
-      rowEl.classList.remove('done', 'near', 'fail');
-      rowEl.classList.add(r.done ? 'done' : near ? 'near' : 'fail');
-      document.querySelector(`[data-ok="${idx}"]`).innerHTML = r.done ? '<span class="pill-ok">Виконано</span>' : near ? '<span class="pill-near">Близько</span>' : '<span class="pill-no">Не виконано</span>';
+      const rowClass = r.done ? 'done' : near ? 'near' : 'fail';
+      if (!ui.row.classList.contains(rowClass) || ui.row.classList.length > 1) {
+        ui.row.classList.remove('done', 'near', 'fail');
+        ui.row.classList.add(rowClass);
+      }
+      const okHtml = r.done ? '<span class="pill-ok">Виконано</span>' : near ? '<span class="pill-near">Близько</span>' : '<span class="pill-no">Не виконано</span>';
+      if (ui.ok.innerHTML !== okHtml) ui.ok.innerHTML = okHtml;
       const p = Math.max(0, Math.min(100, (r.avg / 95) * 100));
-      const progress = document.querySelector(`[data-progress="${idx}"] .progress-fill`);
-      progress.style.width = `${p}%`;
-      progress.style.background = progressGradient(r.avg);
+      const progressWidth = `${p}%`;
+      const progressBg = progressGradient(r.avg);
+      nextProgressSnapshot.push(`${progressWidth}|${progressBg}`);
+      if (!previousProgressSnapshot || previousProgressSnapshot[idx] !== nextProgressSnapshot[idx]) {
+        ui.progress.style.width = progressWidth;
+        ui.progress.style.background = progressBg;
+      }
     });
+    previousProgressSnapshot = nextProgressSnapshot;
 
     groupsDoneCount.textContent = `Виконано ${doneCount} з ${groupNames.length} груп`;
     const nextThreshold = [7,8,9,10].find((t) => doneCount < t);
@@ -556,8 +602,9 @@
       const val = tr.children[1]?.textContent || '';
       if (key) rowsMap[key] = val;
     }));
+    const shouldAnimateSummary = !previousSnapshot || prev.total !== nextSnapshot.total || prev.month !== nextSnapshot.month || prev.quarter !== nextSnapshot.quarter;
     previousSnapshot = { ...nextSnapshot, rows: rowsMap };
-    animateSummaryCards();
+    if (shouldAnimateSummary) animateSummaryCards();
   }
 
   function renderHints(el, items) {
@@ -612,6 +659,14 @@
     if (!weakest.length) hints.push({ type: 'success', text: 'Усі квартальні групи вже виконуються.' });
 
     return hints;
+  }
+
+  function scheduleMotivationCalculation(){
+    if (motivationFrameId) return;
+    motivationFrameId = requestAnimationFrame(() => {
+      motivationFrameId = 0;
+      calculateMotivation();
+    });
   }
 
   function calculateMotivation(){
@@ -718,10 +773,10 @@
     const ids = ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','eurRate','tiresOver'];
     ids.forEach((id)=>{
       byId(id).addEventListener('blur', () => { touched.add(id); validateField(id); });
-      byId(id).addEventListener('input', () => { if (touched.has(id)) validateField(id); calculateMotivation(); });
+      byId(id).addEventListener('input', () => { if (touched.has(id)) validateField(id); scheduleMotivationCalculation(); });
     });
-    ['crmDone','tiresMinMet'].forEach(id=>byId(id).addEventListener('change', calculateMotivation));
-    groupsBody.querySelectorAll('input').forEach(input=>input.addEventListener('input', calculateMotivation));
+    ['crmDone','tiresMinMet'].forEach(id=>byId(id).addEventListener('change', scheduleMotivationCalculation));
+    groupInputs.forEach((input)=>input.addEventListener('input', scheduleMotivationCalculation));
   }
 
   byId('refreshRate').addEventListener('click', refreshRate);

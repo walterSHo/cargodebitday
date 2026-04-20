@@ -2,6 +2,16 @@
 
 ## 2026-04-20
 
+- Added a compact helper text under `Виконання плану продажів, %` to clarify plan-bonus tiers and the 27.5% discount reduction rule without changing formulas.
+- Added a compact `Умови мотивації` button and a modal reference table (monthly, CRM, plan execution, delay, overdue, quarter, groups, tires) so full conditions are available on demand without overloading the main form.
+- Removed distracting service labels near field titles in the motivation form: `Фокус` was fully removed, and noisy inline tags like `Впливає` / `Ризик` / `Штраф` are no longer rendered next to labels while keeping underlying calculations unchanged.
+- Performed a safe UI performance cleanup pass without changing formulas or field composition: motivation recalculation from inputs is now frame-batched via `requestAnimationFrame` to reduce bursty rerenders while typing.
+- Reduced repeated DOM querying in quarterly group updates by caching group row nodes/inputs once and reusing them in calculations.
+- Lowered unnecessary DOM writes by updating quarterly average/status/progress cells only when values actually changed.
+- Removed forced reflow from summary flash animation restart and now animate summary cards only when totals actually changed.
+- Added lightweight PDF snapshot guarding so report DOM mirrors are not rewritten when motivation output is unchanged.
+- Synced the same optimization changes across `index.html`, `docs/index.html`, and `assets/scripts/app.js`.
+
 - Removed native number-field spin buttons from the calculator inputs to clean up the compact dark UI.
 - Removed the yellow framed priority container treatment in the motivation form and kept priority feedback on the small label badges instead.
 - Simplified the priority badge further so only colored text remains near the label, avoiding overlap with the field grid.
