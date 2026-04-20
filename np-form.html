@@ -83,6 +83,8 @@
     .hint { font-size: .8rem; color: var(--muted); margin: 0; }
     .print-sheet { display: none; }
     .hidden { display: none !important; }
+    .grid.bn-mode #edrpouField { order: 2; }
+    .grid.bn-mode #contactField { order: 1; }
     @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
     @media print {
       @page { size: A4 portrait; margin: 10mm; }
@@ -158,12 +160,12 @@
           <p class="hint">Якщо БН — обов’язково вкажіть ЄДРПОУ.</p>
         </div>
       </div>
-      <div class="grid">
+      <div class="grid" id="contactEdrpouGrid">
         <div class="field hidden" id="edrpouField">
           <label for="edrpou">ЄДРПОУ</label>
           <input id="edrpou" type="text" inputmode="numeric" placeholder="12345678" />
         </div>
-        <div class="field">
+        <div class="field" id="contactField">
           <label for="contact">Контакт</label>
           <input id="contact" type="text" placeholder="Джефрі – (095) 786 16-65" />
         </div>
@@ -193,6 +195,7 @@
       const paymentType = byId('paymentType');
       const edrpouField = byId('edrpouField');
       const edrpouInput = byId('edrpou');
+      const contactEdrpouGrid = byId('contactEdrpouGrid');
       const contactInput = byId('contact');
       const fieldIds = ['address', 'department', 'receiver', 'paymentType', 'edrpou', 'contact', 'comment'];
 
@@ -200,6 +203,7 @@
         const isBn = paymentType.value === 'БН';
         edrpouField.classList.toggle('hidden', !isBn);
         edrpouInput.required = isBn;
+        contactEdrpouGrid.classList.toggle('bn-mode', isBn);
       }
 
       function formatPhoneUa(rawValue) {
