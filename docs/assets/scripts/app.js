@@ -100,6 +100,7 @@
   let catResumeTimer = null;
   let catVisible = true;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const catLiteMode = prefersReducedMotion.matches || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
   const catLines = [
     'Мрр. Я рахую бонуси лапками.',
     'Якщо що, я за зелені progress bar.',
@@ -876,6 +877,7 @@
     calculateDelay(); calculateMotivation(); setMStatus('Усі поля очищено.', 'ok');
   });
   if (easterCat) {
+    if (catLiteMode) easterCat.classList.add('is-lite');
     easterCat.addEventListener('click', () => {
       setCatLine(catLineIndex + 1, true);
       pauseCatTemporarily(1600);

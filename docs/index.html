@@ -1123,6 +1123,17 @@
     .easter-cat.is-paused {
       animation-play-state: paused;
     }
+    .easter-cat.is-paused .easter-cat-body,
+    .easter-cat.is-paused .easter-cat-tail {
+      animation-play-state: paused;
+    }
+    .easter-cat.is-lite {
+      animation-duration: 30s;
+    }
+    .easter-cat.is-lite .easter-cat-body,
+    .easter-cat.is-lite .easter-cat-tail {
+      animation: none;
+    }
     .easter-cat-bubble {
       position: relative;
       margin-bottom: 26px;
@@ -1778,6 +1789,7 @@
   let catResumeTimer = null;
   let catVisible = true;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const catLiteMode = prefersReducedMotion.matches || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
   const catLines = [
     'Мрр. Я рахую бонуси лапками.',
     'Якщо що, я за зелені progress bar.',
@@ -2554,6 +2566,7 @@
     calculateDelay(); calculateMotivation(); setMStatus('Усі поля очищено.', 'ok');
   });
   if (easterCat) {
+    if (catLiteMode) easterCat.classList.add('is-lite');
     easterCat.addEventListener('click', () => {
       setCatLine(catLineIndex + 1, true);
       pauseCatTemporarily(1600);

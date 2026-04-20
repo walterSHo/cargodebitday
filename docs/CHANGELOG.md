@@ -2,6 +2,7 @@
 
 ## 2026-04-20
 
+- Optimized cat easter-egg runtime: pause all cat sub-animations when paused/offscreen and enable a lightweight mode on reduced-motion / lower-core devices to lower panel jank.
 - Polished the cat easter egg visuals (bubble tail and cat tail geometry) and expanded the rotating cat phrases/celebration lines so interactions feel more playful without affecting calculations.
 - Added gentle threshold alerts (discount near 27.5% and quarterly groups close to 95%), a compact target slider (`Хочу +N грн`) with short actionable suggestions, and a sticky bottom `Загальна сума` bar for long-scroll visibility.
 - Added a generic quiet info-status style for any neutral non-error/non-success message, optimized localStorage writes with dirty-state snapshot checks, and skipped hint-list rerender when markup is unchanged.
