@@ -2054,14 +2054,14 @@
     resetPriorities();
     if (monthly.avgDelay > 7) setPriority('avgDelayFact', monthly.avgDelay > 14 ? 'high' : 'soft');
     if (monthly.avgDiscount >= 24) setPriority('avgDiscount', monthly.avgDiscount >= 27.5 ? 'high' : 'soft');
-    if (!byId('crmDone').checked) setPriority('planTurnover', 'soft', 'Плече');
+    if (!byId('crmDone').checked) setPriority('planTurnover', 'soft');
     const overdueMap = [
       { id: 'overdue1', value: monthly.overdue1 },
       { id: 'overdue2', value: monthly.overdue2 },
       { id: 'overdue3', value: monthly.overdue3 }
     ].sort((a, b) => b.value - a.value);
     if (overdueMap[0].value > 0) setPriority(overdueMap[0].id, 'high');
-    if (!byId('tiresMinMet').checked || quarter.doneCount < 7) setPriority('tiresOver', quarter.doneCount < 7 ? 'high' : 'soft', 'Квартал');
+    if (!byId('tiresMinMet').checked || quarter.doneCount < 7) setPriority('tiresOver', quarter.doneCount < 7 ? 'high' : 'soft');
   }
 
   function updateSummaryNotes(monthly, quarter, total){
