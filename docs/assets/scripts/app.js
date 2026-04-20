@@ -81,6 +81,10 @@
   const pdfQuarterTotal = byId('pdfQuarterTotal');
   const pdfAllTotal = byId('pdfAllTotal');
   const pdfTimestamp = byId('pdfTimestamp');
+  const stickyAllTotal = byId('stickyAllTotal');
+  const targetGainInput = byId('targetGain');
+  const targetGainOut = byId('targetGainOut');
+  const targetPlanAdvice = byId('targetPlanAdvice');
   const summaryMiniCard = document.querySelector('.summary-mini');
   const touched = new Set();
   const priorityFields = new Set();
@@ -611,6 +615,7 @@
     }));
     const shouldAnimateSummary = !previousSnapshot || prev.total !== nextSnapshot.total || prev.month !== nextSnapshot.month || prev.quarter !== nextSnapshot.quarter;
     previousSnapshot = { ...nextSnapshot, rows: rowsMap };
+    if (stickyAllTotal) stickyAllTotal.textContent = money(nextSnapshot.total);
     if (shouldAnimateSummary) animateSummaryCards();
   }
 
@@ -639,6 +644,9 @@
     hints.push(monthly.avgDiscount >= 27.5
       ? { type: 'warn', text: 'Середня знижка зменшує бонус за план на 50%.' }
       : { type: 'info', text: 'Поточна знижка ще не впливає на бонус за план.' });
+    if (monthly.avgDiscount < 27.5 && monthly.avgDiscount >= 25.5) {
+      hints.push({ type: 'warn', text: `До порогу знижки 27.5% залишилось ${(27.5 - monthly.avgDiscount).toFixed(1)}%.` });
+    }
 
     const overdueMax = Math.max(monthly.overdue1, monthly.overdue2, monthly.overdue3);
     if (monthly.overdueEur <= 0) hints.push({ type: 'success', text: 'Прострочення відсутнє — утримання немає.' });
@@ -666,9 +674,64 @@
 
     const weakest = quarter.results.filter((r) => !r.done).sort((a, b) => a.avg - b.avg).slice(0, 2);
     weakest.forEach((r) => hints.push({ type: 'warn', text: `${r.name}: не вистачає +${(95 - r.avg).toFixed(1)}% до 95%.` }));
+    const nearDone = quarter.results
+      .filter((r) => !r.done && (95 - r.avg) <= 2)
+      .sort((a, b) => a.avg - b.avg)
+      .slice(0, 2);
+    nearDone.forEach((r) => hints.push({ type: 'info', text: `${r.name}: майже готово, лишилось ${(95 - r.avg).toFixed(1)}% до порогу 95%.` }));
     if (!weakest.length) hints.push({ type: 'success', text: 'Усі квартальні групи вже виконуються.' });
 
     return hints;
+  }
+
+  function updateTargetAdvisor(monthly, quarter) {
+    if (!targetGainInput || !targetPlanAdvice || !targetGainOut) return;
+    const rawTarget = Math.max(0, Number(targetGainInput.value) || 0);
+    targetGainOut.textContent = money(rawTarget);
+    if (rawTarget <= 0) {
+      targetPlanAdvice.textContent = 'Оберіть ціль — і підкажу найкоротший шлях до приросту.';
+      return;
+    }
+
+    const steps = [];
+    const pushStep = (gain, text) => {
+      if (gain > 0) steps.push({ gain, text });
+    };
+
+    if (monthly.avgDiscount >= 27.5 && monthly.discountReduce > 0) {
+      pushStep(monthly.discountReduce, `Знизити середню знижку нижче 27.5%: +${money(monthly.discountReduce)}.`);
+    }
+
+    if (quarter.doneCount < 10) {
+      const nextCount = quarter.doneCount + 1;
+      const nextGain = groupsBonusByCount(nextCount) - groupsBonusByCount(quarter.doneCount);
+      const closest = quarter.results.filter((r) => !r.done).sort((a, b) => a.avg - b.avg).slice(-1)[0];
+      if (closest && nextGain > 0) {
+        pushStep(nextGain, `${closest.name}: добрати ${(95 - closest.avg).toFixed(1)}% до 95% (+${money(nextGain)}).`);
+      }
+    }
+
+    const perPercentGain = Math.max(0, planBonusByPercent(monthly.planPercent + 1) - planBonusByPercent(monthly.planPercent)) * (monthly.avgDiscount >= 27.5 ? 0.5 : 1);
+    if (perPercentGain > 0 && monthly.planPercent < 120) {
+      const needPercent = Math.min(20, Math.max(1, Math.ceil(rawTarget / perPercentGain)));
+      pushStep(perPercentGain * needPercent, `Підняти виконання плану ще на ${needPercent}% (≈ +${money(perPercentGain * needPercent)}).`);
+    }
+
+    if (monthly.avgDelay > 14) pushStep(3000, 'Опустити відтермінування до 14 днів: +3 000.');
+    if (monthly.avgDelay > 7) pushStep(6000, 'Опустити відтермінування до 7 днів: +6 000.');
+
+    steps.sort((a, b) => b.gain - a.gain);
+    let covered = 0;
+    const selected = [];
+    for (const step of steps) {
+      selected.push(step.text);
+      covered += step.gain;
+      if (covered >= rawTarget) break;
+    }
+
+    targetPlanAdvice.textContent = selected.length
+      ? selected.slice(0, 3).join(' ')
+      : 'Поточні важелі майже в максимумі. Для приросту цілі потрібні додаткові дані/обсяги.';
   }
 
   function scheduleMotivationCalculation(){
@@ -688,6 +751,7 @@
     updateFieldPriorities(monthly, quarter);
     updateSummaryNotes(monthly, quarter, monthly.total + quarter.total);
     updateRewardState(monthly, quarter);
+    updateTargetAdvisor(monthly, quarter);
     renderPdfReport(monthly, quarter);
     saveCalculatorState();
     return { monthly, quarter, total: monthly.total + quarter.total };
@@ -787,6 +851,7 @@
     });
     ['crmDone','tiresMinMet'].forEach(id=>byId(id).addEventListener('change', scheduleMotivationCalculation));
     groupInputs.forEach((input)=>input.addEventListener('input', scheduleMotivationCalculation));
+    if (targetGainInput) targetGainInput.addEventListener('input', scheduleMotivationCalculation);
   }
 
   byId('refreshRate').addEventListener('click', refreshRate);
