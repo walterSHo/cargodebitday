@@ -338,8 +338,8 @@
     }
     .status {
       min-height: 20px;
-      font-size: .84rem;
-      font-weight: 600;
+      font-size: .8rem;
+      font-weight: 500;
       margin: 0;
       line-height: 1.35;
       transition: opacity .18s ease, transform .18s ease, color .18s ease;
@@ -360,10 +360,13 @@
     }
     .status.draft {
       color: #b8d6ff;
+      opacity: .72;
     }
     .status.error {
       color: var(--error);
+      opacity: 1;
     }
+    .status.ok { opacity: 1; }
     .example {
       margin: 10px 2px 0;
       color: var(--muted-soft);
@@ -1430,6 +1433,13 @@
       .pdf-summary-card h3 { font-size: .82rem; }
       .pdf-table td { padding: 3.5px 0; }
       .pdf-total { padding-top: 5px; }
+      .status,
+      .status.ok,
+      .status.draft,
+      .status.error {
+        color: #111621 !important;
+        opacity: 1 !important;
+      }
     }
   </style>
 </head>

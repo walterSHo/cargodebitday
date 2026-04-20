@@ -2,6 +2,7 @@
 
 ## 2026-04-20
 
+- Refined status typography to a single thinner size across both calculators, reduced opacity for non-critical info (`draft`) states, and forced monochrome status text in print/PDF output.
 - Simplified status badges by removing the pill frame/background treatment and leaving only clean colored text for success/draft/error messages.
 - Relaxed the previous print compression pass (larger print zoom and typography) so the PDF remains one-page on A4 but is easier to read.
 - Tightened print/PDF output density (smaller page margins, typography, paddings, and metric/table spacing) and applied print zoom so the existing summary report fits on a single A4 page more reliably.
