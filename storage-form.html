@@ -92,9 +92,13 @@
       <div class="field"><label for="acceptedAt">Дата прийому</label><input id="acceptedAt" type="date" /></div>
       <div class="field"><label for="deadlineAt">Закрити питання до</label><input id="deadlineAt" type="date" /></div>
     </div>
+    <div class="grid">
+      <div class="field"><label for="partNumber">Номер запчастини</label><input id="partNumber" type="text" /></div>
+      <div class="field"><label for="partQty">Кількість</label><input id="partQty" type="number" min="0" step="1" /></div>
+    </div>
     <div class="field">
-      <label for="goodsInfo">Що передали</label>
-      <textarea id="goodsInfo" placeholder="Найменування/кількість/стан"></textarea>
+      <label for="partCondition">Опис / стан</label>
+      <textarea id="partCondition" placeholder="Опис стану, комплектність, дефекти"></textarea>
     </div>
     <div class="field">
       <label for="storageComment">Коментар</label>
@@ -108,7 +112,9 @@
     <div class="row"><div class="key">Відповідальний:</div><div id="printResponsible">—</div></div>
     <div class="row"><div class="key">Дата прийому:</div><div id="printAcceptedAt">—</div></div>
     <div class="row"><div class="key">Закрити питання до:</div><div id="printDeadlineAt">—</div></div>
-    <div class="row"><div class="key">Що передали:</div><div id="printGoodsInfo">—</div></div>
+    <div class="row"><div class="key">Номер запчастини:</div><div id="printPartNumber">—</div></div>
+    <div class="row"><div class="key">Кількість:</div><div id="printPartQty">—</div></div>
+    <div class="row"><div class="key">Опис / стан:</div><div id="printPartCondition">—</div></div>
     <div class="row"><div class="key">Коментар:</div><div id="printStorageComment">—</div></div>
   </section>
 </main>
@@ -120,7 +126,9 @@
     byId('printResponsible').textContent = byId('responsible').value.trim() || '—';
     byId('printAcceptedAt').textContent = byId('acceptedAt').value || '—';
     byId('printDeadlineAt').textContent = byId('deadlineAt').value || '—';
-    byId('printGoodsInfo').textContent = byId('goodsInfo').value.trim() || '—';
+    byId('printPartNumber').textContent = byId('partNumber').value.trim() || '—';
+    byId('printPartQty').textContent = byId('partQty').value.trim() || '—';
+    byId('printPartCondition').textContent = byId('partCondition').value.trim() || '—';
     byId('printStorageComment').textContent = byId('storageComment').value.trim() || '—';
   }
   byId('printStorageBtn').addEventListener('click', () => {
