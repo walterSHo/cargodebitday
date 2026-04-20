@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Форма НП (чернетка)</title>
+  <style>
+    :root {
+      --bg: #09101a;
+      --surface: rgba(14, 22, 36, .84);
+      --line: rgba(100, 124, 161, .22);
+      --text: #f4f7fd;
+      --muted: #9ba9c1;
+      --accent: #6ea8ff;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text);
+      background: linear-gradient(180deg, #09101a 0%, #07111c 52%, #081019 100%);
+      padding: 20px;
+    }
+    .page {
+      width: min(980px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 14px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+    }
+    h1, h2 { margin: 0; }
+    p { margin: 0; color: var(--muted); line-height: 1.45; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .field { display: grid; gap: 6px; }
+    label { font-size: .85rem; color: var(--muted); font-weight: 700; }
+    input, textarea {
+      width: 100%;
+      border: 1px solid rgba(118,150,197,.35);
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(10, 16, 28, .92);
+      color: var(--text);
+      font-size: .95rem;
+    }
+    textarea { min-height: 90px; resize: vertical; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn {
+      border: 1px solid rgba(143,190,255,.5);
+      background: var(--accent);
+      color: #08111d;
+      border-radius: 8px;
+      min-height: 40px;
+      padding: 0 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn[disabled] { opacity: .65; cursor: not-allowed; }
+    .btn-link {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      color: #d7e2f5;
+      border: 1px solid rgba(118,150,197,.34);
+      border-radius: 8px;
+      min-height: 40px;
+      padding: 0 14px;
+    }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="card">
+      <h1>Форма шаблону відправки НП</h1>
+      <p>Чернетка сторінки. Далі додамо ваші поля та вивантаження в PDF на 1 аркуш A4.</p>
+      <div class="actions">
+        <a class="btn-link" href="./index.html">← На головний екран</a>
+        <button class="btn" type="button" disabled>Експорт в PDF (A4) — скоро</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Базовий каркас форми</h2>
+      <div class="grid">
+        <div class="field">
+          <label for="senderName">Відправник</label>
+          <input id="senderName" type="text" placeholder="ПІБ / назва" />
+        </div>
+        <div class="field">
+          <label for="receiverName">Отримувач</label>
+          <input id="receiverName" type="text" placeholder="ПІБ / назва" />
+        </div>
+        <div class="field">
+          <label for="senderPhone">Телефон відправника</label>
+          <input id="senderPhone" type="text" placeholder="+380..." />
+        </div>
+        <div class="field">
+          <label for="receiverPhone">Телефон отримувача</label>
+          <input id="receiverPhone" type="text" placeholder="+380..." />
+        </div>
+      </div>
+      <div class="field">
+        <label for="comment">Коментар</label>
+        <textarea id="comment" placeholder="Тут можна лишити службовий коментар"></textarea>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
