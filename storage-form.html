@@ -76,6 +76,8 @@
       .row { display: grid; grid-template-columns: 170px 1fr; gap: 10px; border-bottom: 1px solid #ddd; padding: 6px 0; }
       .row:last-child { border-bottom: 0; }
       .key { font-weight: 700; }
+      .print-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 8px; }
+      .print-photo { width: 100%; max-height: 125px; object-fit: contain; border: 1px solid #d9d9d9; border-radius: 4px; }
     }
   </style>
 </head>
@@ -135,15 +137,54 @@
   const byId = (id) => document.getElementById(id);
   const photosInput = byId('storagePhotos');
   const photosHint = byId('storagePhotosHint');
+  const printPhotosEl = byId('printStoragePhotos');
+  let currentPhotoUrls = [];
+
+  function clearPhotoUrls() {
+    currentPhotoUrls.forEach((url) => URL.revokeObjectURL(url));
+    currentPhotoUrls = [];
+  }
+
   function getPhotoNames() {
     const files = photosInput && photosInput.files ? Array.from(photosInput.files) : [];
     return files.map((file) => file.name);
   }
+
+  function getPhotoFiles() {
+    return photosInput && photosInput.files ? Array.from(photosInput.files) : [];
+  }
+
+  async function renderPrintPhotos() {
+    clearPhotoUrls();
+    const files = getPhotoFiles();
+    printPhotosEl.innerHTML = '';
+    if (!files.length) {
+      printPhotosEl.textContent = '—';
+      return;
+    }
+
+    const wrap = document.createElement('div');
+    wrap.className = 'print-photos';
+    printPhotosEl.appendChild(wrap);
+
+    const decodes = files.map((file, idx) => {
+      const url = URL.createObjectURL(file);
+      currentPhotoUrls.push(url);
+      const img = document.createElement('img');
+      img.className = 'print-photo';
+      img.src = url;
+      img.alt = `Фото ${idx + 1}`;
+      wrap.appendChild(img);
+      return img.decode ? img.decode().catch(() => null) : Promise.resolve();
+    });
+    await Promise.all(decodes);
+  }
+
   function syncPhotoHint() {
     const names = getPhotoNames();
     photosHint.textContent = names.length ? `Додано фото: ${names.join(', ')}` : 'Фото не вибрано.';
   }
-  function fillPrint() {
+  async function fillPrint() {
     byId('printClient').textContent = byId('client').value.trim() || '—';
     byId('printResponsible').textContent = byId('responsible').value.trim() || '—';
     byId('printAcceptedAt').textContent = byId('acceptedAt').value || '—';
@@ -152,15 +193,15 @@
     byId('printPartQty').textContent = byId('partQty').value.trim() || '—';
     byId('printPartCondition').textContent = byId('partCondition').value.trim() || '—';
     byId('printStorageComment').textContent = byId('storageComment').value.trim() || '—';
-    const names = getPhotoNames();
-    byId('printStoragePhotos').textContent = names.length ? names.join(', ') : '—';
+    await renderPrintPhotos();
   }
   photosInput.addEventListener('change', syncPhotoHint);
   syncPhotoHint();
-  byId('printStorageBtn').addEventListener('click', () => {
-    fillPrint();
+  byId('printStorageBtn').addEventListener('click', async () => {
+    await fillPrint();
     window.print();
   });
+  window.addEventListener('afterprint', clearPhotoUrls);
 })();
 </script>
 </body>
