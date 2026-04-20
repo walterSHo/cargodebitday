@@ -121,7 +121,16 @@
       <div class="actions">
         <a class="btn-link" href="./index.html">← На головний екран</a>
         <button class="btn btn-copy" id="copyRequestBtn" type="button">Скопіювати текст заявки</button>
+        <button class="btn btn-copy" id="saveHistoryBtn" type="button">Зберегти в історію</button>
+        <button class="btn btn-copy" id="loadHistoryBtn" type="button">Підставити з історії</button>
+        <button class="btn btn-copy" id="clearFormBtn" type="button">Очистити форму / Новий бланк</button>
         <button class="btn" id="printPdfBtn" type="button">Завантажити PDF (A4)</button>
+      </div>
+      <div class="field">
+        <label for="historySelect">Останні 5 заявок</label>
+        <select id="historySelect">
+          <option value="">— оберіть заявку —</option>
+        </select>
       </div>
     </section>
 
@@ -180,6 +189,7 @@
     (function () {
       const byId = (id) => document.getElementById(id);
       const storageKey = 'np-form-draft-v1';
+      const historyKey = 'np-form-history-v1';
       const paymentType = byId('paymentType');
       const edrpouField = byId('edrpouField');
       const edrpouInput = byId('edrpou');
@@ -281,6 +291,64 @@
         } catch (_) {}
       }
 
+      function clearForm() {
+        fieldIds.forEach((id) => { byId(id).value = id === 'paymentType' ? 'НАЛ' : ''; });
+        syncPaymentState();
+        saveDraft();
+      }
+
+      function getHistory() {
+        try {
+          const raw = localStorage.getItem(historyKey);
+          const parsed = raw ? JSON.parse(raw) : [];
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (_) {
+          return [];
+        }
+      }
+
+      function saveHistory(history) {
+        try {
+          localStorage.setItem(historyKey, JSON.stringify(history.slice(0, 5)));
+        } catch (_) {}
+      }
+
+      function renderHistoryOptions() {
+        const select = byId('historySelect');
+        const current = getHistory();
+        select.innerHTML = '<option value=\"\">— оберіть заявку —</option>';
+        current.forEach((entry, idx) => {
+          const option = document.createElement('option');
+          option.value = String(idx);
+          option.textContent = `${entry.receiver || 'Без одержувача'} · ${entry.department || 'Без відділення'}`;
+          select.appendChild(option);
+        });
+      }
+
+      function saveCurrentToHistory() {
+        const next = collectData();
+        const current = getHistory();
+        const deduped = current.filter((entry) => JSON.stringify(entry) !== JSON.stringify(next));
+        saveHistory([next, ...deduped]);
+        renderHistoryOptions();
+      }
+
+      function loadFromHistory() {
+        const idx = Number(byId('historySelect').value);
+        if (!Number.isInteger(idx) || idx < 0) return;
+        const entry = getHistory()[idx];
+        if (!entry) return;
+        byId('address').value = entry.address || '';
+        byId('department').value = entry.department || '';
+        byId('receiver').value = entry.receiver || '';
+        byId('paymentType').value = entry.payment || 'НАЛ';
+        byId('edrpou').value = entry.edrpou || '';
+        byId('contact').value = entry.contact || '';
+        byId('comment').value = entry.comment || '';
+        syncPaymentState();
+        saveDraft();
+      }
+
       function restoreDraft() {
         try {
           const raw = localStorage.getItem(storageKey);
@@ -304,6 +372,15 @@
         btn.textContent = ok ? 'Скопійовано ✓' : 'Не вдалося скопіювати';
         setTimeout(() => { btn.textContent = original; }, 1400);
       });
+      byId('saveHistoryBtn').addEventListener('click', () => {
+        saveCurrentToHistory();
+      });
+      byId('loadHistoryBtn').addEventListener('click', () => {
+        loadFromHistory();
+      });
+      byId('clearFormBtn').addEventListener('click', () => {
+        clearForm();
+      });
       contactInput.addEventListener('input', () => {
         const next = formatPhoneUa(contactInput.value);
         contactInput.value = next;
@@ -317,6 +394,7 @@
         syncPaymentState();
         saveDraft();
       });
+      renderHistoryOptions();
       restoreDraft();
       syncPaymentState();
     })();

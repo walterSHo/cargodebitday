@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Зберігання товару (склад)</title>
+  <style>
+    :root {
+      --bg: #09101a;
+      --surface: rgba(14, 22, 36, .84);
+      --line: rgba(100, 124, 161, .22);
+      --text: #f4f7fd;
+      --muted: #9ba9c1;
+      --accent: #6ea8ff;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text);
+      background: linear-gradient(180deg, #09101a 0%, #07111c 52%, #081019 100%);
+      padding: 20px;
+    }
+    .page { width: min(980px, 100%); margin: 0 auto; display: grid; gap: 14px; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+    }
+    h1, h2 { margin: 0; }
+    p { margin: 0; color: var(--muted); }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .field { display: grid; gap: 6px; }
+    label { font-size: .85rem; color: var(--muted); font-weight: 700; }
+    input, textarea {
+      width: 100%;
+      border: 1px solid rgba(118,150,197,.35);
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(10, 16, 28, .92);
+      color: var(--text);
+      font-size: .95rem;
+    }
+    textarea { min-height: 86px; resize: vertical; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn, .btn-link {
+      min-height: 40px;
+      padding: 0 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid rgba(143,190,255,.5);
+    }
+    .btn { background: var(--accent); color: #08111d; cursor: pointer; }
+    .btn-link { color: #d7e2f5; border-color: rgba(118,150,197,.34); }
+    .print-sheet { display: none; }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    @media print {
+      @page { size: A4 portrait; margin: 10mm; }
+      body { background: #fff; color: #111; padding: 0; }
+      .card { display: none !important; }
+      .print-sheet { display: block; border: 1px solid #999; border-radius: 8px; padding: 12px; font-size: 11pt; }
+      .row { display: grid; grid-template-columns: 170px 1fr; gap: 10px; border-bottom: 1px solid #ddd; padding: 6px 0; }
+      .row:last-child { border-bottom: 0; }
+      .key { font-weight: 700; }
+    }
+  </style>
+</head>
+<body>
+<main class="page">
+  <section class="card">
+    <h1>Зберігання товару (склад)</h1>
+    <p>Форма для випадків, коли товар передано без документів на повернення.</p>
+    <div class="actions">
+      <a class="btn-link" href="./index.html">← На головний екран</a>
+      <button type="button" class="btn" id="printStorageBtn">Завантажити PDF (A4)</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Дані</h2>
+    <div class="grid">
+      <div class="field"><label for="client">Клієнт</label><input id="client" type="text" /></div>
+      <div class="field"><label for="responsible">Відповідальний</label><input id="responsible" type="text" /></div>
+      <div class="field"><label for="acceptedAt">Дата прийому</label><input id="acceptedAt" type="date" /></div>
+      <div class="field"><label for="deadlineAt">Закрити питання до</label><input id="deadlineAt" type="date" /></div>
+    </div>
+    <div class="field">
+      <label for="goodsInfo">Що передали</label>
+      <textarea id="goodsInfo" placeholder="Найменування/кількість/стан"></textarea>
+    </div>
+    <div class="field">
+      <label for="storageComment">Коментар</label>
+      <textarea id="storageComment" placeholder="Деталі, домовленості, ризики"></textarea>
+    </div>
+  </section>
+
+  <section id="storagePrintSheet" class="print-sheet" aria-hidden="true">
+    <h1>Акт зберігання товару (склад)</h1>
+    <div class="row"><div class="key">Клієнт:</div><div id="printClient">—</div></div>
+    <div class="row"><div class="key">Відповідальний:</div><div id="printResponsible">—</div></div>
+    <div class="row"><div class="key">Дата прийому:</div><div id="printAcceptedAt">—</div></div>
+    <div class="row"><div class="key">Закрити питання до:</div><div id="printDeadlineAt">—</div></div>
+    <div class="row"><div class="key">Що передали:</div><div id="printGoodsInfo">—</div></div>
+    <div class="row"><div class="key">Коментар:</div><div id="printStorageComment">—</div></div>
+  </section>
+</main>
+<script>
+(function () {
+  const byId = (id) => document.getElementById(id);
+  function fillPrint() {
+    byId('printClient').textContent = byId('client').value.trim() || '—';
+    byId('printResponsible').textContent = byId('responsible').value.trim() || '—';
+    byId('printAcceptedAt').textContent = byId('acceptedAt').value || '—';
+    byId('printDeadlineAt').textContent = byId('deadlineAt').value || '—';
+    byId('printGoodsInfo').textContent = byId('goodsInfo').value.trim() || '—';
+    byId('printStorageComment').textContent = byId('storageComment').value.trim() || '—';
+  }
+  byId('printStorageBtn').addEventListener('click', () => {
+    fillPrint();
+    window.print();
+  });
+})();
+</script>
+</body>
+</html>
