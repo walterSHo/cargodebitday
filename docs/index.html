@@ -1739,6 +1739,9 @@
   const pdfAllTotal = byId('pdfAllTotal');
   const pdfTimestamp = byId('pdfTimestamp');
   const stickyAllTotal = byId('stickyAllTotal');
+  const motivationGuideModal = byId('motivationGuideModal');
+  const openMotivationGuideBtn = byId('openMotivationGuide');
+  const closeMotivationGuideBtn = byId('closeMotivationGuide');
   const summaryMiniCard = document.querySelector('.summary-mini');
   const touched = new Set();
   const priorityFields = new Set();
@@ -2355,6 +2358,14 @@
     });
   }
 
+  function setGuideModalOpen(isOpen){
+    if (!motivationGuideModal) return;
+    motivationGuideModal.hidden = !isOpen;
+    motivationGuideModal.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+    if (isOpen) closeMotivationGuideBtn?.focus({ preventScroll: true });
+    else openMotivationGuideBtn?.focus({ preventScroll: true });
+  }
+
   function calculateMotivation(){
     const monthly = calcMonthly();
     const quarter = calcQuarter();
@@ -2466,6 +2477,14 @@
   }
 
   byId('refreshRate').addEventListener('click', refreshRate);
+  openMotivationGuideBtn?.addEventListener('click', () => setGuideModalOpen(true));
+  closeMotivationGuideBtn?.addEventListener('click', () => setGuideModalOpen(false));
+  motivationGuideModal?.addEventListener('click', (event) => {
+    if (event.target === motivationGuideModal) setGuideModalOpen(false);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && motivationGuideModal && !motivationGuideModal.hidden) setGuideModalOpen(false);
+  });
   byId('recalcMotivation').addEventListener('click', ()=>{ if (!validateAllInputs()) { setMStatus('Виправте помилки перед перерахунком.', 'error'); return; } calculateMotivation(); setMStatus('Розрахунок оновлено.', 'ok'); });
   byId('downloadPdf').addEventListener('click', ()=>{ const stamp = new Date().toLocaleString('uk-UA'); printMeta.textContent = `Дата друку: ${stamp}`; pdfTimestamp.textContent = `Сформовано: ${stamp}`; setMStatus('Підготовлено короткий PDF-звіт.', 'ok'); window.print(); });
   byId('clearAll').addEventListener('click', ()=>{
