@@ -1443,7 +1443,7 @@
           <section class="card">
             <h3>Місячна мотивація</h3>
             <div class="monthly-grid">
-              <div class="field monthly-field"><label for="planTurnover">Плановий оборот (факт)</label><input id="planTurnover" type="number" value="0" /><p class="field-msg" data-msg-for="planTurnover"></p></div>
+              <div class="field monthly-field"><label for="planTurnover">Плановий оборот (факт)</label><input id="planTurnover" type="number" value="0" /><p class="field-hint">До 50 тис: 10 000; 50–150 тис: 20 000; понад 150 тис: 25 000.</p><p class="field-msg" data-msg-for="planTurnover"></p></div>
               <div class="field monthly-field"><label for="planPercent">Виконання плану продажів, %</label><input id="planPercent" type="number" value="0" min="0" max="200" /><p class="field-hint">90%+: +1000/1%, 100%+: +1500/1%, 110%+: +500/1%; знижка ≥27.5% зменшує плановий бонус на 50%.</p><p class="field-msg" data-msg-for="planPercent"></p></div>
               <div class="field monthly-field"><label>CRM</label><div class="monthly-check"><label class="check"><input id="crmDone" type="checkbox" /> CRM виконано на 100% (20 дзвінків або 5 зустрічей)</label><p class="field-hint">Якщо позначено, бонус CRM = 10 000.</p></div></div>
               <div class="field monthly-field"><label for="avgDiscount">Середня знижка, %</label><input id="avgDiscount" type="number" value="0" step="0.1" /><p class="field-hint">При 27.5% і вище бонус за план зменшується на 50%.</p><p class="field-msg" data-msg-for="avgDiscount"></p></div>
@@ -2323,6 +2323,20 @@
     }
   }
 
+  function openMotivationGuide(){
+    if (!motivationGuideModal) return;
+    motivationGuideModal.hidden = false;
+    motivationGuideModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMotivationGuide(){
+    if (!motivationGuideModal) return;
+    motivationGuideModal.hidden = true;
+    motivationGuideModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
   async function refreshRate(){
     const btn = byId('refreshRate');
     btn.disabled = true;
@@ -2419,15 +2433,3 @@
 </script>
 </body>
 </html>
-  function openMotivationGuide(){
-    if (!motivationGuideModal) return;
-    motivationGuideModal.hidden = false;
-    motivationGuideModal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeMotivationGuide(){
-    if (!motivationGuideModal) return;
-    motivationGuideModal.hidden = true;
-    motivationGuideModal.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-  }

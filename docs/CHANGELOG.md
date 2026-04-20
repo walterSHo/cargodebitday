@@ -2,6 +2,8 @@
 
 ## 2026-04-20
 
+- Fixed the motivation guide modal wiring (`Умови мотивації`) so the button opens the dialog correctly, and removed stray JS text that was rendered at the page bottom.
+- Added a compact helper hint under `Плановий оборот (факт)` in the monthly block.
 - Added a compact helper text under `Виконання плану продажів, %` to clarify plan-bonus tiers and the 27.5% discount reduction rule without changing formulas.
 - Added a compact `Умови мотивації` button and a modal reference table (monthly, CRM, plan execution, delay, overdue, quarter, groups, tires) so full conditions are available on demand without overloading the main form.
 - Removed distracting service labels near field titles in the motivation form: `Фокус` was fully removed, and noisy inline tags like `Впливає` / `Ризик` / `Штраф` are no longer rendered next to labels while keeping underlying calculations unchanged.
