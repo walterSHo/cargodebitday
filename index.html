@@ -945,6 +945,25 @@
       text-transform: uppercase;
       letter-spacing: -.01em;
     }
+    .summary-mini-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .summary-mini-head h4 { margin: 0; }
+    .btn-cat-toggle {
+      min-height: 28px;
+      padding: 0 10px;
+      font-size: .72rem;
+      border-radius: 999px;
+      opacity: .85;
+    }
+    .btn-cat-toggle.is-off {
+      border-color: rgba(255,98,102,.38);
+      color: #ffb8bc;
+    }
     .summary-note {
       margin: -4px 0 2px;
       color: var(--muted);
@@ -1103,12 +1122,27 @@
     .easter-cat.is-paused .easter-cat-tail {
       animation-play-state: paused;
     }
+    .easter-cat.is-sleeping {
+      filter: saturate(.72) brightness(.92);
+      opacity: .88;
+    }
+    .easter-cat.is-disabled {
+      animation: none !important;
+      pointer-events: none;
+      opacity: .55;
+      filter: grayscale(.25);
+    }
     .easter-cat.is-lite {
       animation-duration: 30s;
     }
     .easter-cat.is-lite .easter-cat-body,
     .easter-cat.is-lite .easter-cat-tail {
       animation: none;
+    }
+    .field.cat-focus {
+      border-radius: 8px;
+      box-shadow: 0 0 0 2px rgba(110,168,255,.22), 0 0 18px rgba(110,168,255,.14);
+      transition: box-shadow .22s ease;
     }
     .easter-cat-bubble {
       position: relative;
@@ -1534,7 +1568,10 @@
           <div class="summary-item" id="monthlySummaryCard"><h4>Підсумок місяця</h4><p id="monthSummaryNote" class="summary-note">Поки спокійно: оберіть сценарій або введіть дані, щоб побачити важелі впливу.</p><table class="mini-table" id="monthlyBreakdown"></table><div class="total"><span>Підсумок місяця</span><span id="monthTotal" class="mono">0 ₴</span></div></div>
           <div class="summary-item summary-item--total" id="totalSummaryCard"><h4>Загальний підсумок</h4><p id="totalSummaryNote" class="summary-note">Звідси видно сумарний ефект місяця й кварталу разом.</p><table class="mini-table" id="totalBreakdown"></table><div class="total"><span>Загальна сума</span><span id="allTotal" class="mono">0 ₴</span></div></div>
           <section class="summary-item summary-mini" aria-label="Маленька пасхалка з котиком">
-            <h4>Пухнастий ревізор</h4>
+            <div class="summary-mini-head">
+              <h4>Пухнастий ревізор</h4>
+              <button type="button" id="toggleCatBtn" class="btn btn-secondary btn-cat-toggle" aria-pressed="false">Без кота</button>
+            </div>
             <div class="easter-egg-strip">
               <button type="button" id="easterCat" class="easter-cat" aria-label="Погладити котика">
                 <span id="easterCatBubble" class="easter-cat-bubble">Мрр. Я рахую бонуси лапками.</span>
@@ -1721,6 +1758,7 @@
   const printMeta = byId('printMeta');
   const easterCat = byId('easterCat');
   const easterCatBubble = byId('easterCatBubble');
+  const toggleCatBtn = byId('toggleCatBtn');
   const groupsDoneCount = byId('groupsDoneCount'), groupsNextHint = byId('groupsNextHint');
   const errorSummary = byId('errorSummary');
   const summaryItems = Array.from(document.querySelectorAll('.summary-item'));
@@ -1755,6 +1793,26 @@
   let catVisible = true;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const catLiteMode = prefersReducedMotion.matches || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+  const catFacts = [
+    'Факт: бонус за групи стартує з 7 виконаних груп.',
+    'Факт: середнє відтермінування до 7 днів дає максимум.',
+    'Факт: знижка 27.5%+ ріже бонус за план на 50%.'
+  ];
+  const catContextLines = [
+    'Контекст: дивлюсь на підсвічені поля — там головний вплив.',
+    'Контекст: зараз найцікавіше біля квартального блоку.',
+    'Контекст: якщо щось червоне, почни з нього.'
+  ];
+  const catActionLines = [
+    'Лапка в роботі: підсвічую поле, яке найкраще рухне результат.',
+    'Дія: клікай підсвічене поле, воно зараз пріоритетне.',
+    'Я зробив підказку лапкою — далі твій хід.'
+  ];
+  const catSleepLines = [
+    'Тсс... я дрімаю. Розбуди мене кліком.',
+    'Сплю. Без різких рухів, будь ласка.',
+    'Дрімота mode on. Одним кліком повертаюсь.'
+  ];
   const catLines = [
     'Мрр. Я рахую бонуси лапками.',
     'Якщо що, я за зелені progress bar.',
@@ -1776,6 +1834,40 @@
     'Квартал топ. Я вже святкую хвостом.'
   ];
   let catLineIndex = 0;
+  let catState = 'context';
+
+  function nextCatLineFrom(collection){
+    const index = Math.floor(Math.random() * collection.length);
+    return collection[index];
+  }
+
+  function setCatState(state){
+    catState = state;
+    if (!easterCat) return;
+    easterCat.classList.toggle('is-sleeping', state === 'sleep');
+    easterCat.classList.toggle('is-disabled', state === 'off');
+    if (state === 'off') stopCatCycle();
+  }
+
+  function toggleCatVisibility(){
+    if (!easterCat || !toggleCatBtn) return;
+    const isOff = catState === 'off';
+    if (isOff) {
+      setCatState('context');
+      easterCat.hidden = false;
+      toggleCatBtn.textContent = 'Без кота';
+      toggleCatBtn.classList.remove('is-off');
+      toggleCatBtn.setAttribute('aria-pressed', 'false');
+      setCatLine(catLineIndex + 1, false);
+      scheduleCatCycle(7000);
+      return;
+    }
+    setCatState('off');
+    easterCat.hidden = true;
+    toggleCatBtn.textContent = 'Повернути кота';
+    toggleCatBtn.classList.add('is-off');
+    toggleCatBtn.setAttribute('aria-pressed', 'true');
+  }
 
   function row(label, value){ return `<tr><td>${label}</td><td class="mono">${value}</td></tr>`; }
   function setMStatus(msg, type){ motivationStatus.textContent = msg || ''; motivationStatus.className = 'status' + (type ? ' ' + type : ''); }
@@ -1892,8 +1984,15 @@
   }
   function setCatLine(nextIndex, paused){
     if (!easterCatBubble) return;
+    const lineByState = {
+      context: () => nextCatLineFrom(catContextLines),
+      action: () => nextCatLineFrom(catActionLines),
+      fact: () => nextCatLineFrom(catFacts),
+      sleep: () => nextCatLineFrom(catSleepLines),
+      off: () => ''
+    };
     catLineIndex = nextIndex % catLines.length;
-    const nextLine = catLines[catLineIndex];
+    const nextLine = lineByState[catState] ? lineByState[catState]() : catLines[catLineIndex];
     if (easterCatBubble.textContent !== nextLine) easterCatBubble.textContent = nextLine;
     easterCat.classList.toggle('is-paused', Boolean(paused));
   }
@@ -1916,8 +2015,20 @@
     easterCat.classList.add('is-paused');
     catResumeTimer = setTimeout(() => {
       easterCat.classList.remove('is-paused');
+      if (catState === 'action') setCatState('context');
       scheduleCatCycle();
     }, duration);
+  }
+  function catPointToPriorityField(){
+    if (!priorityFields.size) return false;
+    const prioritized = Array.from(priorityFields);
+    const targetField = prioritized.find((field) => field.classList.contains('is-priority-high')) || prioritized[0];
+    if (!targetField) return false;
+    targetField.classList.add('cat-focus');
+    const targetInput = targetField.querySelector('input, select');
+    if (targetInput) targetInput.focus({ preventScroll: true });
+    setTimeout(() => targetField.classList.remove('cat-focus'), 1800);
+    return true;
   }
   function toneClass(value){ return value > 0 ? 'is-positive' : value < 0 ? 'is-negative' : 'is-neutral'; }
   function setFieldMessage(id, msg, kind){
@@ -2096,6 +2207,7 @@
     const miniCard = document.querySelector('.summary-mini');
     if (miniCard) miniCard.classList.toggle('is-celebrating', allGreen);
     if (allGreen && easterCatBubble && !easterCat.classList.contains('is-paused')) {
+      setCatState('fact');
       const celebrationLine = celebrationCatLines[quarter.doneCount % celebrationCatLines.length];
       if (easterCatBubble.textContent !== celebrationLine) easterCatBubble.textContent = celebrationLine;
     }
@@ -2481,8 +2593,11 @@
   if (easterCat) {
     if (catLiteMode) easterCat.classList.add('is-lite');
     easterCat.addEventListener('click', () => {
+      if (catState === 'off') return;
+      const didPoint = catPointToPriorityField();
+      setCatState(didPoint ? 'action' : 'fact');
       setCatLine(catLineIndex + 1, true);
-      pauseCatTemporarily(1600);
+      pauseCatTemporarily(didPoint ? 1700 : 1400);
     });
     if ('IntersectionObserver' in window && summaryMiniCard) {
       const catObserver = new IntersectionObserver(([entry]) => {
@@ -2500,14 +2615,23 @@
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         stopCatCycle();
+        setCatState('sleep');
         easterCat.classList.add('is-paused');
         return;
       }
+      setCatState('context');
       easterCat.classList.remove('is-paused');
       scheduleCatCycle(9000);
     });
+    easterCat.addEventListener('dblclick', () => {
+      if (catState === 'off') return;
+      setCatState('sleep');
+      setCatLine(catLineIndex + 1, true);
+      pauseCatTemporarily(2600);
+    });
     scheduleCatCycle(9000);
   }
+  if (toggleCatBtn) toggleCatBtn.addEventListener('click', toggleCatVisibility);
 
   bindRecalc();
   const restoredState = restoreCalculatorState();
