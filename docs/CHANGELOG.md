@@ -2,6 +2,7 @@
 
 ## 2026-04-20
 
+- Tightened print/PDF output density (smaller page margins, typography, paddings, and metric/table spacing) and applied print zoom so the existing summary report fits on a single A4 page more reliably.
 - Unified the 4-button action block density so all controls now share the same compact height/spacing, and added subtle low-contrast icons to `Умови мотивації` and `Завантажити PDF`.
 - Rearranged the actions block so `Умови мотивації` and `Завантажити PDF` now sit side-by-side, giving a clean 2x2 layout for the four main action buttons.
 - Fixed the motivation guide modal wiring (`Умови мотивації`) so the button opens the dialog correctly, and removed stray JS text that was rendered at the page bottom.
