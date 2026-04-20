@@ -1,0 +1,738 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Калькулятори | Cargo Parts</title>
+  <style>
+    :root {
+      --bg: #eef1f5; --panel: #fff; --header: #102741; --header-border: #0b1d30; --text: #15263d;
+      --muted: #58687f; --line: #cfd7e3; --line-strong: #bbc6d7; --accent: #ffc400; --accent-hover: #efb800;
+      --focus: #2e5e98; --ok: #1f7f43; --error: #c53535; --radius: 8px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Segoe UI", Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); }
+    .topbar { background: var(--header); color: #fff; border-bottom: 1px solid var(--header-border); }
+    .topbar-inner { width: min(1240px, 100%); margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
+    .logo-mark { width: 34px; height: 34px; border-radius: 6px; background: var(--accent); display: grid; place-items: center; color: #0f223a; }
+    .logo-mark svg { width: 20px; height: 20px; }
+    .logo-text { font-weight: 800; text-transform: uppercase; letter-spacing: .4px; line-height: 1; font-size: .75rem; }
+    .page { width: min(1240px, 100%); margin: 0 auto; padding: 16px; display: grid; gap: 14px; }
+    .screen { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; box-shadow: 0 8px 20px rgba(16,39,65,.05); }
+    .screen-head { padding: 12px 14px; border-bottom: 1px solid var(--line); background: #f9fafc; position: relative; }
+    .screen-head::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent); }
+    .screen-head h1,.screen-head h2 { margin: 0; font-size: 1.1rem; letter-spacing: .1px; }
+    .screen-head p { margin: 6px 0 0; color: var(--muted); font-size: .86rem; }
+    .workspace { display: grid; grid-template-columns: minmax(0,2fr) minmax(300px,1fr); }
+    .form-col,.result-col { padding: 14px; }
+    .form-col { border-right: 1px solid var(--line); }
+    .result-col { background: #fcfdff; }
+    .section-grid { display: grid; gap: 12px; }
+    .fields-3 { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
+    .fields-2 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+    .fields-4 { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; }
+    .field { display: grid; gap: 6px; }
+    .monthly-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; align-items: start; }
+    .monthly-field { min-height: 128px; align-content: start; }
+    .monthly-check { min-height: 128px; border: 1px solid var(--line-strong); border-radius: 7px; background: #fff; padding: 8px 10px; display: grid; gap: 8px; align-content: start; }
+    .monthly-check .check { margin: 0; font-size: .83rem; line-height: 1.35; }
+    .field-hint { margin: -2px 0 0; font-size: .74rem; color: #667a95; line-height: 1.35; }
+    .field-msg { min-height: 16px; font-size: .73rem; line-height: 1.3; color: #5a6f89; }
+    .field-msg.error { color: #b23939; }
+    .field-msg.ok { color: #1f7f43; }
+    .field.invalid input { border-color: #d47a7a; box-shadow: 0 0 0 3px rgba(186,57,57,.12); }
+    .field.valid input { border-color: #8ab99a; }
+    label { font-size: .84rem; font-weight: 700; color: #1c3150; }
+    input, select { width: 100%; min-height: 40px; border: 1px solid var(--line-strong); border-radius: 7px; padding: 8px 10px; font-size: .94rem; color: var(--text); background: #fff; outline: none; }
+    input:focus, select:focus { border-color: var(--focus); box-shadow: 0 0 0 3px rgba(46,94,152,.14); }
+    input.is-example { color: rgba(21,38,61,.54); }
+    .hint { margin: 0; padding: 9px 11px; border: 1px solid var(--line); border-radius: 7px; font-size: .81rem; color: #39506f; background: #f7f9fc; line-height: 1.4; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .btn { border: 1px solid transparent; min-height: 40px; padding: 0 12px; border-radius: 7px; font-weight: 700; font-size: .89rem; cursor: pointer; transition: transform .14s ease, box-shadow .18s ease, background-color .18s ease, border-color .18s ease; }
+    .btn-primary { background: var(--accent); color: #1b2f4b; border-color: #e8b500; }
+    .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 6px 14px rgba(255,196,0,.25); }
+    .btn-secondary { background: #eef2f7; color: #203751; border-color: #d4dce8; }
+    .btn-secondary:hover { background: #e4eaf2; box-shadow: 0 4px 10px rgba(16,39,65,.08); }
+    .btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(46,94,152,.18); }
+    .btn:active { transform: translateY(1px); }
+    .btn.copied { background: #dff4e6; border-color: #92d3a4; color: #1d6f3d; }
+    .result-box,.card { border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 12px; display: grid; gap: 8px; }
+    .result-title,.card h3 { margin: 0; font-size: .93rem; font-weight: 800; text-transform: uppercase; letter-spacing: .3px; }
+    .result-line { margin: 0; font-size: .93rem; }
+    .status { min-height: 18px; font-size: .84rem; font-weight: 600; margin: 0; }
+    .status.ok { color: var(--ok); } .status.error { color: var(--error); }
+    .example { margin: 10px 0 0; color: var(--muted); font-size: .8rem; }
+    .motivation-body { padding: 14px; display: grid; gap: 12px; }
+    .cards { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+    .check { display: flex; align-items: center; gap: 8px; font-size: .84rem; }
+    .check input { width: 16px; height: 16px; min-height: auto; accent-color: #1f4f89; }
+    .table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+    .table th,.table td { border-bottom: 1px solid var(--line); padding: 6px 4px; text-align: left; }
+    .table th { background: #f7f9fc; position: sticky; top: 0; }
+    .table td:last-child,.table th:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+    .table-wrap { overflow: auto; max-height: 380px; border: 1px solid var(--line); border-radius: 7px; }
+    .pill-ok,.pill-no { padding: 2px 6px; border-radius: 999px; font-size: .75rem; font-weight: 700; }
+    .pill-ok { background: #e8f5ec; color: #1f7f43; }
+    .pill-no { background: #fdeeee; color: #b23939; }
+    .pill-near { background: #fff5df; color: #8a6111; }
+    .group-row.done { background: #f8fcf9; }
+    .group-row.near { background: #fffcf5; }
+    .group-row.fail { background: #fffafb; }
+    .progress-track { height: 6px; border-radius: 999px; background: #e8edf5; overflow: hidden; min-width: 86px; }
+    .progress-fill { height: 100%; background: #bfc8d8; }
+    .progress-fill.done { background: #53a775; }
+    .progress-fill.near { background: #d8a64a; }
+    .progress-fill.fail { background: #c98383; }
+    .groups-meta { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: .82rem; color: #52667f; margin: 0 0 6px; }
+    .groups-meta strong { color: #1a3556; }
+    .summary-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
+    .summary-item { border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 10px; transition: box-shadow .25s ease, border-color .25s ease; }
+    .summary-item.flash { box-shadow: 0 0 0 3px rgba(46,94,152,.14); border-color: #aac0de; }
+    .summary-item--total { border-color: #c7d3e5; background: #fbfcff; }
+    .summary-item h4 { margin: 0 0 8px; font-size: .88rem; text-transform: uppercase; }
+    .mini-table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+    .mini-table td { border-bottom: 1px solid var(--line); padding: 5px 0; }
+    .mini-table td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+    .total { margin-top: 6px; display: flex; justify-content: space-between; font-weight: 800; font-size: 1.02rem; }
+    .total .mono { color: #102741; }
+    .is-positive { color: #1f7f43; }
+    .is-negative { color: #b23939; }
+    .is-neutral { color: #4d617c; }
+    .row-changed { animation: rowPulse .55s ease; }
+    .disclaimer { margin: 2px 2px 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 7px; background: #f9fafc; color: #5f7088; font-size: .78rem; line-height: 1.45; }
+    .error-summary { border: 1px solid #e7bbbb; background: #fff3f3; color: #8e2a2a; border-radius: 7px; padding: 8px 10px; font-size: .78rem; line-height: 1.35; }
+    .mini-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-xs { min-height: 34px; padding: 0 10px; font-size: .8rem; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(8, 18, 30, .45); display: none; align-items: center; justify-content: center; padding: 18px; z-index: 1000; }
+    .modal-backdrop.open { display: flex; }
+    .modal-card { width: min(920px, 100%); max-height: 86vh; overflow: auto; background: #fff; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 18px 40px rgba(8,18,30,.25); }
+    .modal-head { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; background: #f8fafd; border-bottom: 1px solid var(--line); }
+    .modal-title { margin: 0; font-size: .92rem; text-transform: uppercase; letter-spacing: .2px; }
+    .modal-body { padding: 10px 12px 12px; }
+    .table-compact td, .table-compact th { font-size: .8rem; padding: 6px 5px; }
+    .hints { border: 1px solid var(--line); border-radius: 8px; background: #fbfcff; padding: 10px; }
+    .hints h4 { margin: 0 0 6px; font-size: .82rem; text-transform: uppercase; color: #1d3657; }
+    .hint-list { margin: 0; padding-left: 16px; display: grid; gap: 4px; font-size: .78rem; }
+    .hint-list li.info { color: #495f7a; }
+    .hint-list li.success { color: #237348; }
+    .hint-list li.warn { color: #9b5f0c; }
+    @keyframes rowPulse { from { background: #fff9dc; } to { background: transparent; } }
+    @keyframes fadeInFast { from { opacity: .4; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+    .mono { font-variant-numeric: tabular-nums; }
+    @media (min-width: 1081px){ .summary-item--total { position: sticky; top: 14px; } }
+    @media (max-width: 1080px){ .workspace,.cards,.summary-grid { grid-template-columns: 1fr; } .form-col { border-right: 0; border-bottom: 1px solid var(--line);} }
+    @media (max-width: 760px){ .fields-2,.fields-3,.fields-4,.monthly-grid { grid-template-columns: 1fr; } .actions { display:grid; grid-template-columns:1fr; } .btn { width:100%; } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+    }
+    @media print {
+      body { background: #fff; }
+      .topbar, .actions, #errorSummary, #motivationStatus, #rateStatus, .field-msg, .field-hint { display: none !important; }
+      .page { width: 100%; padding: 0; gap: 8px; }
+      .screen, .card, .summary-item { box-shadow: none; border-color: #d0d0d0; }
+      .table-wrap { max-height: none; overflow: visible; }
+      .disclaimer { border-style: dashed; }
+      #printMeta { display: block !important; }
+    }
+  </style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner"><div class="logo-mark" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="11" fill="#0f223a"></circle><path d="M32 7v10M32 47v10M7 32h10M47 32h10M14 14l7 7M43 43l7 7M14 50l7-7M43 21l7-7" stroke="#0f223a" stroke-width="4" stroke-linecap="round"></path></svg></div><div class="logo-text">Cargo<br>Parts</div></div></header>
+<main class="page">
+  <section class="screen" aria-labelledby="delayTitle">
+    <div class="screen-head"><h1 id="delayTitle">Калькулятор середнього відтермінування</h1><p>Базовий розрахунок коефіцієнта і строку відтермінування.</p></div>
+    <div class="workspace">
+      <div class="form-col">
+        <form id="calcForm" class="section-grid" novalidate>
+          <div class="fields-3">
+            <div class="field"><label for="debt">Борг</label><input id="debt" type="number" value="58617" data-example="58617" class="is-example" /></div>
+            <div class="field"><label for="turnover">Сума оборота</label><input id="turnover" type="number" value="155775" data-example="155775" class="is-example" /></div>
+            <div class="field"><label for="days">Кількість днів</label><input id="days" type="number" value="31" data-example="31" class="is-example" /></div>
+          </div>
+          <p class="hint">Формула: <strong>коефіцієнт = борг / сума оборота</strong>, <strong>дні відтермінування = коефіцієнт × кількість днів у місяці</strong>.</p>
+          <div class="actions"><button type="submit" class="btn btn-primary">Розрахувати</button><button type="button" id="clearBtn" class="btn btn-secondary">Очистити</button><button type="button" id="copyBtn" class="btn btn-secondary">Скопіювати результат</button></div>
+        </form>
+      </div>
+      <aside class="result-col" aria-live="polite" aria-atomic="true"><section class="result-box"><h2 class="result-title">Результат</h2><p id="coefOut" class="result-line">Коефіцієнт: —</p><p id="daysOut" class="result-line">Середнє відтермінування: —</p><p id="status" class="status" role="status"></p></section><p class="example">Приклад: борг 58 617, оборот 155 775, днів 31 → 0.3763 та 11.67 днів.</p></aside>
+    </div>
+  </section>
+
+  <section class="screen" aria-labelledby="motivationTitle">
+    <div class="screen-head"><h2 id="motivationTitle">Розрахунок мотивації / ЗП</h2><p>Окремо: місячна мотивація, квартальний бонус, загальний підсумок.</p></div>
+    <div class="motivation-body">
+      <div class="cards">
+        <section class="card">
+          <h3>Місячна мотивація</h3>
+          <div class="monthly-grid">
+            <div class="field monthly-field"><label for="planTurnover">Плановий оборот</label><input id="planTurnover" type="number" value="0" /><p class="field-msg" data-msg-for="planTurnover"></p></div>
+            <div class="field monthly-field"><label for="planPercent">Виконання плану продажів, %</label><input id="planPercent" type="number" value="0" min="0" max="200" /><p class="field-hint">90%+: +1000/1%, 100%+: +1500/1%, 110%+: +500/1%. При знижці ≥27.5% бонус за план ×0.5.</p><p class="field-msg" data-msg-for="planPercent"></p></div>
+            <div class="field monthly-field"><label>CRM</label><div class="monthly-check"><label class="check"><input id="crmDone" type="checkbox" /> CRM виконано на 100% (20 дзвінків або 5 зустрічей)</label><p class="field-hint">Якщо позначено, бонус CRM = 10 000.</p></div></div>
+            <div class="field monthly-field"><label for="avgDiscount">Середня знижка, %</label><input id="avgDiscount" type="number" value="0" step="0.1" /><p class="field-hint">При 27.5% і вище бонус за план зменшується на 50%.</p><p class="field-msg" data-msg-for="avgDiscount"></p></div>
+            <div class="field monthly-field"><label for="avgDelayFact">Середнє відтермінування (факт), днів</label><input id="avgDelayFact" type="number" value="0" step="0.1" /><p class="field-hint">До 7 днів: 6000, до 14: 3000, більше 14: 0.</p><p class="field-msg" data-msg-for="avgDelayFact"></p></div>
+            <div class="field monthly-field"><label for="eurRate">Курс EUR → бонусна валюта</label><input id="eurRate" type="number" value="45" step="0.01" /><p class="field-hint">Якщо автокурс недоступний, введіть вручну.</p><p class="field-msg" data-msg-for="eurRate"></p></div>
+            <div class="field monthly-field"><label for="overdue1">Прострочка 1–10 днів (EUR)</label><input id="overdue1" type="number" value="0" /><p class="field-hint">Утримання 0.5% від суми.</p><p class="field-msg" data-msg-for="overdue1"></p></div>
+            <div class="field monthly-field"><label for="overdue2">Прострочка 11–20 днів (EUR)</label><input id="overdue2" type="number" value="0" /><p class="field-hint">Утримання 1.0% від суми.</p><p class="field-msg" data-msg-for="overdue2"></p></div>
+            <div class="field monthly-field"><label for="overdue3">Прострочка 20+ днів (EUR)</label><input id="overdue3" type="number" value="0" /><p class="field-hint">Утримання 2.0% від суми.</p><p class="field-msg" data-msg-for="overdue3"></p></div>
+            <div class="field monthly-field"><label>&nbsp;</label><button type="button" id="refreshRate" class="btn btn-secondary">Оновити курс</button></div>
+          </div>
+          <div class="mini-actions"><button type="button" id="openRulesModal" class="btn btn-secondary btn-xs">Таблиця умов мотивації</button></div>
+          <p id="rateStatus" class="status"></p>
+        </section>
+
+        <section class="card">
+          <h3>Квартальна мотивація</h3>
+          <div class="fields-2">
+            <label class="check"><input id="tiresMinMet" type="checkbox" checked /> Мінімальний план шин виконано</label>
+            <div class="field"><label for="tiresOver">Шин понад мінімальний план, шт</label><input id="tiresOver" type="number" value="0" /><p class="field-hint">Кожна шина понад мінімум: +300.</p><p class="field-msg" data-msg-for="tiresOver"></p></div>
+          </div>
+          <p class="groups-meta"><span><strong id="groupsDoneCount">Виконано 0 з 12 груп</strong></span><span id="groupsNextHint">До бонусного порогу потрібно щонайменше 7 груп.</span><span>Група виконується, якщо середнє за квартал ≥ 95%.</span></p>
+          <div class="table-wrap">
+            <table class="table" id="groupsTable"><thead><tr><th>Група</th><th>М1 %</th><th>М2 %</th><th>М3 %</th><th>Середнє</th><th>Прогрес до 95%</th><th>Статус</th></tr></thead><tbody></tbody></table>
+          </div>
+        </section>
+      </div>
+
+      <section class="card">
+        <h3>Підсумки</h3>
+        <p id="printMeta" class="field-hint" style="display:none;">Дата друку: —</p>
+        <div class="summary-grid">
+          <div class="summary-item"><h4>Місячна мотивація</h4><table class="mini-table" id="monthlyBreakdown"></table><div class="total"><span>Підсумок місяця</span><span id="monthTotal" class="mono">0 ₴</span></div></div>
+          <div class="summary-item"><h4>Квартальний бонус</h4><table class="mini-table" id="quarterBreakdown"></table><div class="total"><span>Підсумок кварталу</span><span id="quarterTotal" class="mono">0 ₴</span></div></div>
+          <div class="summary-item summary-item--total"><h4>Загальний підсумок</h4><table class="mini-table" id="totalBreakdown"></table><div class="total"><span>Загальна сума</span><span id="allTotal" class="mono">0 ₴</span></div></div>
+        </div>
+        <div id="errorSummary" class="error-summary" role="alert" hidden></div>
+        <div class="actions"><button type="button" id="recalcMotivation" class="btn btn-primary">Перерахувати</button><button type="button" id="copyMotivationShort" class="btn btn-secondary">Скопіювати коротко</button><button type="button" id="copyMotivation" class="btn btn-secondary">Скопіювати детально</button><button type="button" id="downloadPdf" class="btn btn-secondary">Завантажити PDF</button><button type="button" id="clearAll" class="btn btn-secondary">Очистити все</button></div>
+        <p id="motivationStatus" class="status" role="status" aria-live="polite"></p>
+        <div class="summary-grid">
+          <section class="hints">
+            <h4>Підказки: місяць</h4>
+            <ul id="monthlyHints" class="hint-list"></ul>
+          </section>
+          <section class="hints">
+            <h4>Підказки: квартал</h4>
+            <ul id="quarterHints" class="hint-list"></ul>
+          </section>
+        </div>
+        <p class="disclaimer">Увага: розрахунок має інформаційний характер і може відрізнятися від фактичного нарахування. Підсумкові значення залежать від внутрішніх правил компанії, актуального курсу валют і фінального підтвердження.</p>
+      </section>
+    </div>
+  </section>
+</main>
+
+<div id="rulesModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
+  <section class="modal-card">
+    <header class="modal-head">
+      <h3 id="rulesTitle" class="modal-title">Умови мотивації (довідка)</h3>
+      <button type="button" id="closeRulesModal" class="btn btn-secondary btn-xs">Закрити</button>
+    </header>
+    <div class="modal-body">
+      <table class="table table-compact">
+        <thead><tr><th>Блок</th><th>Умова</th><th>Нарахування / утримання</th></tr></thead>
+        <tbody>
+          <tr><td>ТП</td><td>Плановий оборот &lt; 50000 / 50000–150000 / &gt;150000</td><td>10000 / 20000 / 25000</td></tr>
+          <tr><td>CRM</td><td>Checkbox “CRM 100%”</td><td>+10000 або 0</td></tr>
+          <tr><td>План продажів</td><td>90%+, 100%+, 110%+</td><td>+1000 / +1500 / +500 за кожен 1%</td></tr>
+          <tr><td>Знижка</td><td>Середня знижка ≥ 27.5%</td><td>Бонус за план ×0.5</td></tr>
+          <tr><td>Відтермінування</td><td>≤7 / ≤14 / &gt;14 днів</td><td>6000 / 3000 / 0</td></tr>
+          <tr><td>Прострочка (EUR)</td><td>1–10 / 11–20 / 20+</td><td>0.5% / 1.0% / 2.0%, далі конвертація по курсу</td></tr>
+          <tr><td>Групи кварталу</td><td>Середнє за 3 міс. = (M1+M2+M3)/3, виконано при ≥95%</td><td>7/8/9/10+ груп: 12000/16000/22000/30000</td></tr>
+          <tr><td>Всі 12 груп</td><td>Виконані всі групи</td><td>+10000 додатково</td></tr>
+          <tr><td>Шини</td><td>Мін. план не виконано / шини понад мінімум</td><td>-5000 / +300 за 1 шт.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  const groupNames = ['АВТОХІМІЯ І ОЛИВИ','АМОРТИЗАЦІЯ','ГАЛЬМІВНА СИСТЕМА','ДВИГУН','ЕЛЕКТРИКА','ОХОЛОДЖЕННЯ','ПІДВІСКА','ПНЕВМАТИКА','СИСТЕМА ЗЧЕПЛЕННЯ','ТРАНСМІСІЯ','ФІЛЬТР','PROFIT / JOKER'];
+  const groupsBody = document.querySelector('#groupsTable tbody');
+  const groupRows = [];
+  groupNames.forEach((name, i) => {
+    const tr = document.createElement('tr');
+    tr.className = 'group-row fail';
+    tr.innerHTML = `<td>${name}</td>
+      <td><input type="number" min="0" max="200" step="0.1" data-g="${i}" data-m="1" value="0"></td>
+      <td><input type="number" min="0" max="200" step="0.1" data-g="${i}" data-m="2" value="0"></td>
+      <td><input type="number" min="0" max="200" step="0.1" data-g="${i}" data-m="3" value="0"></td>
+      <td class="mono" data-avg="${i}">0.00%</td>
+      <td data-progress="${i}"><div class="progress-track"><div class="progress-fill fail" style="width:0%"></div></div></td>
+      <td data-ok="${i}"><span class="pill-no">Не виконано</span></td>`;
+    groupsBody.appendChild(tr);
+    groupRows.push({
+      name,
+      rowEl: tr,
+      m1: tr.querySelector('input[data-m="1"]'),
+      m2: tr.querySelector('input[data-m="2"]'),
+      m3: tr.querySelector('input[data-m="3"]'),
+      avgEl: tr.querySelector(`[data-avg="${i}"]`),
+      okEl: tr.querySelector(`[data-ok="${i}"]`),
+      progressEl: tr.querySelector(`[data-progress="${i}"] .progress-fill`)
+    });
+  });
+
+  const byId = (id) => document.getElementById(id);
+  const money = (v) => `${new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(v)} ₴`;
+  const eur = (v) => `${new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(v)} EUR`;
+  const num = (id) => { const v = parseFloat(byId(id).value); return Number.isFinite(v) ? v : 0; };
+  const clamp = (n,min,max) => Math.max(min, Math.min(max, n));
+
+  // Delay calculator (existing)
+  const form = byId('calcForm'), debtInput = byId('debt'), turnoverInput = byId('turnover'), daysInput = byId('days');
+  const coefOut = byId('coefOut'), daysOut = byId('daysOut'), status = byId('status'), clearBtn = byId('clearBtn'), copyBtn = byId('copyBtn');
+  const exampleInputs = [debtInput, turnoverInput, daysInput];
+  let lastResult = '';
+  function setStatus(msg, type){ status.textContent = msg || ''; status.className = 'status' + (type ? ' ' + type : ''); }
+  function parseNumber(v){ return Number(String(v).replace(',', '.')); }
+  function refreshExampleState(input){ input.classList.toggle('is-example', Boolean(input.dataset.example && input.value.trim() === input.dataset.example)); }
+  function calculateDelay(){
+    const debt = parseNumber(debtInput.value.trim()), turnover = parseNumber(turnoverInput.value.trim()), days = parseNumber(daysInput.value.trim());
+    if (!debtInput.value.trim() || !turnoverInput.value.trim() || !daysInput.value.trim()) return setStatus('Будь ласка, заповніть усі поля.', 'error');
+    if ([debt, turnover, days].some(Number.isNaN) || turnover === 0 || days <= 0 || debt < 0 || turnover < 0) { coefOut.textContent='Коефіцієнт: —'; daysOut.textContent='Середнє відтермінування: —'; return setStatus('Перевірте значення полів.', 'error'); }
+    const c = debt / turnover, d = c * days;
+    coefOut.textContent = `Коефіцієнт: ${c.toFixed(4)}`; daysOut.textContent = `Середнє відтермінування: ${d.toFixed(2)} днів`;
+    lastResult = `${coefOut.textContent}\n${daysOut.textContent}`; setStatus('Розрахунок виконано успішно.', 'ok');
+  }
+  form.addEventListener('submit', (e)=>{ e.preventDefault(); calculateDelay(); });
+  form.addEventListener('keydown', (e)=>{ if (e.key==='Enter'){ e.preventDefault(); calculateDelay(); }});
+  exampleInputs.forEach((i)=>i.addEventListener('input', ()=>refreshExampleState(i)));
+  clearBtn.addEventListener('click', ()=>{ debtInput.value=''; turnoverInput.value=''; daysInput.value=''; exampleInputs.forEach(i=>i.classList.remove('is-example')); coefOut.textContent='Коефіцієнт: —'; daysOut.textContent='Середнє відтермінування: —'; setStatus('Поля очищено.','ok'); });
+  copyBtn.addEventListener('click', async (e)=>{
+    if(!lastResult) return setStatus('Немає результату для копіювання.','error');
+    const ok = await copyToClipboard(lastResult);
+    if (ok) { setStatus('✓ Скопійовано', 'ok'); blinkCopied(e.currentTarget); }
+    else { setStatus('Не вдалося скопіювати. Спробуйте ще раз.', 'error'); }
+  });
+
+  // Motivation calculator
+  const monthlyTable = byId('monthlyBreakdown'), quarterTable = byId('quarterBreakdown'), totalTable = byId('totalBreakdown');
+  const monthTotalEl = byId('monthTotal'), quarterTotalEl = byId('quarterTotal'), allTotalEl = byId('allTotal');
+  const motivationStatus = byId('motivationStatus'), rateStatus = byId('rateStatus');
+  const monthlyHintsEl = byId('monthlyHints'), quarterHintsEl = byId('quarterHints');
+  const printMeta = byId('printMeta');
+  const groupsDoneCount = byId('groupsDoneCount'), groupsNextHint = byId('groupsNextHint');
+  const errorSummary = byId('errorSummary');
+  const summaryItems = Array.from(document.querySelectorAll('.summary-item'));
+  const touched = new Set();
+  let previousSnapshot = null;
+  let recalcScheduled = false;
+
+  function row(label, value){ return `<tr><td>${label}</td><td class="mono">${value}</td></tr>`; }
+  function setMStatus(msg, type){ motivationStatus.textContent = msg || ''; motivationStatus.className = 'status' + (type ? ' ' + type : ''); }
+  function setRateStatus(msg, type){ rateStatus.textContent = msg || ''; rateStatus.className = 'status' + (type ? ' ' + type : ''); }
+  async function copyToClipboard(text){
+    if (!text) return false;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (_) {}
+
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '-9999px';
+      ta.style.left = '-9999px';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, ta.value.length);
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return Boolean(ok);
+    } catch (_) {
+      return false;
+    }
+  }
+  function blinkCopied(btn){
+    if (!btn) return;
+    btn.classList.add('copied');
+    setTimeout(() => btn.classList.remove('copied'), 1100);
+  }
+  function toneClass(value){ return value > 0 ? 'is-positive' : value < 0 ? 'is-negative' : 'is-neutral'; }
+  function setFieldMessage(id, msg, kind){
+    const input = byId(id);
+    const field = input && input.closest('.field');
+    const msgEl = document.querySelector(`[data-msg-for="${id}"]`);
+    if (!field || !msgEl) return;
+    field.classList.remove('invalid', 'valid');
+    msgEl.className = 'field-msg';
+    msgEl.textContent = msg || '';
+    if (msg && kind === 'error') { field.classList.add('invalid'); msgEl.classList.add('error'); }
+    if (msg && kind === 'ok') { field.classList.add('valid'); msgEl.classList.add('ok'); }
+  }
+  function validateField(id){
+    const val = parseFloat(byId(id).value);
+    const finite = Number.isFinite(val);
+    if (!touched.has(id)) { setFieldMessage(id, '', ''); return true; }
+    const rules = {
+      planTurnover: () => !finite || val < 0 ? 'Введіть число ≥ 0.' : '',
+      planPercent: () => !finite || val < 0 || val > 200 ? 'Діапазон: 0–200%.' : '',
+      avgDiscount: () => !finite || val < 0 || val > 200 ? 'Діапазон: 0–200%.' : '',
+      avgDelayFact: () => !finite || val < 0 ? 'Значення має бути ≥ 0.' : '',
+      overdue1: () => !finite || val < 0 ? 'Сума EUR має бути ≥ 0.' : '',
+      overdue2: () => !finite || val < 0 ? 'Сума EUR має бути ≥ 0.' : '',
+      overdue3: () => !finite || val < 0 ? 'Сума EUR має бути ≥ 0.' : '',
+      eurRate: () => !finite || val <= 0 ? 'Курс має бути > 0.' : '',
+      tiresOver: () => !finite || val < 0 || !Number.isInteger(val) ? 'Вкажіть ціле число ≥ 0.' : ''
+    };
+    const err = rules[id] ? rules[id]() : '';
+    if (err) { setFieldMessage(id, err, 'error'); return false; }
+    setFieldMessage(id, '✓ Коректно', 'ok');
+    return true;
+  }
+  function validateAllInputs(){
+    const ids = ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','eurRate','tiresOver'];
+    ids.forEach((id) => touched.add(id));
+    const invalid = ids.filter((id) => !validateField(id));
+    if (invalid.length) {
+      errorSummary.hidden = false;
+      errorSummary.textContent = `Перевірте заповнення полів (${invalid.length}). Наприклад: ${invalid.slice(0,3).join(', ')}.`;
+      return false;
+    }
+    errorSummary.hidden = true;
+    return true;
+  }
+  function animateSummaryCards(){
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    summaryItems.forEach((el) => {
+      el.classList.remove('flash');
+      requestAnimationFrame(() => {
+        el.classList.add('flash');
+        setTimeout(() => el.classList.remove('flash'), 360);
+      });
+    });
+  }
+  function requestMotivationRecalc(){
+    if (recalcScheduled) return;
+    recalcScheduled = true;
+    requestAnimationFrame(() => {
+      recalcScheduled = false;
+      calculateMotivation();
+    });
+  }
+  function animateNumber(el, from, to, formatter){
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) { el.textContent = formatter(to); return; }
+    const duration = 280;
+    const start = performance.now();
+    function tick(now){
+      const p = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = formatter(from + (to - from) * eased);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function planBonusByPercent(percent){
+    const p = clamp(percent,0,200);
+    if (p <= 90) return 0;
+    return Math.max(0, Math.min(p,100)-90)*1000 + Math.max(0, Math.min(p,110)-100)*1500 + Math.max(0, p-110)*500;
+  }
+
+  function calcMonthly(){
+    const planTurnover = num('planTurnover');
+    const crmBonus = byId('crmDone').checked ? 10000 : 0;
+    const planPercent = clamp(num('planPercent'),0,200);
+    const avgDiscount = num('avgDiscount');
+    const avgDelay = num('avgDelayFact');
+    const overdue1 = Math.max(0, num('overdue1'));
+    const overdue2 = Math.max(0, num('overdue2'));
+    const overdue3 = Math.max(0, num('overdue3'));
+    const rate = Math.max(0, num('eurRate'));
+
+    const tpBonus = planTurnover < 50000 ? 10000 : planTurnover > 150000 ? 25000 : 20000;
+    const planBase = planBonusByPercent(planPercent);
+    const discountReduce = avgDiscount >= 27.5 ? planBase * 0.5 : 0;
+    const planFinal = planBase - discountReduce;
+    const delayBonus = avgDelay <= 7 ? 6000 : avgDelay <= 14 ? 3000 : 0;
+
+    const overdueEur = overdue1*0.005 + overdue2*0.01 + overdue3*0.02;
+    const overdueLocal = overdueEur * rate;
+
+    const total = tpBonus + crmBonus + planFinal + delayBonus - overdueLocal;
+
+    return { tpBonus, crmBonus, planBase, discountReduce, planFinal, delayBonus, overdueEur, rate, overdueLocal, total, planPercent, avgDelay, avgDiscount, overdue1, overdue2, overdue3 };
+  }
+
+  function groupsBonusByCount(count){
+    if (count < 7) return 0;
+    if (count === 7) return 12000;
+    if (count === 8) return 16000;
+    if (count === 9) return 22000;
+    return 30000;
+  }
+
+  function calcQuarter(){
+    const tiresOver = Math.max(0, num('tiresOver'));
+    const tiresAdj = (byId('tiresMinMet').checked ? 0 : -5000) + tiresOver*300;
+
+    const results = groupRows.map((gRow)=>{
+      const m1 = clamp(parseFloat(gRow.m1.value) || 0,0,200);
+      const m2 = clamp(parseFloat(gRow.m2.value) || 0,0,200);
+      const m3 = clamp(parseFloat(gRow.m3.value) || 0,0,200);
+      const avg = (m1+m2+m3)/3;
+      const done = avg >= 95;
+      return { name: gRow.name, avg, done };
+    });
+
+    const doneCount = results.filter(r=>r.done).length;
+    const doneNames = results.filter(r=>r.done).map(r=>r.name);
+    const groupBonus = groupsBonusByCount(doneCount);
+    const allGroupsBonus = doneCount === groupNames.length ? 10000 : 0;
+    const total = tiresAdj + groupBonus + allGroupsBonus;
+
+    results.forEach((r, idx)=>{
+      const near = !r.done && r.avg >= 85;
+      const { rowEl, avgEl, okEl, progressEl } = groupRows[idx];
+      avgEl.textContent = `${r.avg.toFixed(2)}%`;
+      rowEl.classList.remove('done', 'near', 'fail');
+      rowEl.classList.add(r.done ? 'done' : near ? 'near' : 'fail');
+      okEl.innerHTML = r.done ? '<span class="pill-ok">Виконано</span>' : near ? '<span class="pill-near">Близько</span>' : '<span class="pill-no">Не виконано</span>';
+      const p = Math.max(0, Math.min(100, (r.avg / 95) * 100));
+      progressEl.style.width = `${p}%`;
+      progressEl.className = `progress-fill ${r.done ? 'done' : near ? 'near' : 'fail'}`;
+    });
+
+    groupsDoneCount.textContent = `Виконано ${doneCount} з ${groupNames.length} груп`;
+    const nextThreshold = [7,8,9,10].find((t) => doneCount < t);
+    groupsNextHint.textContent = doneCount >= 10
+      ? (doneCount === groupNames.length ? 'Виконано максимум: діє додатковий бонус за всі групи.' : 'До наступного рівня бонусу за групи залишився статус “10+”.')
+      : `Ще ${nextThreshold - doneCount} груп(и) до бонусу ${groupsBonusByCount(nextThreshold)}.`;
+
+    return { tiresAdj, doneCount, doneNames, groupBonus, allGroupsBonus, total, results };
+  }
+
+  function renderBreakdown(monthly, quarter){
+    monthlyTable.innerHTML = [
+      row('Бонус ТП', money(monthly.tpBonus)),
+      row('Бонус CRM', money(monthly.crmBonus)),
+      row('Бонус за виконання плану', money(monthly.planBase)),
+      row('Зменшення через знижку', `- ${money(monthly.discountReduce)}`),
+      row('Бонус за відтермінування', money(monthly.delayBonus)),
+      row('Штраф за прострочку (EUR)', eur(monthly.overdueEur)),
+      row('Курс EUR', monthly.rate.toFixed(4)),
+      row('Штраф в бонусній валюті', `- ${money(monthly.overdueLocal)}`)
+    ].join('');
+
+    quarterTable.innerHTML = [
+      row('Штраф/бонус по шинам', money(quarter.tiresAdj)),
+      row('Кількість виконаних груп', String(quarter.doneCount)),
+      row('Бонус за групи', money(quarter.groupBonus)),
+      row('Додатковий бонус за всі групи', money(quarter.allGroupsBonus)),
+      row('Виконані групи', quarter.doneNames.length ? quarter.doneNames.join(', ') : '—')
+    ].join('');
+
+    totalTable.innerHTML = [
+      row('Місячна мотивація', money(monthly.total)),
+      row('Квартальний бонус', money(quarter.total)),
+      row('Курс EUR', monthly.rate.toFixed(4)),
+      row('Виконані квартальні групи', `${quarter.doneCount} / ${groupNames.length}`)
+    ].join('');
+    const nextSnapshot = {
+      month: monthly.total,
+      quarter: quarter.total,
+      total: monthly.total + quarter.total
+    };
+
+    const prev = previousSnapshot || nextSnapshot;
+    animateNumber(monthTotalEl, prev.month, nextSnapshot.month, money);
+    animateNumber(quarterTotalEl, prev.quarter, nextSnapshot.quarter, money);
+    animateNumber(allTotalEl, prev.total, nextSnapshot.total, money);
+
+    [monthTotalEl, quarterTotalEl, allTotalEl].forEach((el, idx) => {
+      const value = idx === 0 ? nextSnapshot.month : idx === 1 ? nextSnapshot.quarter : nextSnapshot.total;
+      el.classList.remove('is-positive', 'is-negative', 'is-neutral');
+      el.classList.add(toneClass(value));
+    });
+
+    const tables = [monthlyTable, quarterTable, totalTable];
+    tables.forEach((table) => {
+      table.querySelectorAll('tr').forEach((tr) => {
+        const key = tr.children[0]?.textContent || '';
+        const val = tr.children[1]?.textContent || '';
+        if (previousSnapshot && previousSnapshot.rows && previousSnapshot.rows[key] !== undefined && previousSnapshot.rows[key] !== val) {
+          tr.classList.add('row-changed');
+          setTimeout(() => tr.classList.remove('row-changed'), 620);
+        }
+      });
+    });
+
+    const rowsMap = {};
+    tables.forEach((table) => table.querySelectorAll('tr').forEach((tr) => {
+      const key = tr.children[0]?.textContent || '';
+      const val = tr.children[1]?.textContent || '';
+      if (key) rowsMap[key] = val;
+    }));
+    previousSnapshot = { ...nextSnapshot, rows: rowsMap };
+    animateSummaryCards();
+  }
+
+  function renderHints(el, items) {
+    el.innerHTML = items.slice(0, 6).map((i) => `<li class="${i.type}">${i.text}</li>`).join('');
+  }
+
+  function buildMonthlyHints(monthly) {
+    const hints = [];
+    if (monthly.planPercent < 90) hints.push({ type: 'warn', text: `До старту бонусу за план залишилось +${(90 - monthly.planPercent).toFixed(1)}%.` });
+    else if (monthly.planPercent < 100) hints.push({ type: 'info', text: `До наступного порогу 100% залишилось +${(100 - monthly.planPercent).toFixed(1)}%.` });
+    else if (monthly.planPercent < 110) hints.push({ type: 'info', text: `До порогу 110% залишилось +${(110 - monthly.planPercent).toFixed(1)}%.` });
+    else hints.push({ type: 'success', text: 'План перевищує 110% — бонус на максимальному базовому порозі.' });
+
+    if (monthly.avgDelay > 14) hints.push({ type: 'warn', text: `Щоб отримати 3000, зменшіть відтермінування ще на ${(monthly.avgDelay - 14).toFixed(1)} дн.` });
+    else if (monthly.avgDelay > 7) hints.push({ type: 'info', text: `Щоб отримати 6000, зменшіть відтермінування ще на ${(monthly.avgDelay - 7).toFixed(1)} дн.` });
+    else hints.push({ type: 'success', text: 'Максимальний бонус за відтермінування вже досягнуто.' });
+
+    hints.push(byId('crmDone').checked
+      ? { type: 'success', text: 'CRM-бонус активний.' }
+      : { type: 'info', text: 'Виконання CRM на 100% додасть +10000.' });
+
+    hints.push(monthly.avgDiscount >= 27.5
+      ? { type: 'warn', text: 'Середня знижка зменшує бонус за план на 50%.' }
+      : { type: 'info', text: 'Поточна знижка ще не впливає на бонус за план.' });
+
+    const overdueMax = Math.max(monthly.overdue1, monthly.overdue2, monthly.overdue3);
+    if (monthly.overdueEur <= 0) hints.push({ type: 'success', text: 'Прострочення відсутнє — утримання немає.' });
+    else {
+      const worst = overdueMax === monthly.overdue3 ? '20+ днів' : overdueMax === monthly.overdue2 ? '11–20 днів' : '1–10 днів';
+      hints.push({ type: 'warn', text: `Найбільше утримання дає прострочка ${worst}. Загалом: ${eur(monthly.overdueEur)} / ${money(monthly.overdueLocal)}.` });
+    }
+    return hints;
+  }
+
+  function buildQuarterHints(quarter) {
+    const hints = [];
+    if (quarter.doneCount < 7) hints.push({ type: 'warn', text: `До мінімального квартального бонусу не вистачає ${7 - quarter.doneCount} груп(и).` });
+    else if (quarter.doneCount < 8) hints.push({ type: 'info', text: 'Ще 1 група — і бонус зросте до 16000.' });
+    else if (quarter.doneCount < 9) hints.push({ type: 'info', text: 'Ще 1 група — і бонус зросте до 22000.' });
+    else if (quarter.doneCount < 10) hints.push({ type: 'info', text: 'До порогу 30000 залишилась 1 група.' });
+    else hints.push({ type: 'success', text: 'Базовий максимум по групах досягнуто.' });
+
+    if (quarter.doneCount >= 10 && quarter.doneCount < groupNames.length) hints.push({ type: 'info', text: 'Якщо виконати всі 12 груп, додатково буде +10000.' });
+    if (quarter.doneCount === groupNames.length) hints.push({ type: 'success', text: 'Додатковий бонус за всі 12 груп активовано.' });
+
+    hints.push(byId('tiresMinMet').checked
+      ? { type: 'info', text: 'Кожна шина понад мінімум додає +300.' }
+      : { type: 'warn', text: 'Мінімальний план шин не виконано: штраф -5000.' });
+
+    const weakest = quarter.results.filter((r) => !r.done).sort((a, b) => a.avg - b.avg).slice(0, 2);
+    weakest.forEach((r) => hints.push({ type: 'warn', text: `${r.name}: не вистачає +${(95 - r.avg).toFixed(1)}% до 95%.` }));
+    if (!weakest.length) hints.push({ type: 'success', text: 'Усі квартальні групи вже виконуються.' });
+
+    return hints;
+  }
+
+  function calculateMotivation(){
+    const monthly = calcMonthly();
+    const quarter = calcQuarter();
+    renderBreakdown(monthly, quarter);
+    renderHints(monthlyHintsEl, buildMonthlyHints(monthly));
+    renderHints(quarterHintsEl, buildQuarterHints(quarter));
+    return { monthly, quarter, total: monthly.total + quarter.total };
+  }
+
+  async function refreshRate(){
+    try {
+      const res = await fetch('https://api.frankfurter.app/latest?from=EUR&to=UAH', { cache: 'no-store' });
+      if (!res.ok) throw new Error('bad status');
+      const data = await res.json();
+      const rate = data && data.rates && data.rates.UAH;
+      if (!rate) throw new Error('no rate');
+      byId('eurRate').value = Number(rate).toFixed(4);
+      touched.add('eurRate');
+      validateField('eurRate');
+      setRateStatus(`Курс оновлено: 1 EUR = ${Number(rate).toFixed(4)}`, 'ok');
+      calculateMotivation();
+    } catch (e) {
+      setRateStatus('Автокурс недоступний. Введіть курс вручну.', 'error');
+    }
+  }
+
+  function copyMotivationTextDetailed(){
+    const ts = new Date().toLocaleString('uk-UA');
+    const lines = ['Розрахунок мотивації'];
+    lines.push(`Дата/час: ${ts}`);
+    lines.push('--- Місячна мотивація ---');
+    monthlyTable.querySelectorAll('tr').forEach(tr=>{ const t=tr.querySelectorAll('td'); lines.push(`${t[0].textContent}: ${t[1].textContent}`); });
+    lines.push(`Підсумок місяця: ${monthTotalEl.textContent}`);
+    lines.push('--- Квартальний бонус ---');
+    quarterTable.querySelectorAll('tr').forEach(tr=>{ const t=tr.querySelectorAll('td'); lines.push(`${t[0].textContent}: ${t[1].textContent}`); });
+    lines.push(`Підсумок кварталу: ${quarterTotalEl.textContent}`);
+    lines.push(`--- Загальна сума: ${allTotalEl.textContent} ---`);
+    lines.push('Увага: розрахунок має інформаційний характер і може відрізнятися від фактичного нарахування.');
+    return lines.join('\n');
+  }
+  function copyMotivationTextShort(){
+    const ts = new Date().toLocaleString('uk-UA');
+    const month = monthTotalEl.textContent;
+    const quarter = quarterTotalEl.textContent;
+    const total = allTotalEl.textContent;
+    const rate = byId('eurRate').value;
+    return [
+      `Розрахунок мотивації (${ts})`,
+      `Курс EUR: ${rate}`,
+      `Місяць: ${month}`,
+      `Квартал: ${quarter}`,
+      `Загалом: ${total}`,
+      `${groupsDoneCount.textContent}`
+    ].join('\n');
+  }
+
+  function bindRecalc(){
+    const ids = ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','eurRate','tiresOver'];
+    ids.forEach((id)=>{
+      byId(id).addEventListener('blur', () => { touched.add(id); validateField(id); });
+      byId(id).addEventListener('input', () => { if (touched.has(id)) validateField(id); requestMotivationRecalc(); });
+    });
+    ['crmDone','tiresMinMet'].forEach(id=>byId(id).addEventListener('change', requestMotivationRecalc));
+    groupRows.forEach((gRow) => [gRow.m1, gRow.m2, gRow.m3].forEach((input) => input.addEventListener('input', requestMotivationRecalc)));
+  }
+
+  const rulesModal = byId('rulesModal');
+  const openRulesModalBtn = byId('openRulesModal');
+  const closeRulesModalBtn = byId('closeRulesModal');
+  const closeRulesModal = () => rulesModal.classList.remove('open');
+
+  openRulesModalBtn.addEventListener('click', () => rulesModal.classList.add('open'));
+  closeRulesModalBtn.addEventListener('click', closeRulesModal);
+  rulesModal.addEventListener('click', (e) => { if (e.target === rulesModal) closeRulesModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeRulesModal(); });
+
+  byId('refreshRate').addEventListener('click', refreshRate);
+  byId('recalcMotivation').addEventListener('click', ()=>{ if (!validateAllInputs()) { setMStatus('Виправте помилки перед перерахунком.', 'error'); return; } calculateMotivation(); setMStatus('Розрахунок оновлено.', 'ok'); });
+  byId('copyMotivation').addEventListener('click', async (e)=>{
+    const ok = await copyToClipboard(copyMotivationTextDetailed());
+    if (ok) { setMStatus('✓ Скопійовано', 'ok'); blinkCopied(e.currentTarget); }
+    else { setMStatus('Не вдалося скопіювати. Спробуйте ще раз.', 'error'); }
+  });
+  byId('copyMotivationShort').addEventListener('click', async (e)=>{
+    const ok = await copyToClipboard(copyMotivationTextShort());
+    if (ok) { setMStatus('✓ Скопійовано', 'ok'); blinkCopied(e.currentTarget); }
+    else { setMStatus('Не вдалося скопіювати. Спробуйте ще раз.', 'error'); }
+  });
+  byId('downloadPdf').addEventListener('click', ()=>{ printMeta.textContent = `Дата друку: ${new Date().toLocaleString('uk-UA')}`; setMStatus('Відкрито режим друку / PDF.', 'ok'); window.print(); });
+  byId('clearAll').addEventListener('click', ()=>{
+    debtInput.value='58617'; turnoverInput.value='155775'; daysInput.value='31'; exampleInputs.forEach(refreshExampleState);
+    ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','tiresOver'].forEach(id=>byId(id).value='0');
+    byId('eurRate').value='45'; byId('crmDone').checked=false; byId('tiresMinMet').checked=true;
+    groupsBody.querySelectorAll('input').forEach(i=>i.value='0');
+    ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','eurRate','tiresOver'].forEach((id)=>{ touched.delete(id); setFieldMessage(id, '', ''); });
+    errorSummary.hidden = true;
+    calculateDelay(); calculateMotivation(); setMStatus('Усі поля очищено.', 'ok');
+  });
+
+  bindRecalc();
+  exampleInputs.forEach(refreshExampleState);
+  calculateDelay();
+  calculateMotivation();
+  refreshRate();
+})();
+</script>
+</body>
+</html>
