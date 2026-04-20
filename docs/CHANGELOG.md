@@ -2,6 +2,7 @@
 
 ## 2026-04-20
 
+- Relaxed the previous print compression pass (larger print zoom and typography) so the PDF remains one-page on A4 but is easier to read.
 - Tightened print/PDF output density (smaller page margins, typography, paddings, and metric/table spacing) and applied print zoom so the existing summary report fits on a single A4 page more reliably.
 - Unified the 4-button action block density so all controls now share the same compact height/spacing, and added subtle low-contrast icons to `Умови мотивації` and `Завантажити PDF`.
 - Rearranged the actions block so `Умови мотивації` and `Завантажити PDF` now sit side-by-side, giving a clean 2x2 layout for the four main action buttons.
