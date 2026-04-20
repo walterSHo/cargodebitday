@@ -84,10 +84,12 @@
   const summaryMiniCard = document.querySelector('.summary-mini');
   const touched = new Set();
   const priorityFields = new Set();
+  const hintsMarkupCache = new WeakMap();
   const storageKey = 'cargo-calculator-state-v2';
   let previousSnapshot = null;
   let previousProgressSnapshot = null;
   let previousPdfSnapshot = '';
+  let lastSavedStateRaw = '';
   let autosaveTimer = null;
   let motivationFrameId = 0;
   let catCycleTimer = null;
@@ -169,7 +171,10 @@
   }
   function persistCalculatorState(){
     try {
-      localStorage.setItem(storageKey, JSON.stringify(collectCalculatorState()));
+      const nextRaw = JSON.stringify(collectCalculatorState());
+      if (nextRaw === lastSavedStateRaw) return;
+      localStorage.setItem(storageKey, nextRaw);
+      lastSavedStateRaw = nextRaw;
     } catch (_) {}
   }
   function saveCalculatorState(options = {}){
@@ -187,6 +192,7 @@
     try {
       const raw = localStorage.getItem(storageKey);
       if (!raw) return false;
+      lastSavedStateRaw = raw;
       const saved = JSON.parse(raw);
       if (saved.delay) {
         debtInput.value = saved.delay.debt ?? debtInput.value;
@@ -214,6 +220,7 @@
     clearTimeout(autosaveTimer);
     try {
       localStorage.removeItem(storageKey);
+      lastSavedStateRaw = '';
     } catch (_) {}
   }
   function setCatLine(nextIndex, paused){
@@ -608,7 +615,10 @@
   }
 
   function renderHints(el, items) {
-    el.innerHTML = items.slice(0, 6).map((i) => `<li class="${i.type}">${i.text}</li>`).join('');
+    const nextMarkup = items.slice(0, 6).map((i) => `<li class="${i.type}">${i.text}</li>`).join('');
+    if (hintsMarkupCache.get(el) === nextMarkup) return;
+    el.innerHTML = nextMarkup;
+    hintsMarkupCache.set(el, nextMarkup);
   }
 
   function buildMonthlyHints(monthly) {

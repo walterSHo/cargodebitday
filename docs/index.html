@@ -362,6 +362,10 @@
       color: #b8d6ff;
       opacity: .72;
     }
+    .status:not(.ok):not(.error):not(.draft):not(:empty) {
+      color: var(--muted-soft);
+      opacity: .72;
+    }
     .status.error {
       color: var(--error);
       opacity: 1;
@@ -1691,13 +1695,14 @@
   const pdfAllTotal = byId('pdfAllTotal');
   const pdfTimestamp = byId('pdfTimestamp');
   const summaryMiniCard = document.querySelector('.summary-mini');
-  const motivationGuideModal = byId('motivationGuideModal');
   const touched = new Set();
   const priorityFields = new Set();
+  const hintsMarkupCache = new WeakMap();
   const storageKey = 'cargo-calculator-state-v2';
   let previousSnapshot = null;
   let previousProgressSnapshot = null;
   let previousPdfSnapshot = '';
+  let lastSavedStateRaw = '';
   let autosaveTimer = null;
   let motivationFrameId = 0;
   let catCycleTimer = null;
@@ -1779,7 +1784,10 @@
   }
   function persistCalculatorState(){
     try {
-      localStorage.setItem(storageKey, JSON.stringify(collectCalculatorState()));
+      const nextRaw = JSON.stringify(collectCalculatorState());
+      if (nextRaw === lastSavedStateRaw) return;
+      localStorage.setItem(storageKey, nextRaw);
+      lastSavedStateRaw = nextRaw;
     } catch (_) {}
   }
   function saveCalculatorState(options = {}){
@@ -1797,6 +1805,7 @@
     try {
       const raw = localStorage.getItem(storageKey);
       if (!raw) return false;
+      lastSavedStateRaw = raw;
       const saved = JSON.parse(raw);
       if (saved.delay) {
         debtInput.value = saved.delay.debt ?? debtInput.value;
@@ -1824,6 +1833,7 @@
     clearTimeout(autosaveTimer);
     try {
       localStorage.removeItem(storageKey);
+      lastSavedStateRaw = '';
     } catch (_) {}
   }
   function setCatLine(nextIndex, paused){
@@ -2218,7 +2228,10 @@
   }
 
   function renderHints(el, items) {
-    el.innerHTML = items.slice(0, 6).map((i) => `<li class="${i.type}">${i.text}</li>`).join('');
+    const nextMarkup = items.slice(0, 6).map((i) => `<li class="${i.type}">${i.text}</li>`).join('');
+    if (hintsMarkupCache.get(el) === nextMarkup) return;
+    el.innerHTML = nextMarkup;
+    hintsMarkupCache.set(el, nextMarkup);
   }
 
   function buildMonthlyHints(monthly) {
@@ -2351,20 +2364,6 @@
     }
   }
 
-  function openMotivationGuide(){
-    if (!motivationGuideModal) return;
-    motivationGuideModal.hidden = false;
-    motivationGuideModal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeMotivationGuide(){
-    if (!motivationGuideModal) return;
-    motivationGuideModal.hidden = true;
-    motivationGuideModal.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-  }
-
   async function refreshRate(){
     const btn = byId('refreshRate');
     btn.disabled = true;
@@ -2404,10 +2403,6 @@
   }
 
   byId('refreshRate').addEventListener('click', refreshRate);
-  byId('openMotivationGuide').addEventListener('click', openMotivationGuide);
-  byId('closeMotivationGuide').addEventListener('click', closeMotivationGuide);
-  motivationGuideModal.addEventListener('click', (e) => { if (e.target === motivationGuideModal) closeMotivationGuide(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !motivationGuideModal.hidden) closeMotivationGuide(); });
   byId('recalcMotivation').addEventListener('click', ()=>{ if (!validateAllInputs()) { setMStatus('Виправте помилки перед перерахунком.', 'error'); return; } calculateMotivation(); setMStatus('Розрахунок оновлено.', 'ok'); });
   byId('downloadPdf').addEventListener('click', ()=>{ const stamp = new Date().toLocaleString('uk-UA'); printMeta.textContent = `Дата друку: ${stamp}`; pdfTimestamp.textContent = `Сформовано: ${stamp}`; setMStatus('Підготовлено короткий PDF-звіт.', 'ok'); window.print(); });
   byId('clearAll').addEventListener('click', ()=>{
