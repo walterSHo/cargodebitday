@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Форма НП (чернетка)</title>
+  <title>Форма НП</title>
   <style>
     :root {
       --bg: #09101a;
@@ -42,7 +42,7 @@
     .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .field { display: grid; gap: 6px; }
     label { font-size: .85rem; color: var(--muted); font-weight: 700; }
-    input, textarea {
+    input, textarea, select {
       width: 100%;
       border: 1px solid rgba(118,150,197,.35);
       border-radius: 8px;
@@ -51,6 +51,7 @@
       color: var(--text);
       font-size: .95rem;
     }
+    select { min-height: 40px; }
     textarea { min-height: 90px; resize: vertical; }
     .actions { display: flex; gap: 10px; flex-wrap: wrap; }
     .btn {
@@ -74,45 +75,129 @@
       min-height: 40px;
       padding: 0 14px;
     }
+    .hint { font-size: .8rem; color: var(--muted); margin: 0; }
+    .print-sheet { display: none; }
+    .hidden { display: none !important; }
     @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    @media print {
+      @page { size: A4 portrait; margin: 10mm; }
+      body { padding: 0; background: #fff; color: #111; }
+      .card { display: none !important; }
+      .print-sheet {
+        display: block;
+        border: 1px solid #999;
+        border-radius: 8px;
+        padding: 14px;
+        font-size: 11pt;
+        line-height: 1.35;
+      }
+      .print-sheet h1 {
+        margin: 0 0 10px;
+        font-size: 15pt;
+      }
+      .print-row {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        gap: 10px;
+        padding: 6px 0;
+        border-bottom: 1px solid #ddd;
+      }
+      .print-row:last-child { border-bottom: 0; }
+      .print-label { font-weight: 700; }
+      .print-value { word-break: break-word; }
+    }
   </style>
 </head>
 <body>
   <main class="page">
     <section class="card">
       <h1>Форма шаблону відправки НП</h1>
-      <p>Чернетка сторінки. Далі додамо ваші поля та вивантаження в PDF на 1 аркуш A4.</p>
+      <p>Заповніть шаблон. Потім натисніть “Завантажити PDF (A4)”.</p>
       <div class="actions">
         <a class="btn-link" href="./index.html">← На головний екран</a>
-        <button class="btn" type="button" disabled>Експорт в PDF (A4) — скоро</button>
+        <button class="btn" id="printPdfBtn" type="button">Завантажити PDF (A4)</button>
       </div>
     </section>
 
     <section class="card">
-      <h2>Базовий каркас форми</h2>
+      <h2>Дані для відправки</h2>
       <div class="grid">
         <div class="field">
-          <label for="senderName">Відправник</label>
-          <input id="senderName" type="text" placeholder="ПІБ / назва" />
+          <label for="address">Адреса</label>
+          <input id="address" type="text" placeholder="Київська обл., м. Васильків" />
         </div>
         <div class="field">
-          <label for="receiverName">Отримувач</label>
-          <input id="receiverName" type="text" placeholder="ПІБ / назва" />
+          <label for="department">Відділення</label>
+          <input id="department" type="text" placeholder="НП №2 / Поштомат №1488" />
         </div>
         <div class="field">
-          <label for="senderPhone">Телефон відправника</label>
-          <input id="senderPhone" type="text" placeholder="+380..." />
+          <label for="receiver">Одержувач</label>
+          <input id="receiver" type="text" placeholder="ТОВ ЯСЕНСВІТ / ФОП Олександр Мудрий" />
         </div>
         <div class="field">
-          <label for="receiverPhone">Телефон отримувача</label>
-          <input id="receiverPhone" type="text" placeholder="+380..." />
+          <label for="paymentType">Оплата</label>
+          <select id="paymentType">
+            <option value="НАЛ">НАЛ</option>
+            <option value="БН">БН</option>
+          </select>
+          <p class="hint">Якщо БН — обов’язково вкажіть ЄДРПОУ.</p>
         </div>
       </div>
-      <div class="field">
-        <label for="comment">Коментар</label>
-        <textarea id="comment" placeholder="Тут можна лишити службовий коментар"></textarea>
+      <div class="grid">
+        <div class="field hidden" id="edrpouField">
+          <label for="edrpou">ЄДРПОУ</label>
+          <input id="edrpou" type="text" inputmode="numeric" placeholder="12345678" />
+        </div>
+        <div class="field">
+          <label for="contact">Контакт</label>
+          <input id="contact" type="text" placeholder="Джефрі – (095) 786 16-65" />
+        </div>
       </div>
     </section>
+
+    <section id="printSheet" class="print-sheet" aria-hidden="true">
+      <h1>Шаблон відправки НП</h1>
+      <div class="print-row"><div class="print-label">Адреса:</div><div id="printAddress" class="print-value">—</div></div>
+      <div class="print-row"><div class="print-label">Відділення:</div><div id="printDepartment" class="print-value">—</div></div>
+      <div class="print-row"><div class="print-label">Одержувач:</div><div id="printReceiver" class="print-value">—</div></div>
+      <div class="print-row"><div class="print-label">Оплата:</div><div id="printPayment" class="print-value">—</div></div>
+      <div id="printEdrpouRow" class="print-row hidden"><div class="print-label">ЄДРПОУ:</div><div id="printEdrpou" class="print-value">—</div></div>
+      <div class="print-row"><div class="print-label">Контакт:</div><div id="printContact" class="print-value">—</div></div>
+    </section>
   </main>
+  <script>
+    (function () {
+      const byId = (id) => document.getElementById(id);
+      const paymentType = byId('paymentType');
+      const edrpouField = byId('edrpouField');
+      const edrpouInput = byId('edrpou');
+
+      function syncPaymentState() {
+        const isBn = paymentType.value === 'БН';
+        edrpouField.classList.toggle('hidden', !isBn);
+        edrpouInput.required = isBn;
+      }
+
+      function fillPrintSheet() {
+        byId('printAddress').textContent = byId('address').value.trim() || '—';
+        byId('printDepartment').textContent = byId('department').value.trim() || '—';
+        byId('printReceiver').textContent = byId('receiver').value.trim() || '—';
+        byId('printPayment').textContent = paymentType.value || '—';
+        byId('printContact').textContent = byId('contact').value.trim() || '—';
+        const isBn = paymentType.value === 'БН';
+        byId('printEdrpouRow').classList.toggle('hidden', !isBn);
+        byId('printEdrpou').textContent = byId('edrpou').value.trim() || '—';
+      }
+
+      byId('printPdfBtn').addEventListener('click', () => {
+        syncPaymentState();
+        fillPrintSheet();
+        window.print();
+      });
+
+      paymentType.addEventListener('change', syncPaymentState);
+      syncPaymentState();
+    })();
+  </script>
 </body>
 </html>
