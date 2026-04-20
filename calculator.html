@@ -993,6 +993,10 @@
       color: #f0f3f8;
       font-weight: 700;
     }
+    .mini-table tr.row-penalty td:first-child,
+    .mini-table tr.row-penalty td:last-child {
+      color: #ff6d73;
+    }
     .total {
       margin-top: 12px;
       padding-top: 14px;
@@ -1875,7 +1879,7 @@
     toggleCatBtn.setAttribute('aria-pressed', 'true');
   }
 
-  function row(label, value){ return `<tr><td>${label}</td><td class="mono">${value}</td></tr>`; }
+  function row(label, value, rowClass = ''){ return `<tr class="${rowClass}"><td>${label}</td><td class="mono">${value}</td></tr>`; }
   function setMStatus(msg, type){ motivationStatus.textContent = msg || ''; motivationStatus.className = 'status' + (type ? ' ' + type : ''); }
   function setRateStatus(msg, type){ rateStatus.textContent = msg || ''; rateStatus.className = 'status' + (type ? ' ' + type : ''); }
   async function copyToClipboard(text){
@@ -2338,11 +2342,11 @@
       row('Бонус ТП', money(monthly.tpBonus)),
       row('Бонус CRM', money(monthly.crmBonus)),
       row('Бонус за виконання плану', money(monthly.planBase)),
-      row('Зменшення через знижку', `- ${money(monthly.discountReduce)}`),
+      row('Зменшення через знижку', `- ${money(monthly.discountReduce)}`, 'row-penalty'),
       row('Бонус за відтермінування', money(monthly.delayBonus)),
-      row('Штраф за прострочку (EUR)', eur(monthly.overdueEur)),
+      row('Штраф за прострочку (EUR)', eur(monthly.overdueEur), 'row-penalty'),
       row('Курс EUR', monthly.rate.toFixed(4)),
-      row('Штраф в бонусній валюті', `- ${money(monthly.overdueLocal)}`)
+      row('Штраф в бонусній валюті', `- ${money(monthly.overdueLocal)}`, 'row-penalty')
     ].join('');
 
     quarterTable.innerHTML = [
