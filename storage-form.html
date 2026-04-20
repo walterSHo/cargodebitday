@@ -46,7 +46,13 @@
       color: var(--text);
       font-size: .95rem;
     }
+    input[type="file"] {
+      border: 1px dashed rgba(118,150,197,.45);
+      background: rgba(10, 16, 28, .55);
+      padding: 8px 10px;
+    }
     textarea { min-height: 86px; resize: vertical; }
+    .hint { margin: 0; color: var(--muted); font-size: .82rem; }
     .actions { display: flex; gap: 10px; flex-wrap: wrap; }
     .btn, .btn-link {
       min-height: 40px;
@@ -104,6 +110,11 @@
       <label for="storageComment">Коментар</label>
       <textarea id="storageComment" placeholder="Деталі, домовленості, ризики"></textarea>
     </div>
+    <div class="field">
+      <label for="storagePhotos">Фото (за потреби)</label>
+      <input id="storagePhotos" type="file" accept="image/*" multiple />
+      <p id="storagePhotosHint" class="hint">Фото не вибрано.</p>
+    </div>
   </section>
 
   <section id="storagePrintSheet" class="print-sheet" aria-hidden="true">
@@ -116,11 +127,22 @@
     <div class="row"><div class="key">Кількість:</div><div id="printPartQty">—</div></div>
     <div class="row"><div class="key">Опис / стан:</div><div id="printPartCondition">—</div></div>
     <div class="row"><div class="key">Коментар:</div><div id="printStorageComment">—</div></div>
+    <div class="row"><div class="key">Фото:</div><div id="printStoragePhotos">—</div></div>
   </section>
 </main>
 <script>
 (function () {
   const byId = (id) => document.getElementById(id);
+  const photosInput = byId('storagePhotos');
+  const photosHint = byId('storagePhotosHint');
+  function getPhotoNames() {
+    const files = photosInput && photosInput.files ? Array.from(photosInput.files) : [];
+    return files.map((file) => file.name);
+  }
+  function syncPhotoHint() {
+    const names = getPhotoNames();
+    photosHint.textContent = names.length ? `Додано фото: ${names.join(', ')}` : 'Фото не вибрано.';
+  }
   function fillPrint() {
     byId('printClient').textContent = byId('client').value.trim() || '—';
     byId('printResponsible').textContent = byId('responsible').value.trim() || '—';
@@ -130,7 +152,11 @@
     byId('printPartQty').textContent = byId('partQty').value.trim() || '—';
     byId('printPartCondition').textContent = byId('partCondition').value.trim() || '—';
     byId('printStorageComment').textContent = byId('storageComment').value.trim() || '—';
+    const names = getPhotoNames();
+    byId('printStoragePhotos').textContent = names.length ? names.join(', ') : '—';
   }
+  photosInput.addEventListener('change', syncPhotoHint);
+  syncPhotoHint();
   byId('printStorageBtn').addEventListener('click', () => {
     fillPrint();
     window.print();

@@ -54,6 +54,11 @@
     select { min-height: 40px; }
     textarea { min-height: 90px; resize: vertical; }
     .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .actions > .btn,
+    .actions > .btn-link {
+      flex: 1 1 220px;
+      justify-content: center;
+    }
     .btn {
       border: 1px solid rgba(143,190,255,.5);
       background: var(--accent);
@@ -75,6 +80,7 @@
       align-items: center;
       text-decoration: none;
       color: #d7e2f5;
+      background: rgba(34,48,71,.64);
       border: 1px solid rgba(118,150,197,.34);
       border-radius: 8px;
       min-height: 40px;
