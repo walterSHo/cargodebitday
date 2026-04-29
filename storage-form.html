@@ -10,13 +10,13 @@
   </script>
   <style>
     :root {
-      --bg: #09101a;
-      --surface: rgba(14, 22, 36, .84);
-      --line: rgba(100, 124, 161, .22);
-      --text: #f4f7fd;
-      --muted: #9ba9c1;
-      --accent: #6ea8ff;
-      --radius: 8px;
+      --bg: var(--color-bg);
+      --surface: var(--color-surface);
+      --line: var(--color-line);
+      --text: var(--color-text);
+      --muted: var(--color-muted);
+      --accent: var(--color-accent);
+      --radius: var(--radius-lg);
       --surface-l1: rgba(10, 16, 28, .92);
       --surface-l2: rgba(18, 30, 48, .88);
     }
@@ -26,7 +26,9 @@
       min-height: 100vh;
       font-family: "Segoe UI", Roboto, Arial, sans-serif;
       color: var(--text);
-      background: linear-gradient(180deg, #09101a 0%, #07111c 52%, #081019 100%);
+      background:
+        radial-gradient(circle at top, rgba(88, 144, 255, .08), transparent 34%),
+        linear-gradient(180deg, #09101a 0%, #07111c 52%, #081019 100%);
       padding: 20px;
       overflow-y: scroll;
     }
@@ -44,7 +46,7 @@
     .panel-head-meta { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
     .meta-chip { padding:0; border:0; background:transparent; color:#d7e2f5; font-size:.8rem; line-height:1.2; }
     .card {
-      background: var(--surface);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.008)), var(--surface);
       border: 1px solid var(--line);
       border-radius: var(--radius);
       padding: var(--space-md);
@@ -59,7 +61,7 @@
     input, textarea {
       width: 100%;
       border: 1px solid rgba(118,150,197,.35);
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius-md);
       padding: 8px var(--space-sm);
       background: var(--surface-l1);
       color: var(--text);
@@ -76,7 +78,7 @@
     .btn, .btn-link {
       min-height: var(--control-h-md);
       padding: 0 var(--space-sm);
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius-md);
       font-weight: 600;
       text-decoration: none;
       display: inline-flex;
@@ -86,7 +88,7 @@
       border: 1px solid rgba(143,190,255,.5);
     }
     .btn, .btn-link {
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius-md);
       min-height: var(--btn-h-md);
       padding: 0 16px;
     }
@@ -183,7 +185,12 @@
 <script>
 (function () {
   const panelTime = document.getElementById('panelTime');
-  if (panelTime) panelTime.textContent = `UTC: ${new Date().toISOString().slice(11,16)}`;
+  function syncPanelTime(){
+      if (!panelTime) return;
+      panelTime.textContent = `Київ: ${new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Kyiv' })}`;
+    }
+    syncPanelTime();
+    setInterval(syncPanelTime, 60000);
   const byId = (id) => document.getElementById(id);
   const photosInput = byId('storagePhotos');
   const photosHint = byId('storagePhotosHint');
