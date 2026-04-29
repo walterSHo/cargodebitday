@@ -15,7 +15,7 @@
       --text: #f4f7fd;
       --muted: #9ba9c1;
       --accent: #6ea8ff;
-      --radius: 14px;
+      --radius: 10px;
     }
     * { box-sizing: border-box; }
     body {
@@ -26,8 +26,8 @@
       background: linear-gradient(180deg, #09101a 0%, #07111c 52%, #081019 100%);
       padding: 20px;
     }
-    .page { width: min(980px, 100%); margin: 0 auto; display: grid; gap: 14px; }
-    .app-shell { width: min(1320px, 100%); margin: 0 auto; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; }
+    .page { width: min(1620px, calc(100% - 56px)); margin: 0 auto; display: grid; gap: 14px; }
+    .app-shell { width: min(1860px, calc(100% - 32px)); margin: 16px auto; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; }
     .sidebar { background: rgba(19, 30, 47, .84); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; align-self: start; position: sticky; top: 20px; }
     .sidebar h2 { margin: 0 0 10px; font-size: .9rem; text-transform: uppercase; color: var(--muted); }
     .menu-link { display:block; padding:10px 11px; border-radius:8px; color:#d9e4f7; text-decoration:none; border:1px solid transparent; margin-bottom:8px; }
@@ -35,7 +35,7 @@
     .menu-link.is-active { background: rgba(110,168,255,.22); border-color: rgba(143,190,255,.42); color:#fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); }
     .embedded .sidebar { display: none; }
     .embedded .app-shell { grid-template-columns: 1fr; width: 100%; margin: 0; }
-    .embedded .page { width: min(980px, calc(100% - 20px)); margin: 10px auto 20px; }
+    .embedded .page { width: min(1620px, calc(100% - 20px)); margin: 10px auto 20px; }
     .card {
       background: var(--surface);
       border: 1px solid var(--line);
@@ -85,7 +85,10 @@
       @page { size: A4 portrait; margin: 10mm; }
       body { background: #fff; color: #111; padding: 0; }
       .card { display: none !important; }
-      .print-sheet { display: block; border: 1px solid #999; border-radius: 8px; padding: 12px; font-size: 11pt; }
+      .print-sheet { display: block; border: 1px solid #999; border-radius: 2px; padding: 12px; font-size: 11pt; }
+      .app-shell,
+      .page { width: 100%; margin: 0; }
+      .sidebar { display: none !important; }
       .row { display: grid; grid-template-columns: 170px 1fr; gap: 10px; border-bottom: 1px solid #ddd; padding: 6px 0; }
       .row:last-child { border-bottom: 0; }
       .key { font-weight: 700; }

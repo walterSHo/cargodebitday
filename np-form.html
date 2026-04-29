@@ -15,7 +15,7 @@
       --text: #f4f7fd;
       --muted: #9ba9c1;
       --accent: #6ea8ff;
-      --radius: 14px;
+      --radius: 10px;
     }
     * { box-sizing: border-box; }
     body {
@@ -27,12 +27,12 @@
       padding: 20px;
     }
     .page {
-      width: min(980px, 100%);
+      width: min(1620px, calc(100% - 56px));
       margin: 0 auto;
       display: grid;
       gap: 14px;
     }
-    .app-shell { width: min(1320px, 100%); margin: 0 auto; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; }
+    .app-shell { width: min(1860px, calc(100% - 32px)); margin: 16px auto; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; }
     .sidebar { background: rgba(19, 30, 47, .84); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; align-self: start; position: sticky; top: 20px; }
     .sidebar h2 { margin: 0 0 10px; font-size: .9rem; text-transform: uppercase; color: var(--muted); }
     .menu-link { display:block; padding:10px 11px; border-radius:8px; color:#d9e4f7; text-decoration:none; border:1px solid transparent; margin-bottom:8px; }
@@ -40,7 +40,7 @@
     .menu-link.is-active { background: rgba(110,168,255,.22); border-color: rgba(143,190,255,.42); color:#fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); }
     .embedded .sidebar { display: none; }
     .embedded .app-shell { grid-template-columns: 1fr; width: 100%; margin: 0; }
-    .embedded .page { width: min(980px, calc(100% - 20px)); margin: 10px auto 20px; }
+    .embedded .page { width: min(1620px, calc(100% - 20px)); margin: 10px auto 20px; }
     .card {
       background: var(--surface);
       border: 1px solid var(--line);
@@ -112,7 +112,7 @@
       .print-sheet {
         display: block;
         border: 1px solid #999;
-        border-radius: 8px;
+        border-radius: 2px;
         padding: 14px;
         font-size: 11pt;
         line-height: 1.35;
@@ -129,6 +129,9 @@
         border-bottom: 1px solid #ddd;
       }
       .print-row:last-child { border-bottom: 0; }
+      .app-shell,
+      .page { width: 100%; margin: 0; }
+      .sidebar { display: none !important; }
       .print-label { font-weight: 700; }
       .print-value { word-break: break-word; }
     }

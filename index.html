@@ -17,6 +17,13 @@
     .workspace { border:1px solid var(--line); border-radius:14px; overflow:hidden; min-height:calc(100vh - 20px); }
     iframe { width:100%; height:calc(100vh - 20px); border:0; display:block; background:transparent; }
     @media (max-width: 980px){ .shell{grid-template-columns:1fr; width:calc(100% - 12px); margin:6px auto;} .sidebar{position:static;} iframe{height:calc(100vh - 130px);} .workspace{min-height:calc(100vh - 130px);} }
+    @media print{
+      body{background:#fff;}
+      .shell{display:block; width:100%; margin:0;}
+      .sidebar{display:none !important;}
+      .workspace{border:0; min-height:auto;}
+      iframe{height:100vh; min-height:100vh;}
+    }
   </style>
 </head>
 <body>
