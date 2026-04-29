@@ -88,6 +88,8 @@
       font-weight: 700;
       cursor: pointer;
     }
+    .btn-md { min-height: var(--btn-h-md); }
+    .btn-sm { min-height: var(--btn-h-sm); font-size: .88rem; padding: 0 12px; }
     .btn[disabled] { opacity: .65; cursor: not-allowed; }
     .btn-copy {
       background: rgba(34,48,71,.64);
@@ -160,11 +162,11 @@
       <h1>Форма шаблону відправки НП</h1>
       <p>Заповніть шаблон. Потім натисніть “Завантажити PDF (A4)”.</p>
       <div class="actions">
-        <button class="btn btn-copy" id="copyRequestBtn" type="button">Скопіювати текст заявки</button>
-        <button class="btn btn-copy" id="saveHistoryBtn" type="button">Зберегти в історію</button>
-        <button class="btn btn-copy" id="loadHistoryBtn" type="button">Підставити з історії</button>
-        <button class="btn btn-copy" id="clearFormBtn" type="button">Очистити форму / Новий бланк</button>
-        <button class="btn" id="printPdfBtn" type="button">Завантажити PDF (A4)</button>
+        <button class="btn btn-copy btn-md" id="copyRequestBtn" type="button">⧉ Скопіювати текст заявки</button>
+        <button class="btn btn-copy btn-md" id="saveHistoryBtn" type="button">💾 Зберегти в історію</button>
+        <button class="btn btn-copy btn-md" id="loadHistoryBtn" type="button">↺ Підставити з історії</button>
+        <button class="btn btn-copy btn-md" id="clearFormBtn" type="button">🗑 Очистити форму / Новий бланк</button>
+        <button class="btn btn-md" id="printPdfBtn" type="button">⇩ Завантажити PDF (A4)</button>
       </div>
       <div class="field">
         <label for="historySelect">Останні 5 заявок</label>

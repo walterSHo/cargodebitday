@@ -293,6 +293,8 @@
       cursor: pointer;
       transition: transform .14s ease, border-color .18s ease, background-color .18s ease, color .18s ease, box-shadow .2s ease;
     }
+    .btn-md { min-height: var(--btn-h-md); }
+    .btn-sm { min-height: var(--btn-h-sm); font-size: .88rem; padding: 0 14px; }
     .btn::before {
       content: "";
       position: absolute;
@@ -1598,7 +1600,7 @@
             <div class="field"><label for="days">Кількість днів</label><input id="days" type="number" value="31" data-example="31" class="is-example" /></div>
           </div>
           <p class="hint">Формула: <strong>коефіцієнт = борг / сума оборота</strong>, <strong>дні відтермінування = коефіцієнт × кількість днів у місяці</strong>.</p>
-          <div class="actions"><button type="submit" class="btn btn-primary">Розрахувати</button><button type="button" id="clearBtn" class="btn btn-secondary">Очистити</button><button type="button" id="copyBtn" class="btn btn-secondary">Скопіювати результат</button></div>
+          <div class="actions"><button type="submit" class="btn btn-primary btn-md">↻ Розрахувати</button><button type="button" id="clearBtn" class="btn btn-secondary btn-md">🗑 Очистити</button><button type="button" id="copyBtn" class="btn btn-secondary btn-md">⧉ Скопіювати результат</button></div>
         </form>
       </div>
       <aside class="result-col" aria-live="polite" aria-atomic="true"><section class="result-box"><h2 class="result-title">Результат</h2><p id="coefOut" class="result-line">Коефіцієнт: —</p><p id="daysOut" class="result-line">Середнє відтермінування: —</p><p id="status" class="status" role="status"></p></section><p class="example">Приклад: борг 58 617, оборот 155 775, днів 31 → 0.3763 та 11.67 днів.</p></aside>
@@ -1651,12 +1653,12 @@
               <p id="motivationStatus" class="status" role="status" aria-live="polite"></p>
             </div>
             <div class="actions-quarter-top">
-              <button type="button" id="recalcMotivation" class="btn btn-primary">Перерахувати</button>
-              <button type="button" id="clearAll" class="btn btn-secondary">Очистити все</button>
+              <button type="button" id="recalcMotivation" class="btn btn-primary btn-md">↻ Перерахувати</button>
+              <button type="button" id="clearAll" class="btn btn-secondary btn-md">🗑 Очистити все</button>
             </div>
             <div class="actions-quarter-bottom">
-              <button type="button" id="openMotivationGuide" class="btn btn-secondary btn-quiet"><svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.8A1.8 1.8 0 0 1 6.8 3h10.4A1.8 1.8 0 0 1 19 4.8v14.4a1.8 1.8 0 0 1-1.8 1.8H6.8A1.8 1.8 0 0 1 5 19.2z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 7.8h8M8 11.8h8M8 15.8h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>Умови мотивації</button>
-              <button type="button" id="downloadPdf" class="btn btn-secondary"><svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10m0 0 3.2-3.2M12 13 8.8 9.8M5 15.5v2.7A1.8 1.8 0 0 0 6.8 20h10.4a1.8 1.8 0 0 0 1.8-1.8v-2.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Завантажити PDF</button>
+              <button type="button" id="openMotivationGuide" class="btn btn-secondary btn-quiet btn-sm">ⓘ Умови мотивації</button>
+              <button type="button" id="downloadPdf" class="btn btn-secondary btn-sm">⇩ Завантажити PDF</button>
             </div>
           </div>
         </div>

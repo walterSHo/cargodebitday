@@ -83,6 +83,8 @@
       align-items: center;
       border: 1px solid rgba(143,190,255,.5);
     }
+    .btn-md { min-height: var(--btn-h-md); }
+    .btn-sm { min-height: var(--btn-h-sm); font-size: .88rem; padding: 0 12px; }
     .btn { background: var(--accent); color: #08111d; cursor: pointer; }
     .btn-link { color: #d7e2f5; border-color: rgba(118,150,197,.34); }
     .print-sheet { display: none; }
@@ -120,7 +122,7 @@
     <h1>Зберігання товару (склад)</h1>
     <p>Форма для випадків, коли товар передано без документів на повернення.</p>
     <div class="actions">
-      <button type="button" class="btn" id="printStorageBtn">Завантажити PDF (A4)</button>
+      <button type="button" class="btn btn-md" id="printStorageBtn">⇩ Завантажити PDF (A4)</button>
     </div>
   </section>
 
