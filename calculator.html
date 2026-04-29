@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Калькулятори</title>
+  <link rel="stylesheet" href="./assets/styles/tokens.css" />
   <script>
     if (window.self !== window.top) document.documentElement.classList.add('embedded');
   </script>
@@ -31,6 +32,9 @@
       --warn: #ffb324;
       --radius: 18px;
       --shadow: 0 0 0 1px rgba(83, 106, 142, .18);
+      --surface-l1: rgba(10, 16, 28, .9);
+      --surface-l2: rgba(14, 22, 36, .92);
+      --surface-l3: rgba(24, 36, 56, .86);
     }
     * { box-sizing: border-box; }
     html { background: var(--bg); }
@@ -70,7 +74,7 @@
     .page {
       position: relative;
       z-index: 1;
-      width: min(1620px, calc(100% - 56px));
+      width: min(var(--container-page-max), calc(100% - 56px));
       margin: 24px auto 56px;
       display: grid;
       gap: 26px;
@@ -79,7 +83,7 @@
       display: grid;
       grid-template-columns: 220px minmax(0, 1fr);
       gap: 18px;
-      width: min(1860px, calc(100% - 32px));
+      width: min(var(--container-shell-max), calc(100% - 32px));
       margin: 16px auto;
       position: relative;
       z-index: 1;
@@ -99,7 +103,7 @@
     .menu-link.is-active { background: rgba(110,168,255,.22); border-color: rgba(143,190,255,.42); color:#fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); }
     .embedded .sidebar { display: none; }
     .embedded .app-shell { grid-template-columns: 1fr; width: 100%; margin: 0; }
-    .embedded .page { width: min(1620px, calc(100% - 20px)); margin: 10px auto 20px; }
+    .embedded .page { width: min(var(--container-page-max), calc(100% - 20px)); margin: 10px auto 20px; }
     .screen {
       position: relative;
       background:
@@ -422,9 +426,7 @@
       gap: 20px;
       align-content: start;
     }
-    .screen-motivation {
-      --radius-motivation: 10px;
-    }
+    .screen-motivation { --radius-motivation: var(--radius-md); }
     .screen-motivation .screen-head {
       padding: 18px 24px 16px;
     }
@@ -441,8 +443,8 @@
     .screen-motivation .summary-section,
     .screen-motivation .summary-total-row .summary-item {
       border-radius: var(--radius-motivation);
-      padding: 18px;
-      gap: 10px;
+      padding: var(--space-md);
+      gap: var(--space-sm);
     }
     .screen-motivation .summary-section {
       padding: 0;
@@ -462,21 +464,21 @@
     .screen-motivation .table-wrap,
     .screen-motivation .error-summary,
     .screen-motivation .disclaimer {
-      border-radius: 6px;
+      border-radius: var(--radius-sm);
     }
     .screen-motivation label {
       font-size: .79rem;
     }
     .screen-motivation input,
     .screen-motivation select {
-      min-height: 40px;
-      padding: 8px 12px;
-      font-size: .95rem;
+      min-height: var(--control-h-md);
+      padding: var(--space-xs) var(--space-sm);
+      font-size: .92rem;
     }
     .screen-motivation .btn {
-      min-height: 40px;
-      padding: 0 18px;
-      font-size: .91rem;
+      min-height: var(--control-h-md);
+      padding: 0 var(--space-md);
+      font-size: .88rem;
     }
     .screen-motivation .monthly-grid {
       gap: 16px 14px;
@@ -678,14 +680,14 @@
     }
     .screen-motivation .table th,
     .screen-motivation .table td {
-      padding: 9px 10px;
+      padding: var(--space-sm);
     }
     .screen-motivation .table {
-      font-size: .84rem;
+      font-size: .81rem;
     }
     .screen-motivation .table input {
-      min-height: 34px;
-      padding: 6px 8px;
+      min-height: var(--control-h-sm);
+      padding: 4px var(--space-xs);
     }
     .screen-motivation .groups-meta {
       gap: 8px 14px;
@@ -698,7 +700,7 @@
       font-size: .98rem;
     }
     .screen-motivation .mini-table {
-      font-size: .83rem;
+      font-size: .8rem;
     }
     .screen-motivation .mini-table td {
       padding: 8px 0;
@@ -748,8 +750,8 @@
     .screen-motivation .actions-quarter .btn {
       width: 100%;
       min-width: 0;
-      min-height: 42px;
-      padding: 0 16px;
+      min-height: var(--control-h-md);
+      padding: 0 var(--space-sm);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -763,9 +765,20 @@
       opacity: .68;
       flex: 0 0 14px;
     }
+    #clearAll.btn {
+      border-color: rgba(255,98,102,.38);
+      color: #ffc5c8;
+      background: rgba(90, 24, 30, .22);
+    }
+    #clearAll.btn:hover {
+      border-color: rgba(255,98,102,.55);
+      background: rgba(105, 30, 36, .28);
+      color: #ffd9dc;
+      box-shadow: 0 0 0 2px rgba(255,98,102,.12);
+    }
     .screen-motivation .hint-list {
       gap: 8px;
-      font-size: .84rem;
+      font-size: .8rem;
     }
     .screen-motivation .disclaimer {
       padding: 14px 16px;
@@ -851,7 +864,7 @@
       vertical-align: middle;
     }
     .table th {
-      background: rgba(17,25,40,.9);
+      background: var(--surface-l3);
       position: sticky;
       top: 0;
       color: var(--muted);
@@ -863,22 +876,32 @@
       text-align: right;
       font-variant-numeric: tabular-nums;
     }
+    #groupsTable th:first-child,
+    #groupsTable td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: var(--surface-l1);
+    }
+    #groupsTable tbody tr:nth-child(even) {
+      background: rgba(255,255,255,.018);
+    }
     .table-wrap {
       overflow: visible;
       max-height: none;
       border: 1px solid rgba(103,127,164,.24);
-      border-radius: 10px;
-      background: rgba(12,18,30,.74);
+      border-radius: var(--radius-md);
+      background: var(--surface-l1);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 14px 28px rgba(0,0,0,.14);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
     }
     .table .mono { color: var(--text-soft); }
     .table input {
-      min-height: 36px;
-      padding: 7px 10px;
+      min-height: var(--control-h-sm);
+      padding: 6px var(--space-sm);
       text-align: center;
-      background: #12161d;
+      background: var(--surface-l2);
     }
     .pill-ok,
     .pill-no,
@@ -896,6 +919,7 @@
     .group-row.done { background: rgba(28,244,136,.035); }
     .group-row.near { background: rgba(255,179,36,.04); }
     .group-row.fail { background: transparent; }
+    .group-row:hover { background: rgba(110,168,255,.08); }
     .progress-track {
       height: 8px;
       border-radius: 999px;
@@ -972,25 +996,6 @@
       color: #eef2f8;
       text-transform: uppercase;
       letter-spacing: -.01em;
-    }
-    .summary-mini-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-    .summary-mini-head h4 { margin: 0; }
-    .btn-cat-toggle {
-      min-height: 28px;
-      padding: 0 10px;
-      font-size: .72rem;
-      border-radius: 999px;
-      opacity: .85;
-    }
-    .btn-cat-toggle.is-off {
-      border-color: rgba(255,98,102,.38);
-      color: #ffb8bc;
     }
     .summary-note {
       margin: -4px 0 2px;
@@ -1537,13 +1542,13 @@
         page-break-inside: avoid;
       }
       .pdf-report-head { gap: 6px; margin-bottom: 4px; }
-      .pdf-report-head h2 { font-size: 13.2pt; }
+      .pdf-report-head h2 { font-size: 11pt; }
       .pdf-report-head p,
       .pdf-report-meta,
       .pdf-metric-label,
       .pdf-table,
-      .pdf-total { font-size: 8.4pt; }
-      .pdf-metric-value { font-size: 11.6pt; }
+      .pdf-total { font-size: 9pt; }
+      .pdf-metric-value { font-size: 10pt; }
       .pdf-key-metrics { gap: 6px; }
       .pdf-metric { padding: 6px 8px; gap: 4px; border-radius: 2px; }
       .pdf-summary-grid { gap: 8px; }
@@ -1614,24 +1619,6 @@
 
           <div class="summary-item" id="monthlySummaryCard"><h4>Підсумок місяця</h4><p id="monthSummaryNote" class="summary-note">Поки спокійно: оберіть сценарій або введіть дані, щоб побачити важелі впливу.</p><table class="mini-table" id="monthlyBreakdown"></table><div class="total"><span>Підсумок місяця</span><span id="monthTotal" class="mono">0 ₴</span></div></div>
           <div class="summary-item summary-item--total" id="totalSummaryCard"><h4>Загальний підсумок</h4><p id="totalSummaryNote" class="summary-note">Звідси видно сумарний ефект місяця й кварталу разом.</p><table class="mini-table" id="totalBreakdown"></table><div class="total"><span>Загальна сума</span><span id="allTotal" class="mono">0 ₴</span></div></div>
-          <section class="summary-item summary-mini" aria-label="Маленька пасхалка з котиком">
-            <div class="summary-mini-head">
-              <h4>Пухнастий ревізор</h4>
-              <button type="button" id="toggleCatBtn" class="btn btn-secondary btn-cat-toggle" aria-pressed="false">Без кота</button>
-            </div>
-            <div class="easter-egg-strip">
-              <button type="button" id="easterCat" class="easter-cat" aria-label="Погладити котика">
-                <span id="easterCatBubble" class="easter-cat-bubble">Мрр. Я рахую бонуси лапками.</span>
-                <span class="easter-cat-body" aria-hidden="true">
-                  <span class="easter-cat-face">
-                    <span class="easter-cat-nose"></span>
-                  </span>
-                  <span class="easter-cat-paws"></span>
-                  <span class="easter-cat-tail"></span>
-                </span>
-              </button>
-            </div>
-          </section>
         </div>
 
         <div class="motivation-column motivation-column--right">
@@ -1804,9 +1791,6 @@
   const motivationStatus = byId('motivationStatus'), rateStatus = byId('rateStatus');
   const monthlyHintsEl = byId('monthlyHints'), quarterHintsEl = byId('quarterHints');
   const printMeta = byId('printMeta');
-  const easterCat = byId('easterCat');
-  const easterCatBubble = byId('easterCatBubble');
-  const toggleCatBtn = byId('toggleCatBtn');
   const groupsDoneCount = byId('groupsDoneCount'), groupsNextHint = byId('groupsNextHint');
   const errorSummary = byId('errorSummary');
   const summaryItems = Array.from(document.querySelectorAll('.summary-item'));
@@ -1828,7 +1812,6 @@
   const motivationGuideModal = byId('motivationGuideModal');
   const openMotivationGuideBtn = byId('openMotivationGuide');
   const closeMotivationGuideBtn = byId('closeMotivationGuide');
-  const summaryMiniCard = document.querySelector('.summary-mini');
   const touched = new Set();
   const priorityFields = new Set();
   const hintsMarkupCache = new WeakMap();
@@ -1839,86 +1822,6 @@
   let lastSavedStateRaw = '';
   let autosaveTimer = null;
   let motivationFrameId = 0;
-  let catCycleTimer = null;
-  let catResumeTimer = null;
-  let catVisible = true;
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const catLiteMode = prefersReducedMotion.matches || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
-  const catFacts = [
-    'Факт: бонус за групи стартує з 7 виконаних груп.',
-    'Факт: середнє відтермінування до 7 днів дає максимум.',
-    'Факт: знижка 27.5%+ ріже бонус за план на 50%.'
-  ];
-  const catContextLines = [
-    'Контекст: дивлюсь на підсвічені поля — там головний вплив.',
-    'Контекст: зараз найцікавіше біля квартального блоку.',
-    'Контекст: якщо щось червоне, почни з нього.'
-  ];
-  const catActionLines = [
-    'Лапка в роботі: підсвічую поле, яке найкраще рухне результат.',
-    'Дія: клікай підсвічене поле, воно зараз пріоритетне.',
-    'Я зробив підказку лапкою — далі твій хід.'
-  ];
-  const catSleepLines = [
-    'Тсс... я дрімаю. Розбуди мене кліком.',
-    'Сплю. Без різких рухів, будь ласка.',
-    'Дрімота mode on. Одним кліком повертаюсь.'
-  ];
-  const catLines = [
-    'Мрр. Я рахую бонуси лапками.',
-    'Якщо що, я за зелені progress bar.',
-    'Погладь ще раз і я принесу +1 до настрою.',
-    'Сьогодні я чергую біля підказок.',
-    'Не чіпаю розрахунки. Лише ходжу красиво.',
-    'Бонуси пахнуть рибкою, перевірив.',
-    'Мяу. Я тут відповідальний за настрій звіту.',
-    'Обережно, лапа може натиснути “Перерахувати”.',
-    'Я офіційно за план 110% і дрімоту після.',
-    'Якщо цифри сумні — я підмуркну підтримку.',
-    'Поки ти рахуєш, я охороняю “Загальну суму”.'
-  ];
-  const celebrationCatLines = [
-    'Мяу. Усі групи вже в зеленій зоні.',
-    'Пухнасто схвалюю: квартал сяє.',
-    'Лапками підписую цей зелений результат.',
-    'Уррра! Тепер можна премію і ковбаску.',
-    'Квартал топ. Я вже святкую хвостом.'
-  ];
-  let catLineIndex = 0;
-  let catState = 'context';
-
-  function nextCatLineFrom(collection){
-    const index = Math.floor(Math.random() * collection.length);
-    return collection[index];
-  }
-
-  function setCatState(state){
-    catState = state;
-    if (!easterCat) return;
-    easterCat.classList.toggle('is-sleeping', state === 'sleep');
-    easterCat.classList.toggle('is-disabled', state === 'off');
-    if (state === 'off') stopCatCycle();
-  }
-
-  function toggleCatVisibility(){
-    if (!easterCat || !toggleCatBtn) return;
-    const isOff = catState === 'off';
-    if (isOff) {
-      setCatState('context');
-      easterCat.hidden = false;
-      toggleCatBtn.textContent = 'Без кота';
-      toggleCatBtn.classList.remove('is-off');
-      toggleCatBtn.setAttribute('aria-pressed', 'false');
-      setCatLine(catLineIndex + 1, false);
-      scheduleCatCycle(7000);
-      return;
-    }
-    setCatState('off');
-    easterCat.hidden = true;
-    toggleCatBtn.textContent = 'Повернути кота';
-    toggleCatBtn.classList.add('is-off');
-    toggleCatBtn.setAttribute('aria-pressed', 'true');
-  }
 
   function row(label, value, rowClass = ''){ return `<tr class="${rowClass}"><td>${label}</td><td class="mono">${value}</td></tr>`; }
   function setMStatus(msg, type){ motivationStatus.textContent = msg || ''; motivationStatus.className = 'status' + (type ? ' ' + type : ''); }
@@ -2032,54 +1935,6 @@
       localStorage.removeItem(storageKey);
       lastSavedStateRaw = '';
     } catch (_) {}
-  }
-  function setCatLine(nextIndex, paused){
-    if (!easterCatBubble) return;
-    const lineByState = {
-      context: () => nextCatLineFrom(catContextLines),
-      action: () => nextCatLineFrom(catActionLines),
-      fact: () => nextCatLineFrom(catFacts),
-      sleep: () => nextCatLineFrom(catSleepLines),
-      off: () => ''
-    };
-    catLineIndex = nextIndex % catLines.length;
-    const nextLine = lineByState[catState] ? lineByState[catState]() : catLines[catLineIndex];
-    if (easterCatBubble.textContent !== nextLine) easterCatBubble.textContent = nextLine;
-    easterCat.classList.toggle('is-paused', Boolean(paused));
-  }
-  function stopCatCycle(){
-    clearTimeout(catCycleTimer);
-    catCycleTimer = null;
-  }
-  function scheduleCatCycle(delay = 12000){
-    if (!easterCat || !catVisible || document.hidden) return;
-    stopCatCycle();
-    catCycleTimer = setTimeout(() => {
-      if (!easterCat.classList.contains('is-paused')) setCatLine(catLineIndex + 1, false);
-      scheduleCatCycle(12000);
-    }, delay);
-  }
-  function pauseCatTemporarily(duration = 1600){
-    if (!easterCat) return;
-    clearTimeout(catResumeTimer);
-    stopCatCycle();
-    easterCat.classList.add('is-paused');
-    catResumeTimer = setTimeout(() => {
-      easterCat.classList.remove('is-paused');
-      if (catState === 'action') setCatState('context');
-      scheduleCatCycle();
-    }, duration);
-  }
-  function catPointToPriorityField(){
-    if (!priorityFields.size) return false;
-    const prioritized = Array.from(priorityFields);
-    const targetField = prioritized.find((field) => field.classList.contains('is-priority-high')) || prioritized[0];
-    if (!targetField) return false;
-    targetField.classList.add('cat-focus');
-    const targetInput = targetField.querySelector('input, select');
-    if (targetInput) targetInput.focus({ preventScroll: true });
-    setTimeout(() => targetField.classList.remove('cat-focus'), 1800);
-    return true;
   }
   function toneClass(value){ return value > 0 ? 'is-positive' : value < 0 ? 'is-negative' : 'is-neutral'; }
   function setFieldMessage(id, msg, kind){
@@ -2255,13 +2110,6 @@
   function updateRewardState(monthly, quarter){
     const allGreen = quarter.doneCount === groupNames.length;
     [monthlySummaryCard, quarterSummaryCard, totalSummaryCard].forEach((card) => card.classList.toggle('has-success', allGreen));
-    const miniCard = document.querySelector('.summary-mini');
-    if (miniCard) miniCard.classList.toggle('is-celebrating', allGreen);
-    if (allGreen && easterCatBubble && !easterCat.classList.contains('is-paused')) {
-      setCatState('fact');
-      const celebrationLine = celebrationCatLines[quarter.doneCount % celebrationCatLines.length];
-      if (easterCatBubble.textContent !== celebrationLine) easterCatBubble.textContent = celebrationLine;
-    }
   }
 
   function renderPdfReport(monthly, quarter){
@@ -2636,6 +2484,16 @@
     ['crmDone','tiresMinMet'].forEach(id=>byId(id).addEventListener('change', scheduleMotivationCalculation));
     groupInputs.forEach((input)=>input.addEventListener('input', scheduleMotivationCalculation));
   }
+  function runPrintPreflight() {
+    const report = byId('pdfReport');
+    if (!report) return;
+    report.style.display = 'grid';
+    const hasOverflow = report.scrollWidth > report.clientWidth;
+    report.style.display = '';
+    if (hasOverflow) {
+      setMStatus('Попередження: частина таблиць може бути ширшою за аркуш A4.', 'draft');
+    }
+  }
 
   byId('refreshRate').addEventListener('click', refreshRate);
   openMotivationGuideBtn?.addEventListener('click', () => setGuideModalOpen(true));
@@ -2647,7 +2505,7 @@
     if (event.key === 'Escape' && motivationGuideModal && !motivationGuideModal.hidden) setGuideModalOpen(false);
   });
   byId('recalcMotivation').addEventListener('click', ()=>{ if (!validateAllInputs()) { setMStatus('Виправте помилки перед перерахунком.', 'error'); return; } calculateMotivation(); setMStatus('Розрахунок оновлено.', 'ok'); });
-  byId('downloadPdf').addEventListener('click', ()=>{ const stamp = new Date().toLocaleString('uk-UA'); printMeta.textContent = `Дата друку: ${stamp}`; pdfTimestamp.textContent = `Сформовано: ${stamp}`; setMStatus('Підготовлено короткий PDF-звіт.', 'ok'); window.print(); });
+  byId('downloadPdf').addEventListener('click', ()=>{ const stamp = new Date().toLocaleString('uk-UA'); printMeta.textContent = `Дата друку: ${stamp}`; pdfTimestamp.textContent = `Сформовано: ${stamp}`; runPrintPreflight(); setMStatus('Підготовлено короткий PDF-звіт.', 'ok'); window.print(); });
   byId('clearAll').addEventListener('click', ()=>{
     debtInput.value='58617'; turnoverInput.value='155775'; daysInput.value='31'; exampleInputs.forEach(refreshExampleState);
     ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','tiresOver'].forEach(id=>byId(id).value='0');
@@ -2658,49 +2516,6 @@
     clearSavedCalculatorState();
     calculateDelay(); calculateMotivation(); setMStatus('Усі поля очищено.', 'ok');
   });
-  if (easterCat) {
-    if (catLiteMode) easterCat.classList.add('is-lite');
-    easterCat.addEventListener('click', () => {
-      if (catState === 'off') return;
-      const didPoint = catPointToPriorityField();
-      setCatState(didPoint ? 'action' : 'fact');
-      setCatLine(catLineIndex + 1, true);
-      pauseCatTemporarily(didPoint ? 1700 : 1400);
-    });
-    if ('IntersectionObserver' in window && summaryMiniCard) {
-      const catObserver = new IntersectionObserver(([entry]) => {
-        catVisible = Boolean(entry && entry.isIntersecting);
-        if (!catVisible) {
-          stopCatCycle();
-          easterCat.classList.add('is-paused');
-          return;
-        }
-        easterCat.classList.remove('is-paused');
-        scheduleCatCycle(9000);
-      }, { threshold: 0.15 });
-      catObserver.observe(summaryMiniCard);
-    }
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        stopCatCycle();
-        setCatState('sleep');
-        easterCat.classList.add('is-paused');
-        return;
-      }
-      setCatState('context');
-      easterCat.classList.remove('is-paused');
-      scheduleCatCycle(9000);
-    });
-    easterCat.addEventListener('dblclick', () => {
-      if (catState === 'off') return;
-      setCatState('sleep');
-      setCatLine(catLineIndex + 1, true);
-      pauseCatTemporarily(2600);
-    });
-    scheduleCatCycle(9000);
-  }
-  if (toggleCatBtn) toggleCatBtn.addEventListener('click', toggleCatVisibility);
-
   bindRecalc();
   const restoredState = restoreCalculatorState();
   exampleInputs.forEach(refreshExampleState);
