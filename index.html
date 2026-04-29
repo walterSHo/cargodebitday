@@ -8,7 +8,7 @@
   <style>
     :root { --bg:#09101a; --surface:rgba(14,22,36,.86); --line:rgba(100,124,161,.24); --text:#f4f7fd; }
     * { box-sizing: border-box; }
-    body { margin:0; min-height:100vh; font-family:"Segoe UI",Roboto,Arial,sans-serif; color:var(--text); background:linear-gradient(180deg,#09101a 0%,#07111c 52%,#081019 100%); }
+    body { margin:0; min-height:100vh; font-family:"Segoe UI",Roboto,Arial,sans-serif; color:var(--text); background:linear-gradient(180deg,#09101a 0%,#07111c 52%,#081019 100%); overflow-y:scroll; }
     .shell { width:min(var(--container-shell-max), calc(100% - 20px)); margin:10px auto; display:grid; grid-template-columns:220px minmax(0,1fr); gap:14px; }
     .sidebar { border:1px solid var(--line); border-radius:14px; background:rgba(19,30,47,.84); padding:12px; align-self:start; position:sticky; top:10px; }
     .sidebar h1 { margin:0 0 10px; font-size:.9rem; text-transform:uppercase; color:#9ba9c1; }
