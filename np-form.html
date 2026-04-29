@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Форма НП</title>
+  <link rel="stylesheet" href="./assets/styles/tokens.css" />
   <script>
     if (window.self !== window.top) document.documentElement.classList.add('embedded');
   </script>
@@ -15,7 +16,9 @@
       --text: #f4f7fd;
       --muted: #9ba9c1;
       --accent: #6ea8ff;
-      --radius: 14px;
+      --radius: 8px;
+      --surface-l1: rgba(10, 16, 28, .92);
+      --surface-l2: rgba(18, 30, 48, .88);
     }
     * { box-sizing: border-box; }
     body {
@@ -25,14 +28,15 @@
       color: var(--text);
       background: linear-gradient(180deg, #09101a 0%, #07111c 52%, #081019 100%);
       padding: 20px;
+      overflow-y: scroll;
     }
     .page {
-      width: min(980px, 100%);
+      width: min(var(--container-page-max), calc(100% - 56px));
       margin: 0 auto;
       display: grid;
       gap: 14px;
     }
-    .app-shell { width: min(1320px, 100%); margin: 0 auto; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; }
+    .app-shell { width: min(var(--container-shell-max), calc(100% - 32px)); margin: 16px auto; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; }
     .sidebar { background: rgba(19, 30, 47, .84); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; align-self: start; position: sticky; top: 20px; }
     .sidebar h2 { margin: 0 0 10px; font-size: .9rem; text-transform: uppercase; color: var(--muted); }
     .menu-link { display:block; padding:10px 11px; border-radius:8px; color:#d9e4f7; text-decoration:none; border:1px solid transparent; margin-bottom:8px; }
@@ -40,14 +44,17 @@
     .menu-link.is-active { background: rgba(110,168,255,.22); border-color: rgba(143,190,255,.42); color:#fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); }
     .embedded .sidebar { display: none; }
     .embedded .app-shell { grid-template-columns: 1fr; width: 100%; margin: 0; }
-    .embedded .page { width: min(980px, calc(100% - 20px)); margin: 10px auto 20px; }
+    .embedded .page { width: min(var(--container-page-max), calc(100% - 20px)); margin: 10px auto 20px; }
+    .panel-head { display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:46px; padding:8px 14px; border:1px solid var(--line); border-radius:var(--radius-sm); background:rgba(15,22,34,.95); }
+    .panel-head-meta { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .meta-chip { padding:0; border:0; background:transparent; color:#d7e2f5; font-size:.8rem; line-height:1.2; }
     .card {
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      padding: 18px;
+      padding: var(--space-md);
       display: grid;
-      gap: 12px;
+      gap: var(--space-sm);
     }
     h1, h2 { margin: 0; }
     p { margin: 0; color: var(--muted); line-height: 1.45; }
@@ -57,13 +64,13 @@
     input, textarea, select {
       width: 100%;
       border: 1px solid rgba(118,150,197,.35);
-      border-radius: 8px;
-      padding: 10px 12px;
-      background: rgba(10, 16, 28, .92);
+      border-radius: var(--radius-sm);
+      padding: 8px var(--space-sm);
+      background: var(--surface-l1);
       color: var(--text);
-      font-size: .95rem;
+      font-size: .92rem;
     }
-    select { min-height: 40px; }
+    select { min-height: var(--control-h-md); background: var(--surface-l2); }
     textarea { min-height: 90px; resize: vertical; }
     .actions { display: flex; gap: 10px; flex-wrap: wrap; }
     .actions > .btn,
@@ -75,12 +82,19 @@
       border: 1px solid rgba(143,190,255,.5);
       background: var(--accent);
       color: #08111d;
-      border-radius: 8px;
-      min-height: 40px;
-      padding: 0 14px;
-      font-weight: 700;
+      border-radius: var(--radius-sm);
+      min-height: var(--control-h-md);
+      padding: 0 var(--space-sm);
+      font-weight: 600;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
+    .btn-icon-ui { width: 14px; height: 14px; flex: 0 0 14px; opacity: .84; }
+    .btn-md { min-height: var(--btn-h-md); }
+    .btn-sm { min-height: var(--btn-h-sm); font-size: .88rem; padding: 0 12px; }
     .btn[disabled] { opacity: .65; cursor: not-allowed; }
     .btn-copy {
       background: rgba(34,48,71,.64);
@@ -112,7 +126,7 @@
       .print-sheet {
         display: block;
         border: 1px solid #999;
-        border-radius: 8px;
+        border-radius: 2px;
         padding: 14px;
         font-size: 11pt;
         line-height: 1.35;
@@ -129,6 +143,9 @@
         border-bottom: 1px solid #ddd;
       }
       .print-row:last-child { border-bottom: 0; }
+      .app-shell,
+      .page { width: 100%; margin: 0; }
+      .sidebar { display: none !important; }
       .print-label { font-weight: 700; }
       .print-value { word-break: break-word; }
     }
@@ -145,15 +162,16 @@
       </nav>
     </aside>
     <div class="page">
+    <section class="panel-head"><div class="panel-head-meta"><span class="meta-chip">Режим: Шаблон НП</span></div><div class="panel-head-meta"><span class="meta-chip" id="panelTime">UTC: --:--</span></div></section>
     <section class="card">
       <h1>Форма шаблону відправки НП</h1>
       <p>Заповніть шаблон. Потім натисніть “Завантажити PDF (A4)”.</p>
       <div class="actions">
-        <button class="btn btn-copy" id="copyRequestBtn" type="button">Скопіювати текст заявки</button>
-        <button class="btn btn-copy" id="saveHistoryBtn" type="button">Зберегти в історію</button>
-        <button class="btn btn-copy" id="loadHistoryBtn" type="button">Підставити з історії</button>
-        <button class="btn btn-copy" id="clearFormBtn" type="button">Очистити форму / Новий бланк</button>
-        <button class="btn" id="printPdfBtn" type="button">Завантажити PDF (A4)</button>
+        <button class="btn btn-copy btn-md" id="copyRequestBtn" type="button"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="5" y="5" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Скопіювати текст заявки</button>
+        <button class="btn btn-copy btn-md" id="saveHistoryBtn" type="button"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v14H5z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 5v5h8V5M9 19v-5h6v5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Зберегти в історію</button>
+        <button class="btn btn-copy btn-md" id="loadHistoryBtn" type="button"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Підставити з історії</button>
+        <button class="btn btn-copy btn-md" id="clearFormBtn" type="button"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 4h5M8 7l.8 11.1a1.7 1.7 0 0 0 1.7 1.6h3a1.7 1.7 0 0 0 1.7-1.6L16 7" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Очистити форму / Новий бланк</button>
+        <button class="btn btn-md" id="printPdfBtn" type="button"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10m0 0 3.2-3.2M12 13 8.8 9.8M5 15.5v2.7A1.8 1.8 0 0 0 6.8 20h10.4a1.8 1.8 0 0 0 1.8-1.8v-2.7" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Завантажити PDF (A4)</button>
       </div>
       <div class="field">
         <label for="historySelect">Останні 5 заявок</label>
@@ -217,6 +235,8 @@
   </main>
   <script>
     (function () {
+      const panelTime = document.getElementById('panelTime');
+      if (panelTime) panelTime.textContent = `UTC: ${new Date().toISOString().slice(11,16)}`;
       const byId = (id) => document.getElementById(id);
       const storageKey = 'np-form-draft-v1';
       const historyKey = 'np-form-history-v1';

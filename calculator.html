@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Калькулятори</title>
+  <link rel="stylesheet" href="./assets/styles/tokens.css" />
   <script>
     if (window.self !== window.top) document.documentElement.classList.add('embedded');
   </script>
@@ -31,6 +32,9 @@
       --warn: #ffb324;
       --radius: 18px;
       --shadow: 0 0 0 1px rgba(83, 106, 142, .18);
+      --surface-l1: rgba(8, 13, 23, .96);
+      --surface-l2: rgba(18, 28, 44, .94);
+      --surface-l3: rgba(30, 44, 67, .9);
     }
     * { box-sizing: border-box; }
     html { background: var(--bg); }
@@ -43,6 +47,7 @@
         linear-gradient(180deg, #09101a 0%, #07111c 52%, #081019 100%);
       color: var(--text);
       min-height: 100vh;
+      overflow-y: scroll;
     }
     body::before,
     body::after {
@@ -70,7 +75,7 @@
     .page {
       position: relative;
       z-index: 1;
-      width: min(1620px, calc(100% - 56px));
+      width: min(var(--container-page-max), calc(100% - 56px));
       margin: 24px auto 56px;
       display: grid;
       gap: 26px;
@@ -79,7 +84,7 @@
       display: grid;
       grid-template-columns: 220px minmax(0, 1fr);
       gap: 18px;
-      width: min(1860px, calc(100% - 32px));
+      width: min(var(--container-shell-max), calc(100% - 32px));
       margin: 16px auto;
       position: relative;
       z-index: 1;
@@ -99,7 +104,10 @@
     .menu-link.is-active { background: rgba(110,168,255,.22); border-color: rgba(143,190,255,.42); color:#fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); }
     .embedded .sidebar { display: none; }
     .embedded .app-shell { grid-template-columns: 1fr; width: 100%; margin: 0; }
-    .embedded .page { width: min(1620px, calc(100% - 20px)); margin: 10px auto 20px; }
+    .embedded .page { width: min(var(--container-page-max), calc(100% - 20px)); margin: 10px auto 20px; }
+    .panel-head { display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:46px; padding:8px 14px; border:1px solid var(--line); border-radius:var(--radius-md); background:rgba(15,22,34,.95); }
+    .panel-head-meta { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .meta-chip { padding:0; border:0; background:transparent; color:#d7e2f5; font-size:.8rem; line-height:1.2; }
     .screen {
       position: relative;
       background:
@@ -132,7 +140,7 @@
     .screen-head h1,
     .screen-head h2 {
       margin: 0;
-      font-size: 1.08rem;
+      font-size: var(--font-title);
       line-height: 1.25;
       letter-spacing: .01em;
       color: #f7f8fb;
@@ -142,7 +150,7 @@
     .screen-head p {
       margin: 8px 0 0;
       color: var(--muted);
-      font-size: .82rem;
+      font-size: var(--font-body);
       line-height: 1.45;
     }
     .workspace {
@@ -199,7 +207,7 @@
       min-height: 44px;
       border: 1px solid var(--line-strong);
       border-radius: 8px;
-      padding: 10px 14px;
+      padding: 10px 38px 10px 14px;
       font-size: .99rem;
       color: var(--text);
       background: var(--surface-strong);
@@ -225,7 +233,6 @@
     select:focus {
       border-color: var(--focus);
       box-shadow: 0 0 0 3px rgba(122,151,202,.18);
-      transform: translateY(-1px);
     }
     .field:focus-within label { color: #d9e3f4; }
     input.is-example { color: rgba(243,244,247,.72); }
@@ -246,15 +253,16 @@
     .field.invalid input { border-color: #7d3a42; box-shadow: 0 0 0 3px rgba(125,58,66,.14); }
     .field.valid input {
       border-color: #2d7c54;
-      padding-right: 38px;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%231cf488' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.2' d='M3 8.5l3.1 3.1L13 3.8'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-size: 14px 14px;
       background-position: right 12px center;
     }
     .field--with-action.valid input {
-      padding-right: 76px;
       background-position: right 48px center;
+    }
+    .field--with-action input {
+      padding-right: 76px;
     }
     .hint {
       margin: 0;
@@ -279,11 +287,18 @@
       min-height: 44px;
       padding: 0 24px;
       border-radius: 8px;
-      font-weight: 700;
-      font-size: .96rem;
+      font-weight: 600;
+      font-size: .95rem;
       cursor: pointer;
       transition: transform .14s ease, border-color .18s ease, background-color .18s ease, color .18s ease, box-shadow .2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
+    .btn-md { min-height: var(--btn-h-md); }
+    .btn-sm { min-height: var(--btn-h-sm); font-size: .88rem; padding: 0 14px; }
+    .btn-icon-ui { width: 14px; height: 14px; flex: 0 0 14px; opacity: .82; }
     .btn::before {
       content: "";
       position: absolute;
@@ -297,11 +312,11 @@
       background: var(--accent);
       color: #08111d;
       border-color: rgba(143,190,255,.58);
-      box-shadow: 0 10px 20px rgba(110,168,255,.18), 0 0 0 1px rgba(143,190,255,.14);
+      box-shadow: 0 6px 14px rgba(110,168,255,.14), 0 0 0 1px rgba(143,190,255,.12);
     }
     .btn-primary:hover {
       background: var(--accent-hover);
-      box-shadow: 0 12px 24px rgba(110,168,255,.22), 0 0 16px rgba(110,168,255,.12);
+      box-shadow: 0 8px 16px rgba(110,168,255,.17), 0 0 10px rgba(110,168,255,.1);
     }
     .btn-secondary {
       background: linear-gradient(180deg, rgba(34,48,71,.64), rgba(17,24,38,.76));
@@ -422,9 +437,7 @@
       gap: 20px;
       align-content: start;
     }
-    .screen-motivation {
-      --radius-motivation: 10px;
-    }
+    .screen-motivation { --radius-motivation: var(--radius-md); }
     .screen-motivation .screen-head {
       padding: 18px 24px 16px;
     }
@@ -441,8 +454,8 @@
     .screen-motivation .summary-section,
     .screen-motivation .summary-total-row .summary-item {
       border-radius: var(--radius-motivation);
-      padding: 18px;
-      gap: 10px;
+      padding: var(--space-md);
+      gap: var(--space-sm);
     }
     .screen-motivation .summary-section {
       padding: 0;
@@ -462,21 +475,21 @@
     .screen-motivation .table-wrap,
     .screen-motivation .error-summary,
     .screen-motivation .disclaimer {
-      border-radius: 6px;
+      border-radius: var(--radius-sm);
     }
     .screen-motivation label {
       font-size: .79rem;
     }
     .screen-motivation input,
     .screen-motivation select {
-      min-height: 40px;
-      padding: 8px 12px;
-      font-size: .95rem;
+      min-height: var(--control-h-md);
+      padding: var(--space-xs) var(--space-sm);
+      font-size: .92rem;
     }
     .screen-motivation .btn {
-      min-height: 40px;
-      padding: 0 18px;
-      font-size: .91rem;
+      min-height: var(--control-h-md);
+      padding: 0 var(--space-md);
+      font-size: .88rem;
     }
     .screen-motivation .monthly-grid {
       gap: 16px 14px;
@@ -678,14 +691,14 @@
     }
     .screen-motivation .table th,
     .screen-motivation .table td {
-      padding: 9px 10px;
+      padding: var(--space-sm);
     }
     .screen-motivation .table {
-      font-size: .84rem;
+      font-size: .81rem;
     }
     .screen-motivation .table input {
-      min-height: 34px;
-      padding: 6px 8px;
+      min-height: var(--control-h-sm);
+      padding: 4px var(--space-xs);
     }
     .screen-motivation .groups-meta {
       gap: 8px 14px;
@@ -698,7 +711,7 @@
       font-size: .98rem;
     }
     .screen-motivation .mini-table {
-      font-size: .83rem;
+      font-size: .8rem;
     }
     .screen-motivation .mini-table td {
       padding: 8px 0;
@@ -748,8 +761,8 @@
     .screen-motivation .actions-quarter .btn {
       width: 100%;
       min-width: 0;
-      min-height: 42px;
-      padding: 0 16px;
+      min-height: var(--control-h-md);
+      padding: 0 var(--space-sm);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -763,9 +776,20 @@
       opacity: .68;
       flex: 0 0 14px;
     }
+    #clearAll.btn {
+      border-color: rgba(255,98,102,.38);
+      color: #ffc5c8;
+      background: rgba(90, 24, 30, .22);
+    }
+    #clearAll.btn:hover {
+      border-color: rgba(255,98,102,.55);
+      background: rgba(105, 30, 36, .28);
+      color: #ffd9dc;
+      box-shadow: 0 0 0 2px rgba(255,98,102,.12);
+    }
     .screen-motivation .hint-list {
       gap: 8px;
-      font-size: .84rem;
+      font-size: .8rem;
     }
     .screen-motivation .disclaimer {
       padding: 14px 16px;
@@ -781,10 +805,7 @@
     }
     .screen-motivation .card:hover,
     .screen-motivation .summary-item:hover,
-    .screen-motivation .hints:hover {
-      border-color: #42506a;
-      box-shadow: 0 10px 22px rgba(7,10,16,.18);
-    }
+    .screen-motivation .hints:hover { border-color: #42506a; box-shadow: none; }
     .screen-motivation .monthly-check:hover,
     .screen-motivation .table-wrap:hover,
     .screen-motivation .disclaimer:hover {
@@ -793,9 +814,7 @@
     .screen-motivation .table tbody tr {
       transition: background-color .16s ease;
     }
-    .screen-motivation .table tbody tr:hover {
-      background: rgba(255,255,255,.025);
-    }
+    .screen-motivation .table tbody tr:hover { background: rgba(110,168,255,.08); }
     .screen-motivation .hint-list li {
       transition: transform .16s ease, color .16s ease;
     }
@@ -847,11 +866,12 @@
     .table td {
       border-bottom: 1px solid #30394b;
       padding: 11px 14px;
+      height: 44px;
       text-align: left;
       vertical-align: middle;
     }
     .table th {
-      background: rgba(17,25,40,.9);
+      background: var(--surface-l3);
       position: sticky;
       top: 0;
       color: var(--muted);
@@ -863,22 +883,30 @@
       text-align: right;
       font-variant-numeric: tabular-nums;
     }
+    #groupsTable th:first-child,
+    #groupsTable td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: var(--surface-l1);
+    }
+    #groupsTable tbody tr:nth-child(even) { background: rgba(255,255,255,.03); }
     .table-wrap {
       overflow: visible;
       max-height: none;
       border: 1px solid rgba(103,127,164,.24);
-      border-radius: 10px;
-      background: rgba(12,18,30,.74);
+      border-radius: var(--radius-md);
+      background: var(--surface-l1);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 14px 28px rgba(0,0,0,.14);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
     }
     .table .mono { color: var(--text-soft); }
     .table input {
-      min-height: 36px;
-      padding: 7px 10px;
+      min-height: var(--control-h-sm);
+      padding: 6px var(--space-sm);
       text-align: center;
-      background: #12161d;
+      background: var(--surface-l2);
     }
     .pill-ok,
     .pill-no,
@@ -896,6 +924,7 @@
     .group-row.done { background: rgba(28,244,136,.035); }
     .group-row.near { background: rgba(255,179,36,.04); }
     .group-row.fail { background: transparent; }
+    .group-row:hover { background: rgba(110,168,255,.08); }
     .progress-track {
       height: 8px;
       border-radius: 999px;
@@ -972,25 +1001,6 @@
       color: #eef2f8;
       text-transform: uppercase;
       letter-spacing: -.01em;
-    }
-    .summary-mini-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-    .summary-mini-head h4 { margin: 0; }
-    .btn-cat-toggle {
-      min-height: 28px;
-      padding: 0 10px;
-      font-size: .72rem;
-      border-radius: 999px;
-      opacity: .85;
-    }
-    .btn-cat-toggle.is-off {
-      border-color: rgba(255,98,102,.38);
-      color: #ffb8bc;
     }
     .summary-note {
       margin: -4px 0 2px;
@@ -1519,6 +1529,8 @@
         zoom: .92;
       }
       body::before, body::after { display: none !important; }
+      .sidebar { display: none !important; }
+      .app-shell { width: 100%; margin: 0; display: block; }
       .page > :not(.pdf-report) { display: none !important; }
       .pdf-report { display: grid !important; }
       .page {
@@ -1535,17 +1547,17 @@
         page-break-inside: avoid;
       }
       .pdf-report-head { gap: 6px; margin-bottom: 4px; }
-      .pdf-report-head h2 { font-size: 13.2pt; }
+      .pdf-report-head h2 { font-size: 11pt; }
       .pdf-report-head p,
       .pdf-report-meta,
       .pdf-metric-label,
       .pdf-table,
-      .pdf-total { font-size: 8.4pt; }
-      .pdf-metric-value { font-size: 11.6pt; }
+      .pdf-total { font-size: 9pt; }
+      .pdf-metric-value { font-size: 10pt; }
       .pdf-key-metrics { gap: 6px; }
-      .pdf-metric { padding: 6px 8px; gap: 4px; border-radius: 8px; }
+      .pdf-metric { padding: 6px 8px; gap: 4px; border-radius: 2px; }
       .pdf-summary-grid { gap: 8px; }
-      .pdf-summary-card { padding: 8px; gap: 6px; border-radius: 8px; }
+      .pdf-summary-card { padding: 8px; gap: 6px; border-radius: 2px; }
       .pdf-summary-card h3 { font-size: .82rem; }
       .pdf-table td { padding: 3.5px 0; }
       .pdf-total { padding-top: 5px; }
@@ -1571,6 +1583,16 @@
     </nav>
   </aside>
   <div class="page">
+  <section class="panel-head" aria-label="Системна панель">
+    <div class="panel-head-meta">
+      <span class="meta-chip">Режим: Dashboard</span>
+      <span class="meta-chip">Сервіс: Cargodebitday</span>
+    </div>
+    <div class="panel-head-meta">
+      <span class="meta-chip" id="panelTime">Київ: --:--</span>
+      <span class="meta-chip" id="panelRate">Курс EUR/UAH: --</span>
+    </div>
+  </section>
   <section class="screen" aria-labelledby="delayTitle">
     <div class="screen-head"><h1 id="delayTitle">Калькулятор середнього відтермінування</h1><p>Базовий розрахунок коефіцієнта і строку відтермінування.</p></div>
     <div class="workspace">
@@ -1582,7 +1604,11 @@
             <div class="field"><label for="days">Кількість днів</label><input id="days" type="number" value="31" data-example="31" class="is-example" /></div>
           </div>
           <p class="hint">Формула: <strong>коефіцієнт = борг / сума оборота</strong>, <strong>дні відтермінування = коефіцієнт × кількість днів у місяці</strong>.</p>
-          <div class="actions"><button type="submit" class="btn btn-primary">Розрахувати</button><button type="button" id="clearBtn" class="btn btn-secondary">Очистити</button><button type="button" id="copyBtn" class="btn btn-secondary">Скопіювати результат</button></div>
+          <div class="actions">
+            <button type="submit" class="btn btn-primary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Розрахувати</button>
+            <button type="button" id="clearBtn" class="btn btn-secondary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 4h5M8 7l.8 11.1a1.7 1.7 0 0 0 1.7 1.6h3a1.7 1.7 0 0 0 1.7-1.6L16 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Очистити</button>
+            <button type="button" id="copyBtn" class="btn btn-secondary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="5" y="5" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Скопіювати результат</button>
+          </div>
         </form>
       </div>
       <aside class="result-col" aria-live="polite" aria-atomic="true"><section class="result-box"><h2 class="result-title">Результат</h2><p id="coefOut" class="result-line">Коефіцієнт: —</p><p id="daysOut" class="result-line">Середнє відтермінування: —</p><p id="status" class="status" role="status"></p></section><p class="example">Приклад: борг 58 617, оборот 155 775, днів 31 → 0.3763 та 11.67 днів.</p></aside>
@@ -1612,24 +1638,6 @@
 
           <div class="summary-item" id="monthlySummaryCard"><h4>Підсумок місяця</h4><p id="monthSummaryNote" class="summary-note">Поки спокійно: оберіть сценарій або введіть дані, щоб побачити важелі впливу.</p><table class="mini-table" id="monthlyBreakdown"></table><div class="total"><span>Підсумок місяця</span><span id="monthTotal" class="mono">0 ₴</span></div></div>
           <div class="summary-item summary-item--total" id="totalSummaryCard"><h4>Загальний підсумок</h4><p id="totalSummaryNote" class="summary-note">Звідси видно сумарний ефект місяця й кварталу разом.</p><table class="mini-table" id="totalBreakdown"></table><div class="total"><span>Загальна сума</span><span id="allTotal" class="mono">0 ₴</span></div></div>
-          <section class="summary-item summary-mini" aria-label="Маленька пасхалка з котиком">
-            <div class="summary-mini-head">
-              <h4>Пухнастий ревізор</h4>
-              <button type="button" id="toggleCatBtn" class="btn btn-secondary btn-cat-toggle" aria-pressed="false">Без кота</button>
-            </div>
-            <div class="easter-egg-strip">
-              <button type="button" id="easterCat" class="easter-cat" aria-label="Погладити котика">
-                <span id="easterCatBubble" class="easter-cat-bubble">Мрр. Я рахую бонуси лапками.</span>
-                <span class="easter-cat-body" aria-hidden="true">
-                  <span class="easter-cat-face">
-                    <span class="easter-cat-nose"></span>
-                  </span>
-                  <span class="easter-cat-paws"></span>
-                  <span class="easter-cat-tail"></span>
-                </span>
-              </button>
-            </div>
-          </section>
         </div>
 
         <div class="motivation-column motivation-column--right">
@@ -1653,12 +1661,12 @@
               <p id="motivationStatus" class="status" role="status" aria-live="polite"></p>
             </div>
             <div class="actions-quarter-top">
-              <button type="button" id="recalcMotivation" class="btn btn-primary">Перерахувати</button>
-              <button type="button" id="clearAll" class="btn btn-secondary">Очистити все</button>
+              <button type="button" id="recalcMotivation" class="btn btn-primary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Перерахувати</button>
+              <button type="button" id="clearAll" class="btn btn-secondary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 4h5M8 7l.8 11.1a1.7 1.7 0 0 0 1.7 1.6h3a1.7 1.7 0 0 0 1.7-1.6L16 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Очистити все</button>
             </div>
             <div class="actions-quarter-bottom">
-              <button type="button" id="openMotivationGuide" class="btn btn-secondary btn-quiet"><svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.8A1.8 1.8 0 0 1 6.8 3h10.4A1.8 1.8 0 0 1 19 4.8v14.4a1.8 1.8 0 0 1-1.8 1.8H6.8A1.8 1.8 0 0 1 5 19.2z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 7.8h8M8 11.8h8M8 15.8h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>Умови мотивації</button>
-              <button type="button" id="downloadPdf" class="btn btn-secondary"><svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10m0 0 3.2-3.2M12 13 8.8 9.8M5 15.5v2.7A1.8 1.8 0 0 0 6.8 20h10.4a1.8 1.8 0 0 0 1.8-1.8v-2.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Завантажити PDF</button>
+              <button type="button" id="openMotivationGuide" class="btn btn-secondary btn-quiet btn-sm"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 10.5v6M12 7.5h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Умови мотивації</button>
+              <button type="button" id="downloadPdf" class="btn btn-secondary btn-sm"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10m0 0 3.2-3.2M12 13 8.8 9.8M5 15.5v2.7A1.8 1.8 0 0 0 6.8 20h10.4a1.8 1.8 0 0 0 1.8-1.8v-2.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Завантажити PDF</button>
             </div>
           </div>
         </div>
@@ -1802,9 +1810,6 @@
   const motivationStatus = byId('motivationStatus'), rateStatus = byId('rateStatus');
   const monthlyHintsEl = byId('monthlyHints'), quarterHintsEl = byId('quarterHints');
   const printMeta = byId('printMeta');
-  const easterCat = byId('easterCat');
-  const easterCatBubble = byId('easterCatBubble');
-  const toggleCatBtn = byId('toggleCatBtn');
   const groupsDoneCount = byId('groupsDoneCount'), groupsNextHint = byId('groupsNextHint');
   const errorSummary = byId('errorSummary');
   const summaryItems = Array.from(document.querySelectorAll('.summary-item'));
@@ -1823,10 +1828,11 @@
   const pdfAllTotal = byId('pdfAllTotal');
   const pdfTimestamp = byId('pdfTimestamp');
   const stickyAllTotal = byId('stickyAllTotal');
+  const panelTime = byId('panelTime');
+  const panelRate = byId('panelRate');
   const motivationGuideModal = byId('motivationGuideModal');
   const openMotivationGuideBtn = byId('openMotivationGuide');
   const closeMotivationGuideBtn = byId('closeMotivationGuide');
-  const summaryMiniCard = document.querySelector('.summary-mini');
   const touched = new Set();
   const priorityFields = new Set();
   const hintsMarkupCache = new WeakMap();
@@ -1837,86 +1843,6 @@
   let lastSavedStateRaw = '';
   let autosaveTimer = null;
   let motivationFrameId = 0;
-  let catCycleTimer = null;
-  let catResumeTimer = null;
-  let catVisible = true;
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const catLiteMode = prefersReducedMotion.matches || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
-  const catFacts = [
-    'Факт: бонус за групи стартує з 7 виконаних груп.',
-    'Факт: середнє відтермінування до 7 днів дає максимум.',
-    'Факт: знижка 27.5%+ ріже бонус за план на 50%.'
-  ];
-  const catContextLines = [
-    'Контекст: дивлюсь на підсвічені поля — там головний вплив.',
-    'Контекст: зараз найцікавіше біля квартального блоку.',
-    'Контекст: якщо щось червоне, почни з нього.'
-  ];
-  const catActionLines = [
-    'Лапка в роботі: підсвічую поле, яке найкраще рухне результат.',
-    'Дія: клікай підсвічене поле, воно зараз пріоритетне.',
-    'Я зробив підказку лапкою — далі твій хід.'
-  ];
-  const catSleepLines = [
-    'Тсс... я дрімаю. Розбуди мене кліком.',
-    'Сплю. Без різких рухів, будь ласка.',
-    'Дрімота mode on. Одним кліком повертаюсь.'
-  ];
-  const catLines = [
-    'Мрр. Я рахую бонуси лапками.',
-    'Якщо що, я за зелені progress bar.',
-    'Погладь ще раз і я принесу +1 до настрою.',
-    'Сьогодні я чергую біля підказок.',
-    'Не чіпаю розрахунки. Лише ходжу красиво.',
-    'Бонуси пахнуть рибкою, перевірив.',
-    'Мяу. Я тут відповідальний за настрій звіту.',
-    'Обережно, лапа може натиснути “Перерахувати”.',
-    'Я офіційно за план 110% і дрімоту після.',
-    'Якщо цифри сумні — я підмуркну підтримку.',
-    'Поки ти рахуєш, я охороняю “Загальну суму”.'
-  ];
-  const celebrationCatLines = [
-    'Мяу. Усі групи вже в зеленій зоні.',
-    'Пухнасто схвалюю: квартал сяє.',
-    'Лапками підписую цей зелений результат.',
-    'Уррра! Тепер можна премію і ковбаску.',
-    'Квартал топ. Я вже святкую хвостом.'
-  ];
-  let catLineIndex = 0;
-  let catState = 'context';
-
-  function nextCatLineFrom(collection){
-    const index = Math.floor(Math.random() * collection.length);
-    return collection[index];
-  }
-
-  function setCatState(state){
-    catState = state;
-    if (!easterCat) return;
-    easterCat.classList.toggle('is-sleeping', state === 'sleep');
-    easterCat.classList.toggle('is-disabled', state === 'off');
-    if (state === 'off') stopCatCycle();
-  }
-
-  function toggleCatVisibility(){
-    if (!easterCat || !toggleCatBtn) return;
-    const isOff = catState === 'off';
-    if (isOff) {
-      setCatState('context');
-      easterCat.hidden = false;
-      toggleCatBtn.textContent = 'Без кота';
-      toggleCatBtn.classList.remove('is-off');
-      toggleCatBtn.setAttribute('aria-pressed', 'false');
-      setCatLine(catLineIndex + 1, false);
-      scheduleCatCycle(7000);
-      return;
-    }
-    setCatState('off');
-    easterCat.hidden = true;
-    toggleCatBtn.textContent = 'Повернути кота';
-    toggleCatBtn.classList.add('is-off');
-    toggleCatBtn.setAttribute('aria-pressed', 'true');
-  }
 
   function row(label, value, rowClass = ''){ return `<tr class="${rowClass}"><td>${label}</td><td class="mono">${value}</td></tr>`; }
   function setMStatus(msg, type){ motivationStatus.textContent = msg || ''; motivationStatus.className = 'status' + (type ? ' ' + type : ''); }
@@ -2031,53 +1957,15 @@
       lastSavedStateRaw = '';
     } catch (_) {}
   }
-  function setCatLine(nextIndex, paused){
-    if (!easterCatBubble) return;
-    const lineByState = {
-      context: () => nextCatLineFrom(catContextLines),
-      action: () => nextCatLineFrom(catActionLines),
-      fact: () => nextCatLineFrom(catFacts),
-      sleep: () => nextCatLineFrom(catSleepLines),
-      off: () => ''
-    };
-    catLineIndex = nextIndex % catLines.length;
-    const nextLine = lineByState[catState] ? lineByState[catState]() : catLines[catLineIndex];
-    if (easterCatBubble.textContent !== nextLine) easterCatBubble.textContent = nextLine;
-    easterCat.classList.toggle('is-paused', Boolean(paused));
+  function updatePanelKyivTime(){
+    if (!panelTime) return;
+    panelTime.textContent = `Київ: ${new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Kyiv' })}`;
   }
-  function stopCatCycle(){
-    clearTimeout(catCycleTimer);
-    catCycleTimer = null;
-  }
-  function scheduleCatCycle(delay = 12000){
-    if (!easterCat || !catVisible || document.hidden) return;
-    stopCatCycle();
-    catCycleTimer = setTimeout(() => {
-      if (!easterCat.classList.contains('is-paused')) setCatLine(catLineIndex + 1, false);
-      scheduleCatCycle(12000);
-    }, delay);
-  }
-  function pauseCatTemporarily(duration = 1600){
-    if (!easterCat) return;
-    clearTimeout(catResumeTimer);
-    stopCatCycle();
-    easterCat.classList.add('is-paused');
-    catResumeTimer = setTimeout(() => {
-      easterCat.classList.remove('is-paused');
-      if (catState === 'action') setCatState('context');
-      scheduleCatCycle();
-    }, duration);
-  }
-  function catPointToPriorityField(){
-    if (!priorityFields.size) return false;
-    const prioritized = Array.from(priorityFields);
-    const targetField = prioritized.find((field) => field.classList.contains('is-priority-high')) || prioritized[0];
-    if (!targetField) return false;
-    targetField.classList.add('cat-focus');
-    const targetInput = targetField.querySelector('input, select');
-    if (targetInput) targetInput.focus({ preventScroll: true });
-    setTimeout(() => targetField.classList.remove('cat-focus'), 1800);
-    return true;
+  function updatePanelRateLabel(rate){
+    if (!panelRate) return;
+    panelRate.textContent = Number.isFinite(rate) && rate > 0
+      ? `Курс EUR/UAH: ${Number(rate).toFixed(4)}`
+      : 'Курс EUR/UAH: --';
   }
   function toneClass(value){ return value > 0 ? 'is-positive' : value < 0 ? 'is-negative' : 'is-neutral'; }
   function setFieldMessage(id, msg, kind){
@@ -2253,13 +2141,6 @@
   function updateRewardState(monthly, quarter){
     const allGreen = quarter.doneCount === groupNames.length;
     [monthlySummaryCard, quarterSummaryCard, totalSummaryCard].forEach((card) => card.classList.toggle('has-success', allGreen));
-    const miniCard = document.querySelector('.summary-mini');
-    if (miniCard) miniCard.classList.toggle('is-celebrating', allGreen);
-    if (allGreen && easterCatBubble && !easterCat.classList.contains('is-paused')) {
-      setCatState('fact');
-      const celebrationLine = celebrationCatLines[quarter.doneCount % celebrationCatLines.length];
-      if (easterCatBubble.textContent !== celebrationLine) easterCatBubble.textContent = celebrationLine;
-    }
   }
 
   function renderPdfReport(monthly, quarter){
@@ -2608,6 +2489,7 @@
       if (!result || !Number.isFinite(result.rate) || result.rate <= 0) throw new Error('no rate');
 
       byId('eurRate').value = Number(result.rate).toFixed(4);
+      updatePanelRateLabel(Number(result.rate));
       touched.add('eurRate');
       validateField('eurRate');
       calculateMotivation();
@@ -2618,6 +2500,7 @@
         'ok'
       );
     } catch (e) {
+      updatePanelRateLabel(parseFloat(byId('eurRate').value));
       setRateStatus('Не вдалося отримати курс. Введіть значення вручну.', 'error');
     } finally {
       btn.disabled = false;
@@ -2634,6 +2517,16 @@
     ['crmDone','tiresMinMet'].forEach(id=>byId(id).addEventListener('change', scheduleMotivationCalculation));
     groupInputs.forEach((input)=>input.addEventListener('input', scheduleMotivationCalculation));
   }
+  function runPrintPreflight() {
+    const report = byId('pdfReport');
+    if (!report) return;
+    report.style.display = 'grid';
+    const hasOverflow = report.scrollWidth > report.clientWidth;
+    report.style.display = '';
+    if (hasOverflow) {
+      setMStatus('Попередження: частина таблиць може бути ширшою за аркуш A4.', 'draft');
+    }
+  }
 
   byId('refreshRate').addEventListener('click', refreshRate);
   openMotivationGuideBtn?.addEventListener('click', () => setGuideModalOpen(true));
@@ -2645,7 +2538,7 @@
     if (event.key === 'Escape' && motivationGuideModal && !motivationGuideModal.hidden) setGuideModalOpen(false);
   });
   byId('recalcMotivation').addEventListener('click', ()=>{ if (!validateAllInputs()) { setMStatus('Виправте помилки перед перерахунком.', 'error'); return; } calculateMotivation(); setMStatus('Розрахунок оновлено.', 'ok'); });
-  byId('downloadPdf').addEventListener('click', ()=>{ const stamp = new Date().toLocaleString('uk-UA'); printMeta.textContent = `Дата друку: ${stamp}`; pdfTimestamp.textContent = `Сформовано: ${stamp}`; setMStatus('Підготовлено короткий PDF-звіт.', 'ok'); window.print(); });
+  byId('downloadPdf').addEventListener('click', ()=>{ const stamp = new Date().toLocaleString('uk-UA'); printMeta.textContent = `Дата друку: ${stamp}`; pdfTimestamp.textContent = `Сформовано: ${stamp}`; runPrintPreflight(); setMStatus('Підготовлено короткий PDF-звіт.', 'ok'); window.print(); });
   byId('clearAll').addEventListener('click', ()=>{
     debtInput.value='58617'; turnoverInput.value='155775'; daysInput.value='31'; exampleInputs.forEach(refreshExampleState);
     ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','tiresOver'].forEach(id=>byId(id).value='0');
@@ -2656,51 +2549,12 @@
     clearSavedCalculatorState();
     calculateDelay(); calculateMotivation(); setMStatus('Усі поля очищено.', 'ok');
   });
-  if (easterCat) {
-    if (catLiteMode) easterCat.classList.add('is-lite');
-    easterCat.addEventListener('click', () => {
-      if (catState === 'off') return;
-      const didPoint = catPointToPriorityField();
-      setCatState(didPoint ? 'action' : 'fact');
-      setCatLine(catLineIndex + 1, true);
-      pauseCatTemporarily(didPoint ? 1700 : 1400);
-    });
-    if ('IntersectionObserver' in window && summaryMiniCard) {
-      const catObserver = new IntersectionObserver(([entry]) => {
-        catVisible = Boolean(entry && entry.isIntersecting);
-        if (!catVisible) {
-          stopCatCycle();
-          easterCat.classList.add('is-paused');
-          return;
-        }
-        easterCat.classList.remove('is-paused');
-        scheduleCatCycle(9000);
-      }, { threshold: 0.15 });
-      catObserver.observe(summaryMiniCard);
-    }
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        stopCatCycle();
-        setCatState('sleep');
-        easterCat.classList.add('is-paused');
-        return;
-      }
-      setCatState('context');
-      easterCat.classList.remove('is-paused');
-      scheduleCatCycle(9000);
-    });
-    easterCat.addEventListener('dblclick', () => {
-      if (catState === 'off') return;
-      setCatState('sleep');
-      setCatLine(catLineIndex + 1, true);
-      pauseCatTemporarily(2600);
-    });
-    scheduleCatCycle(9000);
-  }
-  if (toggleCatBtn) toggleCatBtn.addEventListener('click', toggleCatVisibility);
-
   bindRecalc();
   const restoredState = restoreCalculatorState();
+  updatePanelKyivTime();
+  setInterval(updatePanelKyivTime, 30000);
+  updatePanelRateLabel(parseFloat(byId('eurRate').value));
+  setInterval(() => refreshRate(), 300000);
   exampleInputs.forEach(refreshExampleState);
   calculateDelay();
   calculateMotivation();
