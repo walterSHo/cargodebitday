@@ -10,21 +10,21 @@
   </script>
   <style>
     :root {
-      --bg: #09101a;
-      --surface: rgba(14, 22, 36, .84);
+      --bg: #111318;
+      --surface: #1A1F27;
       --surface-soft: rgba(20, 31, 48, .82);
       --surface-strong: rgba(10, 16, 28, .92);
       --surface-contrast: rgba(22, 31, 48, .8);
       --header: rgba(20, 31, 48, .86);
       --header-border: rgba(93, 122, 166, .18);
-      --text: #f4f7fd;
+      --text: #F3F6FA;
       --text-soft: #d6dfef;
-      --muted: #9ba9c1;
+      --muted: #A8B1C0;
       --muted-soft: #8190a9;
       --line: rgba(100, 124, 161, .22);
       --line-strong: rgba(118, 150, 197, .38);
       --line-subtle: rgba(90, 116, 153, .16);
-      --accent: #6ea8ff;
+      --accent: #4DA3FF;
       --accent-hover: #8bb9ff;
       --focus: #8fbeff;
       --ok: #1cf488;
@@ -44,9 +44,7 @@
       position: relative;
       margin: 0;
       font-family: "Segoe UI", Roboto, Arial, sans-serif;
-      background:
-        radial-gradient(circle at top, rgba(88, 144, 255, .08), transparent 34%),
-        linear-gradient(180deg, #09101a 0%, #07111c 52%, #081019 100%);
+      background: #111318;
       color: var(--text);
       min-height: 100vh;
       overflow-y: scroll;
@@ -85,7 +83,7 @@
     .app-shell {
       display: grid;
       grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
-      gap: 18px;
+      gap: 16px;
       width: min(var(--container-shell-max), calc(100% - 32px));
       margin: 16px auto;
       position: relative;
@@ -120,15 +118,11 @@
     .meta-chip.is-error { color: #ff8f92; }
     .screen {
       position: relative;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.008)),
-        var(--surface);
+      background: var(--surface);
       border: 1px solid var(--line);
       border-radius: var(--radius);
       overflow: hidden;
       box-shadow: var(--shadow), 0 20px 40px rgba(0,0,0,.24);
-      backdrop-filter: blur(14px) saturate(116%);
-      -webkit-backdrop-filter: blur(14px) saturate(116%);
     }
     .screen::before {
       content: "";
@@ -178,12 +172,12 @@
     .result-col {
       background: rgba(255,255,255,.015);
     }
-    .section-grid { display: grid; gap: 18px; }
+    .section-grid { display: grid; gap: 16px; }
     .fields-3,
     .fields-2,
     .fields-4 {
       display: grid;
-      gap: 18px;
+      gap: 16px;
     }
     .fields-3 { grid-template-columns: repeat(3,minmax(0,1fr)); }
     .fields-2 { grid-template-columns: repeat(2,minmax(0,1fr)); }
@@ -198,7 +192,7 @@
     .monthly-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 22px 18px;
+      gap: 24px 16px;
       align-items: start;
     }
     .monthly-field {
@@ -383,8 +377,6 @@
       display: grid;
       gap: 14px;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.03), 0 14px 28px rgba(0,0,0,.14);
-      backdrop-filter: blur(12px) saturate(116%);
-      -webkit-backdrop-filter: blur(12px) saturate(116%);
       transition: transform .2s ease, border-color .22s ease, box-shadow .26s ease, background-color .22s ease;
     }
     .result-title,
@@ -920,9 +912,9 @@
       position: sticky;
       left: 0;
       z-index: 1;
-      background: var(--surface-l1);
+      background: var(--surface-l3);
     }
-    #groupsTable tbody tr:nth-child(even) { background: rgba(255,255,255,.03); }
+    #groupsTable tbody tr:nth-child(even) { background: rgba(255,255,255,.015); }
     .table-wrap {
       overflow: visible;
       max-height: none;
@@ -956,7 +948,7 @@
     .group-row.done { background: rgba(28,244,136,.035); }
     .group-row.near { background: rgba(255,179,36,.04); }
     .group-row.fail { background: transparent; }
-    .group-row:hover { background: rgba(110,168,255,.08); }
+    .group-row:hover { background: rgba(77,163,255,.06); }
     .progress-track {
       height: 8px;
       border-radius: 999px;
@@ -983,7 +975,7 @@
     .groups-meta strong { color: #eef2f8; }
     .summary-grid {
       display: grid;
-      gap: 18px;
+      gap: 16px;
     }
     .sticky-total {
       position: fixed;
@@ -1076,7 +1068,7 @@
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      gap: 18px;
+      gap: 16px;
       font-weight: 800;
       font-size: 1.08rem;
       color: #f4f6fb;
@@ -1166,7 +1158,7 @@
       border-radius: 999px;
       background: linear-gradient(90deg, rgba(255,255,255,.04), rgba(110,168,255,.18), rgba(255,179,36,.14), rgba(255,255,255,.04));
     }
-    .easter-cat {
+     .easter-cat {
       position: absolute;
       left: 16px;
       bottom: 14px;
@@ -1178,7 +1170,7 @@
       padding: 0;
       cursor: pointer;
       color: inherit;
-      animation: catRoam 20s ease-in-out infinite alternate;
+      animation: none;
       transition: transform .18s ease, filter .18s ease;
       will-change: transform;
       transform: translateZ(0);
@@ -1343,7 +1335,7 @@
     }
     .pdf-report {
       display: none;
-      gap: 18px;
+      gap: 16px;
       color: #10131a;
       background: #fff;
       padding: 0;
@@ -1351,7 +1343,7 @@
     .pdf-report-head {
       display: flex;
       justify-content: space-between;
-      gap: 18px;
+      gap: 16px;
       align-items: flex-end;
       border-bottom: 2px solid #d5dbe6;
       padding-bottom: 12px;
@@ -1527,7 +1519,7 @@
       .fields-4,
       .screen-motivation .motivation-columns { grid-template-columns: 1fr; gap: 16px; }
       .summary-mini { padding: 14px; }
-      .easter-cat { animation-duration: 12s; }
+       .easter-cat { animation-duration: 12s; }
       .easter-cat-bubble {
         max-width: min(52vw, 250px);
         white-space: normal;
@@ -1550,7 +1542,7 @@
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
-      .easter-cat { transform: none !important; }
+       .easter-cat { transform: none !important; }
     }
     @media print {
       @page {
@@ -1697,7 +1689,7 @@
             </div>
             <div class="actions-quarter-top">
               <button type="button" id="recalcMotivation" class="btn btn-primary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>Перерахувати</button>
-              <button type="button" id="clearAll" class="btn btn-secondary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 4h5M8 7l.8 11.1a1.7 1.7 0 0 0 1.7 1.6h3a1.7 1.7 0 0 0 1.7-1.6L16 7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>Очистити все</button>
+              <button type="button" id="clearAll" class="btn btn-danger btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 4h5M8 7l.8 11.1a1.7 1.7 0 0 0 1.7 1.6h3a1.7 1.7 0 0 0 1.7-1.6L16 7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>Очистити все</button>
             </div>
             <div class="actions-quarter-bottom">
               <button type="button" id="openMotivationGuide" class="btn btn-secondary btn-quiet btn-sm"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M12 10.5v6M12 7.5h.01" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>Умови мотивації</button>
