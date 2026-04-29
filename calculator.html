@@ -110,6 +110,11 @@
     .panel-head { display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:46px; padding:8px 14px; border:1px solid var(--line); border-radius:var(--radius-md); background:rgba(15,22,34,.95); }
     .panel-head-meta { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
     .meta-chip { padding:0; border:0; background:transparent; color:#d7e2f5; font-size:.8rem; line-height:1.2; }
+    .meta-chip--static { opacity: .78; }
+    .meta-chip--dynamic { opacity: .96; }
+    .meta-chip.is-ok { color: #8ff2b9; }
+    .meta-chip.is-muted { color: #9ba9c1; }
+    .meta-chip.is-error { color: #ff8f92; }
     .screen {
       position: relative;
       background:
@@ -993,6 +998,9 @@
       color: #f4f8ff;
       font-weight: 800;
     }
+    .hints > summary { cursor: pointer; list-style: none; }
+    .hints > summary::-webkit-details-marker { display:none; }
+    .hints[open] > summary { margin-bottom: 8px; }
     .summary-grid--hints {
       grid-template-columns: repeat(2,minmax(0,1fr));
     }
@@ -1600,12 +1608,13 @@
   <div class="page">
   <section class="panel-head" aria-label="Системна панель">
     <div class="panel-head-meta">
-      <span class="meta-chip">Режим: Dashboard</span>
-      <span class="meta-chip">Сервіс: Cargodebitday</span>
+      <span class="meta-chip meta-chip--static">Режим: Dashboard</span>
+      <span class="meta-chip meta-chip--static">Сервіс: Cargodebitday</span>
     </div>
     <div class="panel-head-meta">
-      <span class="meta-chip" id="panelTime">Київ: --:--</span>
-      <span class="meta-chip" id="panelRate">Курс EUR/UAH: --</span>
+      <span class="meta-chip meta-chip--dynamic" id="panelTime">Київ: --:--</span>
+      <span class="meta-chip meta-chip--dynamic" id="panelRate">Курс EUR/UAH: --</span>
+      <span class="meta-chip meta-chip--dynamic" id="panelRateUpdated">Оновлено: --</span>
     </div>
   </section>
   <section class="screen" aria-labelledby="delayTitle">
@@ -1690,14 +1699,14 @@
       <section class="card summary-section">
         <div id="errorSummary" class="error-summary" role="alert" hidden></div>
         <div class="summary-grid summary-grid--hints">
-          <section class="hints">
-            <h4>Підказки: місяць</h4>
+          <details class="hints" open>
+            <summary><h4>Підказки: місяць</h4></summary>
             <ul id="monthlyHints" class="hint-list"></ul>
-          </section>
-          <section class="hints">
-            <h4>Підказки: квартал</h4>
+          </details>
+          <details class="hints" open>
+            <summary><h4>Підказки: квартал</h4></summary>
             <ul id="quarterHints" class="hint-list"></ul>
-          </section>
+          </details>
         </div>
         <p class="disclaimer">Увага: розрахунок має інформаційний характер і може відрізнятися від фактичного нарахування. Підсумкові значення залежать від внутрішніх правил компанії, актуального курсу валют і фінального підтвердження.</p>
       </section>
@@ -1760,7 +1769,7 @@
     </div>
   </section>
 </div>
-<div id="stickyTotalBar" class="sticky-total" aria-live="polite" aria-atomic="true"><span>Загальна сума</span><strong id="stickyAllTotal" class="mono">0 ₴</strong></div>
+<div id="stickyTotalBar" class="sticky-total" aria-live="polite" aria-atomic="true"><span>Місяць: <strong id="stickyMonthTotal" class="mono">0 ₴</strong></span><span>Квартал: <strong id="stickyQuarterTotal" class="mono">0 ₴</strong></span><span>Разом: <strong id="stickyAllTotal" class="mono">0 ₴</strong></span></div>
 
 <script src="./assets/scripts/app.js"></script>
 

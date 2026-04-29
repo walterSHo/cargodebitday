@@ -86,21 +86,32 @@
   const pdfAllTotal = byId('pdfAllTotal');
   const pdfTimestamp = byId('pdfTimestamp');
   const stickyAllTotal = byId('stickyAllTotal');
+  const stickyMonthTotal = byId('stickyMonthTotal');
+  const stickyQuarterTotal = byId('stickyQuarterTotal');
   const summaryMiniCard = document.querySelector('.summary-mini');
   const panelTime = byId('panelTime');
   const panelRate = byId('panelRate');
+  const panelRateUpdated = byId('panelRateUpdated');
 
   function syncPanelTime(){
     if (!panelTime) return;
     panelTime.textContent = `Київ: ${new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Kyiv' })}`;
   }
 
-  function syncPanelRate(){
+  function syncPanelRate(state = 'muted'){
     if (!panelRate) return;
     const rate = parseNumber(byId('eurRate')?.value || '');
+    panelRate.classList.remove('is-ok', 'is-muted', 'is-error');
+    const tone = state === 'error' ? 'is-error' : state === 'ok' ? 'is-ok' : 'is-muted';
+    panelRate.classList.add(tone);
     panelRate.textContent = Number.isFinite(rate) && rate > 0
       ? `Курс EUR/UAH: ${rate.toFixed(4)}`
       : 'Курс EUR/UAH: --';
+    if (panelRateUpdated) {
+      panelRateUpdated.classList.remove('is-ok', 'is-muted', 'is-error');
+      panelRateUpdated.classList.add(tone);
+      panelRateUpdated.textContent = `Оновлено: ${new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Europe/Kyiv' })}`;
+    }
   }
   const touched = new Set();
   const priorityFields = new Set();
@@ -142,8 +153,10 @@
   const diagnosticsEl = byId('diagnostics');
 
   function row(label, value){ return `<tr><td>${label}</td><td class="mono">${value}</td></tr>`; }
-  function setMStatus(msg, type){ motivationStatus.textContent = msg || ''; motivationStatus.className = 'status' + (type ? ' ' + type : ''); }
-  function setRateStatus(msg, type){ rateStatus.textContent = msg || ''; rateStatus.className = 'status' + (type ? ' ' + type : ''); }
+  let motivationStatusTimer = null;
+  let rateStatusTimer = null;
+  function setMStatus(msg, type){ motivationStatus.textContent = msg || ''; motivationStatus.className = 'status' + (type ? ' ' + type : ''); clearTimeout(motivationStatusTimer); if (msg && type && type !== 'error') motivationStatusTimer = setTimeout(() => { motivationStatus.textContent = ''; motivationStatus.className = 'status'; }, 5200); }
+  function setRateStatus(msg, type){ rateStatus.textContent = msg || ''; rateStatus.className = 'status' + (type ? ' ' + type : ''); clearTimeout(rateStatusTimer); if (msg && type && type !== 'error') rateStatusTimer = setTimeout(() => { rateStatus.textContent = ''; rateStatus.className = 'status'; }, 5200); }
   async function copyToClipboard(text){
     if (!text) return false;
     try {
@@ -643,6 +656,8 @@
     const shouldAnimateSummary = !previousSnapshot || prev.total !== nextSnapshot.total || prev.month !== nextSnapshot.month || prev.quarter !== nextSnapshot.quarter;
     previousSnapshot = { ...nextSnapshot, rows: rowsMap };
     if (stickyAllTotal) stickyAllTotal.textContent = money(nextSnapshot.total);
+    if (stickyMonthTotal) stickyMonthTotal.textContent = money(nextSnapshot.monthlyTotal);
+    if (stickyQuarterTotal) stickyQuarterTotal.textContent = money(nextSnapshot.quarterTotal);
     if (shouldAnimateSummary) animateSummaryCards();
   }
 
@@ -716,7 +731,7 @@
     motivationFrameId = requestAnimationFrame(() => {
       motivationFrameId = 0;
       calculateMotivation();
-      syncPanelRate();
+      syncPanelRate(result.source === 'minfin' ? 'ok' : 'muted');
     });
   }
 
@@ -823,6 +838,7 @@
         'ok'
       );
     } catch (e) {
+      syncPanelRate('error');
       setRateStatus('Не вдалося отримати курс. Введіть значення вручну.', 'error');
     } finally {
       btn.disabled = false;
