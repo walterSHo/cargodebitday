@@ -35,6 +35,8 @@
       --surface-l1: rgba(8, 13, 23, .96);
       --surface-l2: rgba(18, 28, 44, .94);
       --surface-l3: rgba(30, 44, 67, .9);
+      --sidebar-w: var(--sidebar-w, 220px);
+      --menu-radius: var(--menu-radius, 14px);
     }
     * { box-sizing: border-box; }
     html { background: var(--bg); }
@@ -82,7 +84,7 @@
     }
     .app-shell {
       display: grid;
-      grid-template-columns: 220px minmax(0, 1fr);
+      grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
       gap: 18px;
       width: min(var(--container-shell-max), calc(100% - 32px));
       margin: 16px auto;
@@ -91,7 +93,7 @@
     }
     .sidebar {
       border: 1px solid var(--line);
-      border-radius: 14px;
+      border-radius: var(--menu-radius);
       background: rgba(19, 30, 47, .84);
       padding: 12px;
       align-self: start;

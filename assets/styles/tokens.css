@@ -13,6 +13,10 @@
   --color-accent: #6ea8ff;
 
   --radius-lg: 18px;
+  --sidebar-w: 220px;
+  --shell-gap: 16px;
+  --shell-pad: 12px;
+  --menu-radius: 14px;
 
   --space-2xs: 4px;
   --space-xs: 6px;
