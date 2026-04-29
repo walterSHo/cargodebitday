@@ -7,8 +7,9 @@
   <style>
     :root {
       --bg: #09101a;
-      --surface: rgba(14, 22, 36, .84);
-      --line: rgba(100, 124, 161, .22);
+      --surface: rgba(14, 22, 36, .86);
+      --surface-2: rgba(19, 30, 47, .84);
+      --line: rgba(100, 124, 161, .24);
       --text: #f4f7fd;
       --muted: #9ba9c1;
       --accent: #6ea8ff;
@@ -24,58 +25,104 @@
       background:
         radial-gradient(circle at top, rgba(88, 144, 255, .08), transparent 34%),
         linear-gradient(180deg, #09101a 0%, #07111c 52%, #081019 100%);
-      display: grid;
-      place-items: center;
-      padding: 24px;
     }
-    .home {
-      width: min(780px, 100%);
+    .dashboard {
+      width: min(1160px, calc(100% - 32px));
+      min-height: calc(100vh - 32px);
+      margin: 16px auto;
+      display: grid;
+      grid-template-columns: 280px 1fr;
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      padding: 28px;
+      overflow: hidden;
       box-shadow: 0 20px 40px rgba(0,0,0,.24);
-      display: grid;
-      gap: 20px;
     }
-    h1 { margin: 0; font-size: 1.5rem; }
-    p { margin: 0; color: var(--muted); line-height: 1.5; }
-    .actions {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
+    .sidebar {
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.005)), var(--surface-2);
+      border-right: 1px solid var(--line);
+      padding: 22px 14px;
     }
-    .btn {
+    .sidebar h1 {
+      margin: 0 10px 16px;
+      font-size: 1rem;
+      letter-spacing: .02em;
+      color: #dbe7fb;
+      text-transform: uppercase;
+    }
+    .menu {
+      display: grid;
+      gap: 8px;
+    }
+    .menu-link {
       display: block;
       text-decoration: none;
-      text-align: center;
-      min-height: 46px;
-      padding: 12px 16px;
+      border: 1px solid transparent;
       border-radius: 10px;
-      border: 1px solid rgba(143,190,255,.5);
-      background: var(--accent);
-      color: #08111d;
-      font-weight: 700;
-      transition: background-color .15s ease, transform .15s ease;
+      padding: 12px 14px;
+      color: #d9e4f7;
+      font-weight: 600;
+      background: rgba(255,255,255,.01);
+      transition: background-color .15s ease, border-color .15s ease, color .15s ease;
     }
-    .btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
-    .btn-secondary {
-      background: rgba(34,48,71,.64);
-      color: #d7e2f5;
-      border-color: rgba(118,150,197,.34);
+    .menu-link:hover {
+      background: rgba(110,168,255,.14);
+      border-color: rgba(143,190,255,.28);
+      color: #f4f8ff;
     }
-    @media (max-width: 720px) { .actions { grid-template-columns: 1fr; } }
+    .menu-link.is-active {
+      background: rgba(110,168,255,.2);
+      border-color: rgba(143,190,255,.44);
+      color: #f4f8ff;
+    }
+    .content {
+      padding: 26px;
+      display: grid;
+      align-content: start;
+      gap: 16px;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,.02);
+      padding: 18px;
+    }
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 1.2rem;
+    }
+    .panel p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    @media (max-width: 860px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+    }
   </style>
 </head>
 <body>
-  <main class="home">
-    <h1>Головний екран</h1>
-    <p>Оберіть потрібний розділ: калькулятор торгового, форма НП або форма зберігання товару склад.</p>
-    <div class="actions">
-      <a class="btn" href="./calculator.html">Перейти до калькулятора торгового</a>
-      <a class="btn btn-secondary" href="./np-form.html">Форма шаблону відправки НП</a>
-      <a class="btn btn-secondary" href="./storage-form.html">Зберігання товару склад</a>
-    </div>
+  <main class="dashboard" aria-label="Головний екран у форматі dashboard">
+    <aside class="sidebar">
+      <h1>Меню</h1>
+      <nav class="menu" aria-label="Основна навігація">
+        <a class="menu-link is-active" href="./calculator.html">Калькулятор</a>
+        <a class="menu-link" href="./np-form.html">Шаблон НП</a>
+        <a class="menu-link" href="./storage-form.html">Шаблон зберігання</a>
+      </nav>
+    </aside>
+    <section class="content">
+      <article class="panel">
+        <h2>Dashboard-вид головного екрана</h2>
+        <p>Головний екран переведено у веб-панель для B2B-використання: ліве бокове меню на 3 пункти, темний інтерфейс та швидка навігація без змін розрахункової логіки.</p>
+      </article>
+    </section>
   </main>
 </body>
 </html>
