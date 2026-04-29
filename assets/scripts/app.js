@@ -656,8 +656,8 @@
     const shouldAnimateSummary = !previousSnapshot || prev.total !== nextSnapshot.total || prev.month !== nextSnapshot.month || prev.quarter !== nextSnapshot.quarter;
     previousSnapshot = { ...nextSnapshot, rows: rowsMap };
     if (stickyAllTotal) stickyAllTotal.textContent = money(nextSnapshot.total);
-    if (stickyMonthTotal) stickyMonthTotal.textContent = money(nextSnapshot.monthlyTotal);
-    if (stickyQuarterTotal) stickyQuarterTotal.textContent = money(nextSnapshot.quarterTotal);
+    if (stickyMonthTotal) stickyMonthTotal.textContent = money(nextSnapshot.month);
+    if (stickyQuarterTotal) stickyQuarterTotal.textContent = money(nextSnapshot.quarter);
     if (shouldAnimateSummary) animateSummaryCards();
   }
 

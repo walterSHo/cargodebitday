@@ -190,6 +190,7 @@
       display: grid;
       gap: 8px;
       align-content: start;
+      grid-template-rows: auto auto minmax(32px, auto) 15px;
     }
     .monthly-grid {
       display: grid;
@@ -254,9 +255,12 @@
       font-size: .73rem;
       line-height: 1.32;
       color: var(--muted-soft);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .16s ease;
     }
-    .field-msg.error { color: var(--error); }
-    .field-msg.ok { display: none; }
+    .field-msg.error { color: var(--error); opacity: 1; visibility: visible; }
+    .field-msg.ok { color: #8ff2b9; opacity: 0; visibility: hidden; }
     .field.invalid input { border-color: #7d3a42; box-shadow: 0 0 0 3px rgba(125,58,66,.14); }
     .field.valid input {
       border-color: #2d7c54;
@@ -903,11 +907,16 @@
       text-align: right;
       font-variant-numeric: tabular-nums;
     }
-    #groupsTable th:first-child,
-    #groupsTable td:first-child {
+    #groupsTable th:first-child {
       position: sticky;
       left: 0;
       z-index: 2;
+      background: var(--surface-l3);
+    }
+    #groupsTable td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 1;
       background: var(--surface-l1);
     }
     #groupsTable tbody tr:nth-child(even) { background: rgba(255,255,255,.03); }
@@ -984,7 +993,6 @@
       border-radius: 10px;
       border: 1px solid rgba(110,168,255,.2);
       background: rgba(10, 17, 29, .86);
-      backdrop-filter: blur(8px);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -1477,7 +1485,7 @@
     .motivation-column--left > *:nth-child(3),
     .motivation-column--right > *:nth-child(3),
     .summary-section { animation-delay: .12s; }
-    .summary-item--total .total .mono { animation: softFloat 4.2s ease-in-out infinite; }
+    .summary-item--total .total .mono { animation: none; }
     .summary-item--total.has-success {
       animation: successGlow 3.4s ease-in-out infinite;
     }
@@ -1647,11 +1655,11 @@
           <section class="card">
             <h3>Місячна мотивація</h3>
             <div class="monthly-grid">
-              <div class="field monthly-field"><label for="planTurnover">Плановий оборот (факт)</label><input id="planTurnover" type="number" value="0" /><p class="field-hint">До 50 тис: 10 000; 50–150 тис: 20 000; понад 150 тис: 25 000.</p><p class="field-msg" data-msg-for="planTurnover"></p></div>
+              <div class="field monthly-field"><label for="planTurnover">Оборот (факт)</label><input id="planTurnover" type="number" value="0" /><p class="field-hint">До 50 тис: 10 000; 50–150 тис: 20 000; понад 150 тис: 25 000.</p><p class="field-msg" data-msg-for="planTurnover"></p></div>
               <div class="field monthly-field"><label for="planPercent">Виконання плану продажів, %</label><input id="planPercent" type="number" value="0" min="0" max="200" /><p class="field-hint">90%+: +1000/1%, 100%+: +1500/1%, 110%+: +500/1%; знижка ≥27.5% зменшує плановий бонус на 50%.</p><p class="field-msg" data-msg-for="planPercent"></p></div>
               <div class="field monthly-field"><label>CRM</label><div class="monthly-check"><label class="check"><input id="crmDone" type="checkbox" /> CRM виконано на 100% (20 дзвінків або 5 зустрічей)</label><p class="field-hint">Якщо позначено, бонус CRM = 10 000.</p></div></div>
               <div class="field monthly-field"><label for="avgDiscount">Середня знижка, %</label><input id="avgDiscount" type="number" value="0" step="0.1" /><p class="field-hint">При 27.5% і вище бонус за план зменшується на 50%.</p><p class="field-msg" data-msg-for="avgDiscount"></p></div>
-              <div class="field monthly-field"><label for="avgDelayFact">Середнє відтермінування (факт), днів</label><input id="avgDelayFact" type="number" value="0" step="0.1" /><p class="field-hint">До 7 днів: 6000, до 14: 3000, більше 14: 0.</p><p class="field-msg" data-msg-for="avgDelayFact"></p></div>
+              <div class="field monthly-field"><label for="avgDelayFact">Відтермінування (факт), днів</label><input id="avgDelayFact" type="number" value="0" step="0.1" /><p class="field-hint">До 7 днів: 6000, до 14: 3000, більше 14: 0.</p><p class="field-msg" data-msg-for="avgDelayFact"></p></div>
               <div class="field monthly-field field--with-action"><label for="eurRate">Курс EUR → бонусна валюта</label><div class="field-control-combo"><input id="eurRate" type="number" value="45" step="0.01" /><button type="button" id="refreshRate" class="btn btn-secondary" aria-label="Оновити курс EUR" title="Оновити курс EUR"><svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div><p class="field-hint">Якщо автокурс недоступний, введіть вручну.</p><p class="field-msg" data-msg-for="eurRate"></p></div>
               <div class="field monthly-field"><label for="overdue1">Прострочка 1–10 днів (EUR)</label><input id="overdue1" type="number" value="0" /><p class="field-hint">Штраф 0.5% від цієї суми.</p><p class="field-msg" data-msg-for="overdue1"></p></div>
               <div class="field monthly-field"><label for="overdue2">Прострочка 11–20 днів (EUR)</label><input id="overdue2" type="number" value="0" /><p class="field-hint">Штраф 1.0% від цієї суми.</p><p class="field-msg" data-msg-for="overdue2"></p></div>
