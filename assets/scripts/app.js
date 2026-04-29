@@ -24,8 +24,9 @@
   });
 
   const byId = (id) => document.getElementById(id);
-  const money = (v) => `${new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(v)} ₴`;
-  const eur = (v) => `${new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(v)} EUR`;
+  const safeNum = (v) => Number.isFinite(Number(v)) ? Number(v) : 0;
+  const money = (v) => `${new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(safeNum(v))} ₴`;
+  const eur = (v) => `${new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(safeNum(v))} EUR`;
   const num = (id) => { const v = parseNumber(byId(id).value); return Number.isFinite(v) ? v : 0; };
   const clamp = (n,min,max) => Math.max(min, Math.min(max, n));
 
@@ -655,9 +656,9 @@
     }));
     const shouldAnimateSummary = !previousSnapshot || prev.total !== nextSnapshot.total || prev.month !== nextSnapshot.month || prev.quarter !== nextSnapshot.quarter;
     previousSnapshot = { ...nextSnapshot, rows: rowsMap };
-    if (stickyAllTotal) stickyAllTotal.textContent = money(nextSnapshot.total);
-    if (stickyMonthTotal) stickyMonthTotal.textContent = money(nextSnapshot.month);
-    if (stickyQuarterTotal) stickyQuarterTotal.textContent = money(nextSnapshot.quarter);
+    if (stickyAllTotal) stickyAllTotal.textContent = money(safeNum(nextSnapshot.total));
+    if (stickyMonthTotal) stickyMonthTotal.textContent = money(safeNum(nextSnapshot.month));
+    if (stickyQuarterTotal) stickyQuarterTotal.textContent = money(safeNum(nextSnapshot.quarter));
     if (shouldAnimateSummary) animateSummaryCards();
   }
 
