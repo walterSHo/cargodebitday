@@ -815,6 +815,7 @@
       touched.add('eurRate');
       validateField('eurRate');
       calculateMotivation();
+      syncPanelRate();
       setRateStatus(
         result.source === 'minfin'
           ? `Автокурс оновлено з Minfin: 1 EUR = ${Number(result.rate).toFixed(4)}`
