@@ -107,7 +107,7 @@
     .embedded .page { width: min(var(--container-page-max), calc(100% - 20px)); margin: 10px auto 20px; }
     .panel-head { display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:46px; padding:8px 14px; border:1px solid var(--line); border-radius:var(--radius-md); background:rgba(15,22,34,.95); }
     .panel-head-meta { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-    .meta-chip { padding:6px 10px; border-radius:999px; border:1px solid rgba(118,150,197,.28); background:var(--surface-l3); color:#d7e2f5; font-size:.74rem; line-height:1; }
+    .meta-chip { padding:0; border:0; background:transparent; color:#d7e2f5; font-size:.8rem; line-height:1.2; }
     .screen {
       position: relative;
       background:
@@ -233,7 +233,6 @@
     select:focus {
       border-color: var(--focus);
       box-shadow: 0 0 0 3px rgba(122,151,202,.18);
-      transform: translateY(-1px);
     }
     .field:focus-within label { color: #d9e3f4; }
     input.is-example { color: rgba(243,244,247,.72); }
@@ -288,13 +287,18 @@
       min-height: 44px;
       padding: 0 24px;
       border-radius: 8px;
-      font-weight: 700;
-      font-size: .96rem;
+      font-weight: 600;
+      font-size: .95rem;
       cursor: pointer;
       transition: transform .14s ease, border-color .18s ease, background-color .18s ease, color .18s ease, box-shadow .2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
     .btn-md { min-height: var(--btn-h-md); }
     .btn-sm { min-height: var(--btn-h-sm); font-size: .88rem; padding: 0 14px; }
+    .btn-icon-ui { width: 14px; height: 14px; flex: 0 0 14px; opacity: .82; }
     .btn::before {
       content: "";
       position: absolute;
@@ -1585,8 +1589,8 @@
       <span class="meta-chip">Сервіс: Cargodebitday</span>
     </div>
     <div class="panel-head-meta">
-      <span class="meta-chip" id="panelTime">UTC: --:--</span>
-      <span class="meta-chip">Курс: manual/auto</span>
+      <span class="meta-chip" id="panelTime">Київ: --:--</span>
+      <span class="meta-chip" id="panelRate">Курс EUR/UAH: --</span>
     </div>
   </section>
   <section class="screen" aria-labelledby="delayTitle">
@@ -1600,7 +1604,11 @@
             <div class="field"><label for="days">Кількість днів</label><input id="days" type="number" value="31" data-example="31" class="is-example" /></div>
           </div>
           <p class="hint">Формула: <strong>коефіцієнт = борг / сума оборота</strong>, <strong>дні відтермінування = коефіцієнт × кількість днів у місяці</strong>.</p>
-          <div class="actions"><button type="submit" class="btn btn-primary btn-md">↻ Розрахувати</button><button type="button" id="clearBtn" class="btn btn-secondary btn-md">🗑 Очистити</button><button type="button" id="copyBtn" class="btn btn-secondary btn-md">⧉ Скопіювати результат</button></div>
+          <div class="actions">
+            <button type="submit" class="btn btn-primary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Розрахувати</button>
+            <button type="button" id="clearBtn" class="btn btn-secondary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 4h5M8 7l.8 11.1a1.7 1.7 0 0 0 1.7 1.6h3a1.7 1.7 0 0 0 1.7-1.6L16 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Очистити</button>
+            <button type="button" id="copyBtn" class="btn btn-secondary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="5" y="5" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Скопіювати результат</button>
+          </div>
         </form>
       </div>
       <aside class="result-col" aria-live="polite" aria-atomic="true"><section class="result-box"><h2 class="result-title">Результат</h2><p id="coefOut" class="result-line">Коефіцієнт: —</p><p id="daysOut" class="result-line">Середнє відтермінування: —</p><p id="status" class="status" role="status"></p></section><p class="example">Приклад: борг 58 617, оборот 155 775, днів 31 → 0.3763 та 11.67 днів.</p></aside>
@@ -1653,12 +1661,12 @@
               <p id="motivationStatus" class="status" role="status" aria-live="polite"></p>
             </div>
             <div class="actions-quarter-top">
-              <button type="button" id="recalcMotivation" class="btn btn-primary btn-md">↻ Перерахувати</button>
-              <button type="button" id="clearAll" class="btn btn-secondary btn-md">🗑 Очистити все</button>
+              <button type="button" id="recalcMotivation" class="btn btn-primary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Перерахувати</button>
+              <button type="button" id="clearAll" class="btn btn-secondary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 4h5M8 7l.8 11.1a1.7 1.7 0 0 0 1.7 1.6h3a1.7 1.7 0 0 0 1.7-1.6L16 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Очистити все</button>
             </div>
             <div class="actions-quarter-bottom">
-              <button type="button" id="openMotivationGuide" class="btn btn-secondary btn-quiet btn-sm">ⓘ Умови мотивації</button>
-              <button type="button" id="downloadPdf" class="btn btn-secondary btn-sm">⇩ Завантажити PDF</button>
+              <button type="button" id="openMotivationGuide" class="btn btn-secondary btn-quiet btn-sm"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 10.5v6M12 7.5h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Умови мотивації</button>
+              <button type="button" id="downloadPdf" class="btn btn-secondary btn-sm"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10m0 0 3.2-3.2M12 13 8.8 9.8M5 15.5v2.7A1.8 1.8 0 0 0 6.8 20h10.4a1.8 1.8 0 0 0 1.8-1.8v-2.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Завантажити PDF</button>
             </div>
           </div>
         </div>
@@ -1821,6 +1829,7 @@
   const pdfTimestamp = byId('pdfTimestamp');
   const stickyAllTotal = byId('stickyAllTotal');
   const panelTime = byId('panelTime');
+  const panelRate = byId('panelRate');
   const motivationGuideModal = byId('motivationGuideModal');
   const openMotivationGuideBtn = byId('openMotivationGuide');
   const closeMotivationGuideBtn = byId('closeMotivationGuide');
@@ -1947,6 +1956,16 @@
       localStorage.removeItem(storageKey);
       lastSavedStateRaw = '';
     } catch (_) {}
+  }
+  function updatePanelKyivTime(){
+    if (!panelTime) return;
+    panelTime.textContent = `Київ: ${new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Kyiv' })}`;
+  }
+  function updatePanelRateLabel(rate){
+    if (!panelRate) return;
+    panelRate.textContent = Number.isFinite(rate) && rate > 0
+      ? `Курс EUR/UAH: ${Number(rate).toFixed(4)}`
+      : 'Курс EUR/UAH: --';
   }
   function toneClass(value){ return value > 0 ? 'is-positive' : value < 0 ? 'is-negative' : 'is-neutral'; }
   function setFieldMessage(id, msg, kind){
@@ -2470,6 +2489,7 @@
       if (!result || !Number.isFinite(result.rate) || result.rate <= 0) throw new Error('no rate');
 
       byId('eurRate').value = Number(result.rate).toFixed(4);
+      updatePanelRateLabel(Number(result.rate));
       touched.add('eurRate');
       validateField('eurRate');
       calculateMotivation();
@@ -2480,6 +2500,7 @@
         'ok'
       );
     } catch (e) {
+      updatePanelRateLabel(parseFloat(byId('eurRate').value));
       setRateStatus('Не вдалося отримати курс. Введіть значення вручну.', 'error');
     } finally {
       btn.disabled = false;
@@ -2530,7 +2551,10 @@
   });
   bindRecalc();
   const restoredState = restoreCalculatorState();
-  if (panelTime) panelTime.textContent = `UTC: ${new Date().toISOString().slice(11,16)}`;
+  updatePanelKyivTime();
+  setInterval(updatePanelKyivTime, 30000);
+  updatePanelRateLabel(parseFloat(byId('eurRate').value));
+  setInterval(() => refreshRate(), 300000);
   exampleInputs.forEach(refreshExampleState);
   calculateDelay();
   calculateMotivation();
