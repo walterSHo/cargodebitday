@@ -3,79 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Головний екран</title>
-  <style>
-    :root {
-      --bg: #09101a;
-      --surface: rgba(14, 22, 36, .84);
-      --line: rgba(100, 124, 161, .22);
-      --text: #f4f7fd;
-      --muted: #9ba9c1;
-      --accent: #6ea8ff;
-      --accent-hover: #8bb9ff;
-      --radius: 18px;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: "Segoe UI", Roboto, Arial, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top, rgba(88, 144, 255, .08), transparent 34%),
-        linear-gradient(180deg, #09101a 0%, #07111c 52%, #081019 100%);
-      display: grid;
-      place-items: center;
-      padding: 24px;
-    }
-    .home {
-      width: min(780px, 100%);
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 28px;
-      box-shadow: 0 20px 40px rgba(0,0,0,.24);
-      display: grid;
-      gap: 20px;
-    }
-    h1 { margin: 0; font-size: 1.5rem; }
-    p { margin: 0; color: var(--muted); line-height: 1.5; }
-    .actions {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-    }
-    .btn {
-      display: block;
-      text-decoration: none;
-      text-align: center;
-      min-height: 46px;
-      padding: 12px 16px;
-      border-radius: 10px;
-      border: 1px solid rgba(143,190,255,.5);
-      background: var(--accent);
-      color: #08111d;
-      font-weight: 700;
-      transition: background-color .15s ease, transform .15s ease;
-    }
-    .btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
-    .btn-secondary {
-      background: rgba(34,48,71,.64);
-      color: #d7e2f5;
-      border-color: rgba(118,150,197,.34);
-    }
-    @media (max-width: 720px) { .actions { grid-template-columns: 1fr; } }
-  </style>
+  <title>Перенаправлення…</title>
+  <script>
+    window.location.replace('./calculator.html');
+  </script>
 </head>
 <body>
-  <main class="home">
-    <h1>Головний екран</h1>
-    <p>Оберіть потрібний розділ: калькулятор торгового, форма НП або форма зберігання товару склад.</p>
-    <div class="actions">
-      <a class="btn" href="./calculator.html">Перейти до калькулятора торгового</a>
-      <a class="btn btn-secondary" href="./np-form.html">Форма шаблону відправки НП</a>
-      <a class="btn btn-secondary" href="./storage-form.html">Зберігання товару склад</a>
-    </div>
-  </main>
+  <noscript>
+    <p>Переходимо до калькулятора: <a href="./calculator.html">відкрити</a>.</p>
+  </noscript>
 </body>
 </html>
