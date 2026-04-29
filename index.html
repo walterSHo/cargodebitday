@@ -3,126 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Головний екран</title>
-  <style>
-    :root {
-      --bg: #09101a;
-      --surface: rgba(14, 22, 36, .86);
-      --surface-2: rgba(19, 30, 47, .84);
-      --line: rgba(100, 124, 161, .24);
-      --text: #f4f7fd;
-      --muted: #9ba9c1;
-      --accent: #6ea8ff;
-      --accent-hover: #8bb9ff;
-      --radius: 18px;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: "Segoe UI", Roboto, Arial, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top, rgba(88, 144, 255, .08), transparent 34%),
-        linear-gradient(180deg, #09101a 0%, #07111c 52%, #081019 100%);
-    }
-    .dashboard {
-      width: min(1160px, calc(100% - 32px));
-      min-height: calc(100vh - 32px);
-      margin: 16px auto;
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: 0 20px 40px rgba(0,0,0,.24);
-    }
-    .sidebar {
-      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.005)), var(--surface-2);
-      border-right: 1px solid var(--line);
-      padding: 22px 14px;
-    }
-    .sidebar h1 {
-      margin: 0 10px 16px;
-      font-size: 1rem;
-      letter-spacing: .02em;
-      color: #dbe7fb;
-      text-transform: uppercase;
-    }
-    .menu {
-      display: grid;
-      gap: 8px;
-    }
-    .menu-link {
-      display: block;
-      text-decoration: none;
-      border: 1px solid transparent;
-      border-radius: 10px;
-      padding: 12px 14px;
-      color: #d9e4f7;
-      font-weight: 600;
-      background: rgba(255,255,255,.01);
-      transition: background-color .15s ease, border-color .15s ease, color .15s ease;
-    }
-    .menu-link:hover {
-      background: rgba(110,168,255,.14);
-      border-color: rgba(143,190,255,.28);
-      color: #f4f8ff;
-    }
-    .menu-link.is-active {
-      background: rgba(110,168,255,.2);
-      border-color: rgba(143,190,255,.44);
-      color: #f4f8ff;
-    }
-    .content {
-      padding: 26px;
-      display: grid;
-      align-content: start;
-      gap: 16px;
-    }
-    .panel {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: rgba(255,255,255,.02);
-      padding: 18px;
-    }
-    .panel h2 {
-      margin: 0 0 10px;
-      font-size: 1.2rem;
-    }
-    .panel p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-    @media (max-width: 860px) {
-      .dashboard {
-        grid-template-columns: 1fr;
-      }
-      .sidebar {
-        border-right: 0;
-        border-bottom: 1px solid var(--line);
-      }
-    }
-  </style>
+  <title>Перенаправлення…</title>
+  <script>
+    window.location.replace('./calculator.html');
+  </script>
 </head>
 <body>
-  <main class="dashboard" aria-label="Головний екран у форматі dashboard">
-    <aside class="sidebar">
-      <h1>Меню</h1>
-      <nav class="menu" aria-label="Основна навігація">
-        <a class="menu-link is-active" href="./calculator.html">Калькулятор</a>
-        <a class="menu-link" href="./np-form.html">Шаблон НП</a>
-        <a class="menu-link" href="./storage-form.html">Шаблон зберігання</a>
-      </nav>
-    </aside>
-    <section class="content">
-      <article class="panel">
-        <h2>Dashboard-вид головного екрана</h2>
-        <p>Головний екран переведено у веб-панель для B2B-використання: ліве бокове меню на 3 пункти, темний інтерфейс та швидка навігація без змін розрахункової логіки.</p>
-      </article>
-    </section>
-  </main>
+  <noscript>
+    <p>Переходимо до калькулятора: <a href="./calculator.html">відкрити</a>.</p>
+  </noscript>
 </body>
 </html>

@@ -29,6 +29,12 @@
       display: grid;
       gap: 14px;
     }
+    .app-shell { width: min(1320px, 100%); margin: 0 auto; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; }
+    .sidebar { background: rgba(19, 30, 47, .84); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; align-self: start; position: sticky; top: 20px; }
+    .sidebar h2 { margin: 0 0 10px; font-size: .9rem; text-transform: uppercase; color: var(--muted); }
+    .menu-link { display:block; padding:10px 11px; border-radius:8px; color:#d9e4f7; text-decoration:none; border:1px solid transparent; margin-bottom:8px; }
+    .menu-link:hover { background: rgba(110,168,255,.12); border-color: rgba(143,190,255,.24); color:#fff; }
+    .menu-link.is-active { background: rgba(110,168,255,.22); border-color: rgba(143,190,255,.42); color:#fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); }
     .card {
       background: var(--surface);
       border: 1px solid var(--line);
@@ -91,6 +97,7 @@
     .hidden { display: none !important; }
     .grid.bn-mode #edrpouField { order: 2; }
     .grid.bn-mode #contactField { order: 1; }
+    @media (max-width: 980px) { .app-shell { grid-template-columns: 1fr; width: min(100%, calc(100% - 16px)); gap: 12px; } .sidebar { position: static; padding: 10px; } body { padding: 8px; } }
     @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
     @media print {
       @page { size: A4 portrait; margin: 10mm; }
@@ -122,12 +129,20 @@
   </style>
 </head>
 <body>
-  <main class="page">
+  <main class="app-shell">
+    <aside class="sidebar">
+      <h2>Меню</h2>
+      <nav aria-label="Основна навігація">
+        <a class="menu-link" href="./calculator.html">Калькулятор</a>
+        <a class="menu-link is-active" href="./np-form.html" aria-current="page">Шаблон НП</a>
+        <a class="menu-link" href="./storage-form.html">Шаблон зберігання</a>
+      </nav>
+    </aside>
+    <div class="page">
     <section class="card">
       <h1>Форма шаблону відправки НП</h1>
       <p>Заповніть шаблон. Потім натисніть “Завантажити PDF (A4)”.</p>
       <div class="actions">
-        <a class="btn-link" href="./index.html">← На головний екран</a>
         <button class="btn btn-copy" id="copyRequestBtn" type="button">Скопіювати текст заявки</button>
         <button class="btn btn-copy" id="saveHistoryBtn" type="button">Зберегти в історію</button>
         <button class="btn btn-copy" id="loadHistoryBtn" type="button">Підставити з історії</button>
@@ -192,6 +207,7 @@
       <div class="print-row"><div class="print-label">Контакт:</div><div id="printContact" class="print-value">—</div></div>
       <div class="print-row"><div class="print-label">Коментарій:</div><div id="printComment" class="print-value">—</div></div>
     </section>
+    </div>
   </main>
   <script>
     (function () {
