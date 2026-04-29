@@ -87,6 +87,21 @@
   const pdfTimestamp = byId('pdfTimestamp');
   const stickyAllTotal = byId('stickyAllTotal');
   const summaryMiniCard = document.querySelector('.summary-mini');
+  const panelTime = byId('panelTime');
+  const panelRate = byId('panelRate');
+
+  function syncPanelTime(){
+    if (!panelTime) return;
+    panelTime.textContent = `Київ: ${new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Kyiv' })}`;
+  }
+
+  function syncPanelRate(){
+    if (!panelRate) return;
+    const rate = parseNumber(byId('eurRate')?.value || '');
+    panelRate.textContent = Number.isFinite(rate) && rate > 0
+      ? `Курс EUR/UAH: ${rate.toFixed(4)}`
+      : 'Курс EUR/UAH: --';
+  }
   const touched = new Set();
   const priorityFields = new Set();
   const hintsMarkupCache = new WeakMap();
@@ -701,6 +716,7 @@
     motivationFrameId = requestAnimationFrame(() => {
       motivationFrameId = 0;
       calculateMotivation();
+      syncPanelRate();
     });
   }
 
@@ -799,6 +815,7 @@
       touched.add('eurRate');
       validateField('eurRate');
       calculateMotivation();
+      syncPanelRate();
       setRateStatus(
         result.source === 'minfin'
           ? `Автокурс оновлено з Minfin: 1 EUR = ${Number(result.rate).toFixed(4)}`
@@ -817,7 +834,7 @@
     const ids = ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','eurRate','tiresOver'];
     ids.forEach((id)=>{
       byId(id).addEventListener('blur', () => { touched.add(id); validateField(id); });
-      byId(id).addEventListener('input', () => { if (touched.has(id)) validateField(id); scheduleMotivationCalculation(); });
+      byId(id).addEventListener('input', () => { if (touched.has(id)) validateField(id); scheduleMotivationCalculation(); if (id === 'eurRate') syncPanelRate(); });
     });
     ['crmDone','tiresMinMet'].forEach(id=>byId(id).addEventListener('change', scheduleMotivationCalculation));
     groupInputs.forEach((input)=>input.addEventListener('input', scheduleMotivationCalculation));
@@ -830,6 +847,7 @@
     debtInput.value='58617'; turnoverInput.value='155775'; daysInput.value='31'; exampleInputs.forEach(refreshExampleState);
     ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','tiresOver'].forEach(id=>byId(id).value='0');
     byId('eurRate').value='45'; byId('crmDone').checked=false; byId('tiresMinMet').checked=true;
+    syncPanelRate();
     groupsBody.querySelectorAll('input').forEach(i=>i.value='0');
     ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','eurRate','tiresOver'].forEach((id)=>{ touched.delete(id); setFieldMessage(id, '', ''); });
     errorSummary.hidden = true;
@@ -872,5 +890,8 @@
   exampleInputs.forEach(refreshExampleState);
   calculateDelay();
   calculateMotivation();
+  syncPanelTime();
+  syncPanelRate();
+  setInterval(syncPanelTime, 60000);
   if (!restoredState) refreshRate();
 })();
