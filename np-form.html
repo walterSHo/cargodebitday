@@ -92,6 +92,18 @@
       justify-content: center;
       gap: 8px;
     }
+    .btn,
+    .btn-copy,
+    .btn-link {
+      border-radius: var(--radius-sm);
+      min-height: var(--btn-h-md);
+      padding: 0 16px;
+    }
+    .btn:focus-visible,
+    .btn-link:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(143,190,255,.28);
+    }
     .btn-icon-ui { width: 14px; height: 14px; flex: 0 0 14px; opacity: .84; }
     .btn-md { min-height: var(--btn-h-md); }
     .btn-sm { min-height: var(--btn-h-sm); font-size: .88rem; padding: 0 12px; }
@@ -167,11 +179,11 @@
       <h1>Форма шаблону відправки НП</h1>
       <p>Заповніть шаблон. Потім натисніть “Завантажити PDF (A4)”.</p>
       <div class="actions">
-        <button class="btn btn-copy btn-md" id="copyRequestBtn" type="button"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="5" y="5" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Скопіювати текст заявки</button>
-        <button class="btn btn-copy btn-md" id="saveHistoryBtn" type="button"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v14H5z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 5v5h8V5M9 19v-5h6v5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Зберегти в історію</button>
-        <button class="btn btn-copy btn-md" id="loadHistoryBtn" type="button"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Підставити з історії</button>
-        <button class="btn btn-copy btn-md" id="clearFormBtn" type="button"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 4h5M8 7l.8 11.1a1.7 1.7 0 0 0 1.7 1.6h3a1.7 1.7 0 0 0 1.7-1.6L16 7" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Очистити форму / Новий бланк</button>
-        <button class="btn btn-md" id="printPdfBtn" type="button"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10m0 0 3.2-3.2M12 13 8.8 9.8M5 15.5v2.7A1.8 1.8 0 0 0 6.8 20h10.4a1.8 1.8 0 0 0 1.8-1.8v-2.7" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Завантажити PDF (A4)</button>
+        <button class="btn btn-copy btn-md" id="copyRequestBtn" type="button"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.75"/><rect x="5" y="5" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.75"/></svg>Скопіювати текст заявки</button>
+        <button class="btn btn-copy btn-md" id="saveHistoryBtn" type="button"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v14H5z" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M8 5v5h8V5M9 19v-5h6v5" fill="none" stroke="currentColor" stroke-width="1.75"/></svg>Зберегти в історію</button>
+        <button class="btn btn-copy btn-md" id="loadHistoryBtn" type="button"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.75"/></svg>Підставити з історії</button>
+        <button class="btn btn-copy btn-md" id="clearFormBtn" type="button"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 4h5M8 7l.8 11.1a1.7 1.7 0 0 0 1.7 1.6h3a1.7 1.7 0 0 0 1.7-1.6L16 7" fill="none" stroke="currentColor" stroke-width="1.75"/></svg>Очистити форму / Новий бланк</button>
+        <button class="btn btn-md" id="printPdfBtn" type="button"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10m0 0 3.2-3.2M12 13 8.8 9.8M5 15.5v2.7A1.8 1.8 0 0 0 6.8 20h10.4a1.8 1.8 0 0 0 1.8-1.8v-2.7" fill="none" stroke="currentColor" stroke-width="1.75"/></svg>Завантажити PDF (A4)</button>
       </div>
       <div class="field">
         <label for="historySelect">Останні 5 заявок</label>

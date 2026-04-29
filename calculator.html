@@ -324,6 +324,19 @@
       border-color: rgba(118,150,197,.24);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 8px 18px rgba(6,11,20,.16);
     }
+    .btn-primary,
+    .btn-secondary,
+    .btn-quiet {
+      border-radius: var(--radius-sm);
+      min-height: var(--btn-h-md);
+      padding: 0 16px;
+    }
+    .btn-secondary::before,
+    .btn-quiet::before { display: none; }
+    .btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(143,190,255,.28);
+    }
     .btn-secondary:hover {
       background: linear-gradient(180deg, rgba(41,57,84,.8), rgba(19,28,45,.88));
       border-color: rgba(143,190,255,.34);
@@ -1605,9 +1618,9 @@
           </div>
           <p class="hint">Формула: <strong>коефіцієнт = борг / сума оборота</strong>, <strong>дні відтермінування = коефіцієнт × кількість днів у місяці</strong>.</p>
           <div class="actions">
-            <button type="submit" class="btn btn-primary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Розрахувати</button>
-            <button type="button" id="clearBtn" class="btn btn-secondary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 4h5M8 7l.8 11.1a1.7 1.7 0 0 0 1.7 1.6h3a1.7 1.7 0 0 0 1.7-1.6L16 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Очистити</button>
-            <button type="button" id="copyBtn" class="btn btn-secondary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="5" y="5" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Скопіювати результат</button>
+            <button type="submit" class="btn btn-primary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>Розрахувати</button>
+            <button type="button" id="clearBtn" class="btn btn-secondary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 4h5M8 7l.8 11.1a1.7 1.7 0 0 0 1.7 1.6h3a1.7 1.7 0 0 0 1.7-1.6L16 7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>Очистити</button>
+            <button type="button" id="copyBtn" class="btn btn-secondary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.75"/><rect x="5" y="5" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.75"/></svg>Скопіювати результат</button>
           </div>
         </form>
       </div>
@@ -1628,7 +1641,7 @@
               <div class="field monthly-field"><label>CRM</label><div class="monthly-check"><label class="check"><input id="crmDone" type="checkbox" /> CRM виконано на 100% (20 дзвінків або 5 зустрічей)</label><p class="field-hint">Якщо позначено, бонус CRM = 10 000.</p></div></div>
               <div class="field monthly-field"><label for="avgDiscount">Середня знижка, %</label><input id="avgDiscount" type="number" value="0" step="0.1" /><p class="field-hint">При 27.5% і вище бонус за план зменшується на 50%.</p><p class="field-msg" data-msg-for="avgDiscount"></p></div>
               <div class="field monthly-field"><label for="avgDelayFact">Середнє відтермінування (факт), днів</label><input id="avgDelayFact" type="number" value="0" step="0.1" /><p class="field-hint">До 7 днів: 6000, до 14: 3000, більше 14: 0.</p><p class="field-msg" data-msg-for="avgDelayFact"></p></div>
-              <div class="field monthly-field field--with-action"><label for="eurRate">Курс EUR → бонусна валюта</label><div class="field-control-combo"><input id="eurRate" type="number" value="45" step="0.01" /><button type="button" id="refreshRate" class="btn btn-secondary" aria-label="Оновити курс EUR" title="Оновити курс EUR"><svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div><p class="field-hint">Якщо автокурс недоступний, введіть вручну.</p><p class="field-msg" data-msg-for="eurRate"></p></div>
+              <div class="field monthly-field field--with-action"><label for="eurRate">Курс EUR → бонусна валюта</label><div class="field-control-combo"><input id="eurRate" type="number" value="45" step="0.01" /><button type="button" id="refreshRate" class="btn btn-secondary" aria-label="Оновити курс EUR" title="Оновити курс EUR"><svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div><p class="field-hint">Якщо автокурс недоступний, введіть вручну.</p><p class="field-msg" data-msg-for="eurRate"></p></div>
               <div class="field monthly-field"><label for="overdue1">Прострочка 1–10 днів (EUR)</label><input id="overdue1" type="number" value="0" /><p class="field-hint">Штраф 0.5% від цієї суми.</p><p class="field-msg" data-msg-for="overdue1"></p></div>
               <div class="field monthly-field"><label for="overdue2">Прострочка 11–20 днів (EUR)</label><input id="overdue2" type="number" value="0" /><p class="field-hint">Штраф 1.0% від цієї суми.</p><p class="field-msg" data-msg-for="overdue2"></p></div>
               <div class="field monthly-field"><label for="overdue3">Прострочка 20+ днів (EUR)</label><input id="overdue3" type="number" value="0" /><p class="field-hint">Штраф 2.0% від цієї суми.</p><p class="field-msg" data-msg-for="overdue3"></p></div>
@@ -1661,12 +1674,12 @@
               <p id="motivationStatus" class="status" role="status" aria-live="polite"></p>
             </div>
             <div class="actions-quarter-top">
-              <button type="button" id="recalcMotivation" class="btn btn-primary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Перерахувати</button>
-              <button type="button" id="clearAll" class="btn btn-secondary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 4h5M8 7l.8 11.1a1.7 1.7 0 0 0 1.7 1.6h3a1.7 1.7 0 0 0 1.7-1.6L16 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Очистити все</button>
+              <button type="button" id="recalcMotivation" class="btn btn-primary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>Перерахувати</button>
+              <button type="button" id="clearAll" class="btn btn-secondary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 4h5M8 7l.8 11.1a1.7 1.7 0 0 0 1.7 1.6h3a1.7 1.7 0 0 0 1.7-1.6L16 7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>Очистити все</button>
             </div>
             <div class="actions-quarter-bottom">
-              <button type="button" id="openMotivationGuide" class="btn btn-secondary btn-quiet btn-sm"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 10.5v6M12 7.5h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Умови мотивації</button>
-              <button type="button" id="downloadPdf" class="btn btn-secondary btn-sm"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10m0 0 3.2-3.2M12 13 8.8 9.8M5 15.5v2.7A1.8 1.8 0 0 0 6.8 20h10.4a1.8 1.8 0 0 0 1.8-1.8v-2.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Завантажити PDF</button>
+              <button type="button" id="openMotivationGuide" class="btn btn-secondary btn-quiet btn-sm"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M12 10.5v6M12 7.5h.01" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>Умови мотивації</button>
+              <button type="button" id="downloadPdf" class="btn btn-secondary btn-sm"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10m0 0 3.2-3.2M12 13 8.8 9.8M5 15.5v2.7A1.8 1.8 0 0 0 6.8 20h10.4a1.8 1.8 0 0 0 1.8-1.8v-2.7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>Завантажити PDF</button>
             </div>
           </div>
         </div>

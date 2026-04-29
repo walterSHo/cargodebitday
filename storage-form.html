@@ -85,6 +85,16 @@
       gap: 8px;
       border: 1px solid rgba(143,190,255,.5);
     }
+    .btn, .btn-link {
+      border-radius: var(--radius-sm);
+      min-height: var(--btn-h-md);
+      padding: 0 16px;
+    }
+    .btn:focus-visible,
+    .btn-link:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(143,190,255,.28);
+    }
     .btn-icon-ui { width: 14px; height: 14px; flex: 0 0 14px; opacity: .84; }
     .btn-md { min-height: var(--btn-h-md); }
     .btn-sm { min-height: var(--btn-h-sm); font-size: .88rem; padding: 0 12px; }
@@ -125,7 +135,7 @@
     <h1>Зберігання товару (склад)</h1>
     <p>Форма для випадків, коли товар передано без документів на повернення.</p>
     <div class="actions">
-      <button type="button" class="btn btn-md" id="printStorageBtn"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10m0 0 3.2-3.2M12 13 8.8 9.8M5 15.5v2.7A1.8 1.8 0 0 0 6.8 20h10.4a1.8 1.8 0 0 0 1.8-1.8v-2.7" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Завантажити PDF (A4)</button>
+      <button type="button" class="btn btn-md" id="printStorageBtn"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10m0 0 3.2-3.2M12 13 8.8 9.8M5 15.5v2.7A1.8 1.8 0 0 0 6.8 20h10.4a1.8 1.8 0 0 0 1.8-1.8v-2.7" fill="none" stroke="currentColor" stroke-width="1.75"/></svg>Завантажити PDF (A4)</button>
     </div>
   </section>
 
