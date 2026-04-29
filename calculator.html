@@ -10,33 +10,33 @@
   </script>
   <style>
     :root {
-      --bg: #09101a;
-      --surface: rgba(14, 22, 36, .84);
+      --bg: #111318;
+      --surface: #1A1F27;
       --surface-soft: rgba(20, 31, 48, .82);
       --surface-strong: rgba(10, 16, 28, .92);
       --surface-contrast: rgba(22, 31, 48, .8);
       --header: rgba(20, 31, 48, .86);
       --header-border: rgba(93, 122, 166, .18);
-      --text: #f4f7fd;
+      --text: #F3F6FA;
       --text-soft: #d6dfef;
-      --muted: #9ba9c1;
+      --muted: #A8B1C0;
       --muted-soft: #8190a9;
       --line: rgba(100, 124, 161, .22);
       --line-strong: rgba(118, 150, 197, .38);
       --line-subtle: rgba(90, 116, 153, .16);
-      --accent: #6ea8ff;
+      --accent: #4DA3FF;
       --accent-hover: #8bb9ff;
       --focus: #8fbeff;
       --ok: #1cf488;
       --error: #ff6266;
       --warn: #ffb324;
-      --radius: 18px;
+      --radius: 12px;
       --shadow: 0 0 0 1px rgba(83, 106, 142, .18);
       --surface-l1: rgba(8, 13, 23, .96);
       --surface-l2: rgba(18, 28, 44, .94);
       --surface-l3: rgba(30, 44, 67, .9);
-      --sidebar-w: var(--sidebar-w, 220px);
-      --menu-radius: var(--menu-radius, 14px);
+      --sidebar-w: 220px;
+      --menu-radius: 10px;
     }
     * { box-sizing: border-box; }
     html { background: var(--bg); }
@@ -44,9 +44,7 @@
       position: relative;
       margin: 0;
       font-family: "Segoe UI", Roboto, Arial, sans-serif;
-      background:
-        radial-gradient(circle at top, rgba(88, 144, 255, .08), transparent 34%),
-        linear-gradient(180deg, #09101a 0%, #07111c 52%, #081019 100%);
+      background: #111318;
       color: var(--text);
       min-height: 100vh;
       overflow-y: scroll;
@@ -85,7 +83,7 @@
     .app-shell {
       display: grid;
       grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
-      gap: 18px;
+      gap: 16px;
       width: min(var(--container-shell-max), calc(100% - 32px));
       margin: 16px auto;
       position: relative;
@@ -106,21 +104,25 @@
     .menu-link.is-active { background: rgba(110,168,255,.22); border-color: rgba(143,190,255,.42); color:#fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); }
     .embedded .sidebar { display: none; }
     .embedded .app-shell { grid-template-columns: 1fr; width: 100%; margin: 0; }
+    .embedded body { padding: 8px; }
     .embedded .page { width: min(var(--container-page-max), calc(100% - 20px)); margin: 10px auto 20px; }
+    .embedded body::before,
+    .embedded body::after { opacity: .1; }
     .panel-head { display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:46px; padding:8px 14px; border:1px solid var(--line); border-radius:var(--radius-md); background:rgba(15,22,34,.95); }
     .panel-head-meta { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
     .meta-chip { padding:0; border:0; background:transparent; color:#d7e2f5; font-size:.8rem; line-height:1.2; }
+    .meta-chip--static { opacity: .78; }
+    .meta-chip--dynamic { opacity: .96; }
+    .meta-chip.is-ok { color: #8ff2b9; }
+    .meta-chip.is-muted { color: #9ba9c1; }
+    .meta-chip.is-error { color: #ff8f92; }
     .screen {
       position: relative;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.008)),
-        var(--surface);
+      background: var(--surface);
       border: 1px solid var(--line);
       border-radius: var(--radius);
       overflow: hidden;
       box-shadow: var(--shadow), 0 20px 40px rgba(0,0,0,.24);
-      backdrop-filter: blur(14px) saturate(116%);
-      -webkit-backdrop-filter: blur(14px) saturate(116%);
     }
     .screen::before {
       content: "";
@@ -170,12 +172,12 @@
     .result-col {
       background: rgba(255,255,255,.015);
     }
-    .section-grid { display: grid; gap: 18px; }
+    .section-grid { display: grid; gap: 16px; }
     .fields-3,
     .fields-2,
     .fields-4 {
       display: grid;
-      gap: 18px;
+      gap: 16px;
     }
     .fields-3 { grid-template-columns: repeat(3,minmax(0,1fr)); }
     .fields-2 { grid-template-columns: repeat(2,minmax(0,1fr)); }
@@ -185,11 +187,12 @@
       display: grid;
       gap: 8px;
       align-content: start;
+      grid-template-rows: auto auto minmax(32px, auto) 15px;
     }
     .monthly-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 22px 18px;
+      gap: 24px 16px;
       align-items: start;
     }
     .monthly-field {
@@ -249,9 +252,12 @@
       font-size: .73rem;
       line-height: 1.32;
       color: var(--muted-soft);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .16s ease;
     }
-    .field-msg.error { color: var(--error); }
-    .field-msg.ok { display: none; }
+    .field-msg.error { color: var(--error); opacity: 1; visibility: visible; }
+    .field-msg.ok { color: #8ff2b9; opacity: 0; visibility: hidden; }
     .field.invalid input { border-color: #7d3a42; box-shadow: 0 0 0 3px rgba(125,58,66,.14); }
     .field.valid input {
       border-color: #2d7c54;
@@ -371,8 +377,6 @@
       display: grid;
       gap: 14px;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.03), 0 14px 28px rgba(0,0,0,.14);
-      backdrop-filter: blur(12px) saturate(116%);
-      -webkit-backdrop-filter: blur(12px) saturate(116%);
       transition: transform .2s ease, border-color .22s ease, box-shadow .26s ease, background-color .22s ease;
     }
     .result-title,
@@ -898,14 +902,19 @@
       text-align: right;
       font-variant-numeric: tabular-nums;
     }
-    #groupsTable th:first-child,
-    #groupsTable td:first-child {
+    #groupsTable th:first-child {
       position: sticky;
       left: 0;
       z-index: 2;
-      background: var(--surface-l1);
+      background: var(--surface-l3);
     }
-    #groupsTable tbody tr:nth-child(even) { background: rgba(255,255,255,.03); }
+    #groupsTable td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      background: var(--surface-l3);
+    }
+    #groupsTable tbody tr:nth-child(even) { background: rgba(255,255,255,.015); }
     .table-wrap {
       overflow: visible;
       max-height: none;
@@ -939,7 +948,7 @@
     .group-row.done { background: rgba(28,244,136,.035); }
     .group-row.near { background: rgba(255,179,36,.04); }
     .group-row.fail { background: transparent; }
-    .group-row:hover { background: rgba(110,168,255,.08); }
+    .group-row:hover { background: rgba(77,163,255,.06); }
     .progress-track {
       height: 8px;
       border-radius: 999px;
@@ -966,7 +975,7 @@
     .groups-meta strong { color: #eef2f8; }
     .summary-grid {
       display: grid;
-      gap: 18px;
+      gap: 16px;
     }
     .sticky-total {
       position: fixed;
@@ -979,7 +988,6 @@
       border-radius: 10px;
       border: 1px solid rgba(110,168,255,.2);
       background: rgba(10, 17, 29, .86);
-      backdrop-filter: blur(8px);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -993,6 +1001,9 @@
       color: #f4f8ff;
       font-weight: 800;
     }
+    .hints > summary { cursor: pointer; list-style: none; }
+    .hints > summary::-webkit-details-marker { display:none; }
+    .hints[open] > summary { margin-bottom: 8px; }
     .summary-grid--hints {
       grid-template-columns: repeat(2,minmax(0,1fr));
     }
@@ -1057,7 +1068,7 @@
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      gap: 18px;
+      gap: 16px;
       font-weight: 800;
       font-size: 1.08rem;
       color: #f4f6fb;
@@ -1147,7 +1158,7 @@
       border-radius: 999px;
       background: linear-gradient(90deg, rgba(255,255,255,.04), rgba(110,168,255,.18), rgba(255,179,36,.14), rgba(255,255,255,.04));
     }
-    .easter-cat {
+     .easter-cat {
       position: absolute;
       left: 16px;
       bottom: 14px;
@@ -1159,7 +1170,7 @@
       padding: 0;
       cursor: pointer;
       color: inherit;
-      animation: catRoam 20s ease-in-out infinite alternate;
+      animation: none;
       transition: transform .18s ease, filter .18s ease;
       will-change: transform;
       transform: translateZ(0);
@@ -1324,7 +1335,7 @@
     }
     .pdf-report {
       display: none;
-      gap: 18px;
+      gap: 16px;
       color: #10131a;
       background: #fff;
       padding: 0;
@@ -1332,7 +1343,7 @@
     .pdf-report-head {
       display: flex;
       justify-content: space-between;
-      gap: 18px;
+      gap: 16px;
       align-items: flex-end;
       border-bottom: 2px solid #d5dbe6;
       padding-bottom: 12px;
@@ -1469,7 +1480,7 @@
     .motivation-column--left > *:nth-child(3),
     .motivation-column--right > *:nth-child(3),
     .summary-section { animation-delay: .12s; }
-    .summary-item--total .total .mono { animation: softFloat 4.2s ease-in-out infinite; }
+    .summary-item--total .total .mono { animation: none; }
     .summary-item--total.has-success {
       animation: successGlow 3.4s ease-in-out infinite;
     }
@@ -1508,7 +1519,7 @@
       .fields-4,
       .screen-motivation .motivation-columns { grid-template-columns: 1fr; gap: 16px; }
       .summary-mini { padding: 14px; }
-      .easter-cat { animation-duration: 12s; }
+       .easter-cat { animation-duration: 12s; }
       .easter-cat-bubble {
         max-width: min(52vw, 250px);
         white-space: normal;
@@ -1531,7 +1542,7 @@
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
-      .easter-cat { transform: none !important; }
+       .easter-cat { transform: none !important; }
     }
     @media print {
       @page {
@@ -1600,12 +1611,13 @@
   <div class="page">
   <section class="panel-head" aria-label="Системна панель">
     <div class="panel-head-meta">
-      <span class="meta-chip">Режим: Dashboard</span>
-      <span class="meta-chip">Сервіс: Cargodebitday</span>
+      <span class="meta-chip meta-chip--static">Режим: Dashboard</span>
+      <span class="meta-chip meta-chip--static">Сервіс: Cargodebitday</span>
     </div>
     <div class="panel-head-meta">
-      <span class="meta-chip" id="panelTime">Київ: --:--</span>
-      <span class="meta-chip" id="panelRate">Курс EUR/UAH: --</span>
+      <span class="meta-chip meta-chip--dynamic" id="panelTime">Київ: --:--</span>
+      <span class="meta-chip meta-chip--dynamic" id="panelRate">Курс EUR/UAH: --</span>
+      <span class="meta-chip meta-chip--dynamic" id="panelRateUpdated">Оновлено: --</span>
     </div>
   </section>
   <section class="screen" aria-labelledby="delayTitle">
@@ -1638,11 +1650,11 @@
           <section class="card">
             <h3>Місячна мотивація</h3>
             <div class="monthly-grid">
-              <div class="field monthly-field"><label for="planTurnover">Плановий оборот (факт)</label><input id="planTurnover" type="number" value="0" /><p class="field-hint">До 50 тис: 10 000; 50–150 тис: 20 000; понад 150 тис: 25 000.</p><p class="field-msg" data-msg-for="planTurnover"></p></div>
+              <div class="field monthly-field"><label for="planTurnover">Оборот (факт)</label><input id="planTurnover" type="number" value="0" /><p class="field-hint">До 50 тис: 10 000; 50–150 тис: 20 000; понад 150 тис: 25 000.</p><p class="field-msg" data-msg-for="planTurnover"></p></div>
               <div class="field monthly-field"><label for="planPercent">Виконання плану продажів, %</label><input id="planPercent" type="number" value="0" min="0" max="200" /><p class="field-hint">90%+: +1000/1%, 100%+: +1500/1%, 110%+: +500/1%; знижка ≥27.5% зменшує плановий бонус на 50%.</p><p class="field-msg" data-msg-for="planPercent"></p></div>
               <div class="field monthly-field"><label>CRM</label><div class="monthly-check"><label class="check"><input id="crmDone" type="checkbox" /> CRM виконано на 100% (20 дзвінків або 5 зустрічей)</label><p class="field-hint">Якщо позначено, бонус CRM = 10 000.</p></div></div>
               <div class="field monthly-field"><label for="avgDiscount">Середня знижка, %</label><input id="avgDiscount" type="number" value="0" step="0.1" /><p class="field-hint">При 27.5% і вище бонус за план зменшується на 50%.</p><p class="field-msg" data-msg-for="avgDiscount"></p></div>
-              <div class="field monthly-field"><label for="avgDelayFact">Середнє відтермінування (факт), днів</label><input id="avgDelayFact" type="number" value="0" step="0.1" /><p class="field-hint">До 7 днів: 6000, до 14: 3000, більше 14: 0.</p><p class="field-msg" data-msg-for="avgDelayFact"></p></div>
+              <div class="field monthly-field"><label for="avgDelayFact">Відтермінування (факт), днів</label><input id="avgDelayFact" type="number" value="0" step="0.1" /><p class="field-hint">До 7 днів: 6000, до 14: 3000, більше 14: 0.</p><p class="field-msg" data-msg-for="avgDelayFact"></p></div>
               <div class="field monthly-field field--with-action"><label for="eurRate">Курс EUR → бонусна валюта</label><div class="field-control-combo"><input id="eurRate" type="number" value="45" step="0.01" /><button type="button" id="refreshRate" class="btn btn-secondary" aria-label="Оновити курс EUR" title="Оновити курс EUR"><svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div><p class="field-hint">Якщо автокурс недоступний, введіть вручну.</p><p class="field-msg" data-msg-for="eurRate"></p></div>
               <div class="field monthly-field"><label for="overdue1">Прострочка 1–10 днів (EUR)</label><input id="overdue1" type="number" value="0" /><p class="field-hint">Штраф 0.5% від цієї суми.</p><p class="field-msg" data-msg-for="overdue1"></p></div>
               <div class="field monthly-field"><label for="overdue2">Прострочка 11–20 днів (EUR)</label><input id="overdue2" type="number" value="0" /><p class="field-hint">Штраф 1.0% від цієї суми.</p><p class="field-msg" data-msg-for="overdue2"></p></div>
@@ -1677,7 +1689,7 @@
             </div>
             <div class="actions-quarter-top">
               <button type="button" id="recalcMotivation" class="btn btn-primary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>Перерахувати</button>
-              <button type="button" id="clearAll" class="btn btn-secondary btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 4h5M8 7l.8 11.1a1.7 1.7 0 0 0 1.7 1.6h3a1.7 1.7 0 0 0 1.7-1.6L16 7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>Очистити все</button>
+              <button type="button" id="clearAll" class="btn btn-danger btn-md"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 4h5M8 7l.8 11.1a1.7 1.7 0 0 0 1.7 1.6h3a1.7 1.7 0 0 0 1.7-1.6L16 7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>Очистити все</button>
             </div>
             <div class="actions-quarter-bottom">
               <button type="button" id="openMotivationGuide" class="btn btn-secondary btn-quiet btn-sm"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M12 10.5v6M12 7.5h.01" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>Умови мотивації</button>
@@ -1690,14 +1702,14 @@
       <section class="card summary-section">
         <div id="errorSummary" class="error-summary" role="alert" hidden></div>
         <div class="summary-grid summary-grid--hints">
-          <section class="hints">
-            <h4>Підказки: місяць</h4>
+          <details class="hints" open>
+            <summary><h4>Підказки: місяць</h4></summary>
             <ul id="monthlyHints" class="hint-list"></ul>
-          </section>
-          <section class="hints">
-            <h4>Підказки: квартал</h4>
+          </details>
+          <details class="hints" open>
+            <summary><h4>Підказки: квартал</h4></summary>
             <ul id="quarterHints" class="hint-list"></ul>
-          </section>
+          </details>
         </div>
         <p class="disclaimer">Увага: розрахунок має інформаційний характер і може відрізнятися від фактичного нарахування. Підсумкові значення залежать від внутрішніх правил компанії, актуального курсу валют і фінального підтвердження.</p>
       </section>
@@ -1760,7 +1772,7 @@
     </div>
   </section>
 </div>
-<div id="stickyTotalBar" class="sticky-total" aria-live="polite" aria-atomic="true"><span>Загальна сума</span><strong id="stickyAllTotal" class="mono">0 ₴</strong></div>
+<div id="stickyTotalBar" class="sticky-total" aria-live="polite" aria-atomic="true"><span>Місяць: <strong id="stickyMonthTotal" class="mono">0 ₴</strong></span><span>Квартал: <strong id="stickyQuarterTotal" class="mono">0 ₴</strong></span><span>Разом: <strong id="stickyAllTotal" class="mono">0 ₴</strong></span></div>
 
 <script src="./assets/scripts/app.js"></script>
 
