@@ -2,6 +2,29 @@
 
 ## 2026-04-20
 
+- Removed the `Ціль: хочу додати` target-advisor block to keep the summary area cleaner while retaining hints and sticky total visibility.
+- Optimized cat easter-egg runtime: pause all cat sub-animations when paused/offscreen and enable a lightweight mode on reduced-motion / lower-core devices to lower panel jank.
+- Polished the cat easter egg visuals (bubble tail and cat tail geometry) and expanded the rotating cat phrases/celebration lines so interactions feel more playful without affecting calculations.
+- Added gentle threshold alerts (discount near 27.5% and quarterly groups close to 95%), a compact target slider (`Хочу +N грн`) with short actionable suggestions, and a sticky bottom `Загальна сума` bar for long-scroll visibility.
+- Added a generic quiet info-status style for any neutral non-error/non-success message, optimized localStorage writes with dirty-state snapshot checks, and skipped hint-list rerender when markup is unchanged.
+- Refined status typography to a single thinner size across both calculators, reduced opacity for non-critical info (`draft`) states, and forced monochrome status text in print/PDF output.
+- Simplified status badges by removing the pill frame/background treatment and leaving only clean colored text for success/draft/error messages.
+- Relaxed the previous print compression pass (larger print zoom and typography) so the PDF remains one-page on A4 but is easier to read.
+- Tightened print/PDF output density (smaller page margins, typography, paddings, and metric/table spacing) and applied print zoom so the existing summary report fits on a single A4 page more reliably.
+- Unified the 4-button action block density so all controls now share the same compact height/spacing, and added subtle low-contrast icons to `Умови мотивації` and `Завантажити PDF`.
+- Rearranged the actions block so `Умови мотивації` and `Завантажити PDF` now sit side-by-side, giving a clean 2x2 layout for the four main action buttons.
+- Fixed the motivation guide modal wiring (`Умови мотивації`) so the button opens the dialog correctly, and removed stray JS text that was rendered at the page bottom.
+- Added a compact helper hint under `Плановий оборот (факт)` in the monthly block.
+- Added a compact helper text under `Виконання плану продажів, %` to clarify plan-bonus tiers and the 27.5% discount reduction rule without changing formulas.
+- Added a compact `Умови мотивації` button and a modal reference table (monthly, CRM, plan execution, delay, overdue, quarter, groups, tires) so full conditions are available on demand without overloading the main form.
+- Removed distracting service labels near field titles in the motivation form: `Фокус` was fully removed, and noisy inline tags like `Впливає` / `Ризик` / `Штраф` are no longer rendered next to labels while keeping underlying calculations unchanged.
+- Performed a safe UI performance cleanup pass without changing formulas or field composition: motivation recalculation from inputs is now frame-batched via `requestAnimationFrame` to reduce bursty rerenders while typing.
+- Reduced repeated DOM querying in quarterly group updates by caching group row nodes/inputs once and reusing them in calculations.
+- Lowered unnecessary DOM writes by updating quarterly average/status/progress cells only when values actually changed.
+- Removed forced reflow from summary flash animation restart and now animate summary cards only when totals actually changed.
+- Added lightweight PDF snapshot guarding so report DOM mirrors are not rewritten when motivation output is unchanged.
+- Synced the same optimization changes across `index.html`, `docs/index.html`, and `assets/scripts/app.js`.
+
 - Removed native number-field spin buttons from the calculator inputs to clean up the compact dark UI.
 - Removed the yellow framed priority container treatment in the motivation form and kept priority feedback on the small label badges instead.
 - Simplified the priority badge further so only colored text remains near the label, avoiding overlap with the field grid.

@@ -1,0 +1,2673 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Калькулятори</title>
+  <style>
+    :root {
+      --bg: #09101a;
+      --surface: rgba(14, 22, 36, .84);
+      --surface-soft: rgba(20, 31, 48, .82);
+      --surface-strong: rgba(10, 16, 28, .92);
+      --surface-contrast: rgba(22, 31, 48, .8);
+      --header: rgba(20, 31, 48, .86);
+      --header-border: rgba(93, 122, 166, .18);
+      --text: #f4f7fd;
+      --text-soft: #d6dfef;
+      --muted: #9ba9c1;
+      --muted-soft: #8190a9;
+      --line: rgba(100, 124, 161, .22);
+      --line-strong: rgba(118, 150, 197, .38);
+      --line-subtle: rgba(90, 116, 153, .16);
+      --accent: #6ea8ff;
+      --accent-hover: #8bb9ff;
+      --focus: #8fbeff;
+      --ok: #1cf488;
+      --error: #ff6266;
+      --warn: #ffb324;
+      --radius: 18px;
+      --shadow: 0 0 0 1px rgba(83, 106, 142, .18);
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--bg); }
+    body {
+      position: relative;
+      margin: 0;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(88, 144, 255, .08), transparent 34%),
+        linear-gradient(180deg, #09101a 0%, #07111c 52%, #081019 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: auto;
+      width: 34rem;
+      height: 34rem;
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(70px);
+      opacity: .18;
+      z-index: 0;
+    }
+    body::before {
+      top: -10rem;
+      right: -8rem;
+      background: radial-gradient(circle, rgba(110,168,255,.24) 0%, rgba(110,168,255,0) 70%);
+    }
+    body::after {
+      left: -10rem;
+      bottom: -12rem;
+      background: radial-gradient(circle, rgba(255,179,36,.1) 0%, rgba(255,179,36,0) 72%);
+    }
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(1620px, calc(100% - 56px));
+      margin: 24px auto 56px;
+      display: grid;
+      gap: 26px;
+    }
+    .screen {
+      position: relative;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.008)),
+        var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow), 0 20px 40px rgba(0,0,0,.24);
+      backdrop-filter: blur(14px) saturate(116%);
+      -webkit-backdrop-filter: blur(14px) saturate(116%);
+    }
+    .screen::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(143,190,255,.32), rgba(255,255,255,.12) 45%, rgba(255,179,36,.12) 100%);
+      pointer-events: none;
+    }
+    .screen-head {
+      padding: 20px 28px 18px;
+      border-bottom: 1px solid var(--line-subtle);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.006)),
+        rgba(255,255,255,.008);
+      position: relative;
+    }
+    .screen-head::before { display: none; }
+    .screen-head h1,
+    .screen-head h2 {
+      margin: 0;
+      font-size: 1.08rem;
+      line-height: 1.25;
+      letter-spacing: .01em;
+      color: #f7f8fb;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .screen-head p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.45;
+    }
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 3.3fr) minmax(340px, 1.25fr);
+      align-items: start;
+    }
+    .form-col,
+    .result-col {
+      padding: 24px 26px 26px;
+    }
+    .form-col {
+      border-right: 1px solid var(--line-subtle);
+    }
+    .result-col {
+      background: rgba(255,255,255,.015);
+    }
+    .section-grid { display: grid; gap: 18px; }
+    .fields-3,
+    .fields-2,
+    .fields-4 {
+      display: grid;
+      gap: 18px;
+    }
+    .fields-3 { grid-template-columns: repeat(3,minmax(0,1fr)); }
+    .fields-2 { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .fields-4 { grid-template-columns: repeat(4,minmax(0,1fr)); }
+    .field {
+      position: relative;
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+    .monthly-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px 18px;
+      align-items: start;
+    }
+    .monthly-field {
+      min-height: 132px;
+      align-content: start;
+    }
+    label {
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--muted);
+      line-height: 1.25;
+      transition: color .18s ease, transform .18s ease;
+    }
+    input,
+    select {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: .99rem;
+      color: var(--text);
+      background: var(--surface-strong);
+      outline: none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.02);
+      transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease, transform .18s ease;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      margin: 0;
+      -webkit-appearance: none;
+    }
+    input:hover,
+    select:hover {
+      border-color: #4a5770;
+      background: rgba(31,35,45,.96);
+    }
+    input:focus,
+    select:focus {
+      border-color: var(--focus);
+      box-shadow: 0 0 0 3px rgba(122,151,202,.18);
+      transform: translateY(-1px);
+    }
+    .field:focus-within label { color: #d9e3f4; }
+    input.is-example { color: rgba(243,244,247,.72); }
+    .field-hint {
+      margin: -2px 0 0;
+      font-size: .74rem;
+      color: var(--muted-soft);
+      line-height: 1.38;
+    }
+    .field-msg {
+      min-height: 18px;
+      font-size: .73rem;
+      line-height: 1.32;
+      color: var(--muted-soft);
+    }
+    .field-msg.error { color: var(--error); }
+    .field-msg.ok { display: none; }
+    .field.invalid input { border-color: #7d3a42; box-shadow: 0 0 0 3px rgba(125,58,66,.14); }
+    .field.valid input {
+      border-color: #2d7c54;
+      padding-right: 38px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%231cf488' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.2' d='M3 8.5l3.1 3.1L13 3.8'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-size: 14px 14px;
+      background-position: right 12px center;
+    }
+    .field--with-action.valid input {
+      padding-right: 76px;
+      background-position: right 48px center;
+    }
+    .hint {
+      margin: 0;
+      padding: 14px 16px;
+      border: 1px solid #3b465c;
+      border-radius: 8px;
+      font-size: .84rem;
+      color: var(--text-soft);
+      background: var(--surface-contrast);
+      line-height: 1.45;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    .btn {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid transparent;
+      min-height: 44px;
+      padding: 0 24px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: .96rem;
+      cursor: pointer;
+      transition: transform .14s ease, border-color .18s ease, background-color .18s ease, color .18s ease, box-shadow .2s ease;
+    }
+    .btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,.14) 50%, transparent 80%);
+      transform: translateX(-135%);
+      transition: transform .45s ease;
+      pointer-events: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #08111d;
+      border-color: rgba(143,190,255,.58);
+      box-shadow: 0 10px 20px rgba(110,168,255,.18), 0 0 0 1px rgba(143,190,255,.14);
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 12px 24px rgba(110,168,255,.22), 0 0 16px rgba(110,168,255,.12);
+    }
+    .btn-secondary {
+      background: linear-gradient(180deg, rgba(34,48,71,.64), rgba(17,24,38,.76));
+      color: #d7e2f5;
+      border-color: rgba(118,150,197,.24);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 8px 18px rgba(6,11,20,.16);
+    }
+    .btn-secondary:hover {
+      background: linear-gradient(180deg, rgba(41,57,84,.8), rgba(19,28,45,.88));
+      border-color: rgba(143,190,255,.34);
+      box-shadow: 0 10px 20px rgba(8,14,24,.2), 0 0 12px rgba(110,168,255,.08);
+    }
+    .btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(122,151,202,.2);
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+    .btn:hover::before { transform: translateX(135%); }
+    .btn:active { transform: translateY(1px); }
+    .btn.copied {
+      background: rgba(28,244,136,.12);
+      border-color: rgba(28,244,136,.35);
+      color: #72f7b2;
+    }
+    .result-box,
+    .card,
+    .summary-item,
+    .hints {
+      border: 1px solid rgba(103,127,164,.22);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)),
+        var(--surface-contrast);
+      padding: 24px;
+      display: grid;
+      gap: 14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03), 0 14px 28px rgba(0,0,0,.14);
+      backdrop-filter: blur(12px) saturate(116%);
+      -webkit-backdrop-filter: blur(12px) saturate(116%);
+      transition: transform .2s ease, border-color .22s ease, box-shadow .26s ease, background-color .22s ease;
+    }
+    .result-title,
+    .card h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: -.01em;
+      color: #f4f6fb;
+    }
+    .result-line {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--text-soft);
+      line-height: 1.45;
+    }
+    .result-line strong,
+    .result-box .mono {
+      color: var(--text);
+    }
+    .status {
+      min-height: 20px;
+      font-size: .8rem;
+      font-weight: 500;
+      margin: 0;
+      line-height: 1.35;
+      transition: opacity .18s ease, transform .18s ease, color .18s ease;
+    }
+    .status:not(:empty) {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+      max-width: 100%;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      border-radius: 0;
+    }
+    .status.ok {
+      color: var(--ok);
+    }
+    .status.draft {
+      color: #b8d6ff;
+      opacity: .72;
+    }
+    .status:not(.ok):not(.error):not(.draft):not(:empty) {
+      color: var(--muted-soft);
+      opacity: .72;
+    }
+    .status.error {
+      color: var(--error);
+      opacity: 1;
+    }
+    .status.ok { opacity: 1; }
+    .example {
+      margin: 10px 2px 0;
+      color: var(--muted-soft);
+      font-size: .8rem;
+      line-height: 1.45;
+    }
+    .screen-motivation .motivation-body {
+      position: relative;
+      padding: 28px 30px 30px;
+      display: grid;
+      gap: 24px;
+    }
+    .screen-motivation .motivation-columns {
+      display: grid;
+      grid-template-columns: repeat(2,minmax(0,1fr));
+      gap: 20px;
+      align-items: start;
+    }
+    .screen-motivation .motivation-column {
+      display: grid;
+      gap: 20px;
+      align-content: start;
+    }
+    .screen-motivation {
+      --radius-motivation: 10px;
+    }
+    .screen-motivation .screen-head {
+      padding: 18px 24px 16px;
+    }
+    .screen-motivation .screen-head h2 {
+      font-size: 1.08rem;
+    }
+    .screen-motivation .screen-head p {
+      margin-top: 6px;
+      font-size: .8rem;
+    }
+    .screen-motivation .card,
+    .screen-motivation .summary-item,
+    .screen-motivation .hints,
+    .screen-motivation .summary-section,
+    .screen-motivation .summary-total-row .summary-item {
+      border-radius: var(--radius-motivation);
+      padding: 18px;
+      gap: 10px;
+    }
+    .screen-motivation .summary-section {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      gap: 14px;
+    }
+    .screen-motivation .summary-section > h3 {
+      margin: 0 0 2px;
+    }
+    .screen-motivation input,
+    .screen-motivation select,
+    .screen-motivation .table input,
+    .screen-motivation .btn,
+    .screen-motivation .monthly-check,
+    .screen-motivation .table-wrap,
+    .screen-motivation .error-summary,
+    .screen-motivation .disclaimer {
+      border-radius: 6px;
+    }
+    .screen-motivation label {
+      font-size: .79rem;
+    }
+    .screen-motivation input,
+    .screen-motivation select {
+      min-height: 40px;
+      padding: 8px 12px;
+      font-size: .95rem;
+    }
+    .screen-motivation .btn {
+      min-height: 40px;
+      padding: 0 18px;
+      font-size: .91rem;
+    }
+    .screen-motivation .monthly-grid {
+      gap: 16px 14px;
+    }
+    .screen-motivation .monthly-field {
+      min-height: 110px;
+    }
+    .screen-motivation .monthly-check {
+      min-height: 82px;
+      padding: 12px 14px;
+      gap: 8px;
+    }
+    .screen-motivation .fields-2,
+    .screen-motivation .fields-3,
+    .screen-motivation .fields-4,
+    .screen-motivation .section-grid,
+    .screen-motivation .actions {
+      gap: 10px;
+    }
+    .screen-motivation .field {
+      gap: 6px;
+    }
+    .field.is-priority {
+      padding: 0;
+      margin: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+    .field.is-priority-high {
+      background: transparent;
+      box-shadow: none;
+    }
+    .field.is-priority-soft {
+      background: transparent;
+      box-shadow: none;
+    }
+    .field label[data-priority]::after {
+      content: attr(data-priority);
+      display: inline;
+      margin-left: 8px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #d9e4f6;
+      font-size: .66rem;
+      font-weight: 800;
+      letter-spacing: .02em;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    .field.is-priority-high label[data-priority]::after {
+      color: #ffd58a;
+      text-shadow: 0 0 12px rgba(255,171,23,.18);
+    }
+    .field.is-priority-soft label[data-priority]::after {
+      color: #d9e4f6;
+    }
+    .screen-motivation .field-hint,
+    .screen-motivation .field-msg,
+    .screen-motivation .example {
+      font-size: .72rem;
+    }
+    .screen-motivation .btn-quiet {
+      background: rgba(255,255,255,.03);
+      border-color: rgba(122,151,202,.24);
+      color: #d4deef;
+    }
+    .screen-motivation .btn-quiet:hover {
+      border-color: rgba(143,190,255,.5);
+      color: #f0f5ff;
+    }
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: grid;
+      place-items: center;
+      background: rgba(5, 10, 18, .66);
+      backdrop-filter: blur(4px);
+      padding: 24px;
+    }
+    .modal[hidden] { display: none; }
+    .modal-card {
+      width: min(980px, 100%);
+      max-height: min(86vh, 840px);
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(14, 22, 36, .98);
+      box-shadow: 0 22px 54px rgba(0,0,0,.42);
+    }
+    .modal-head {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line-subtle);
+      background: rgba(14, 22, 36, .98);
+    }
+    .modal-head h3 {
+      margin: 0;
+      font-size: .95rem;
+      letter-spacing: .01em;
+    }
+    .modal-close {
+      width: 32px;
+      min-width: 32px;
+      height: 32px;
+      min-height: 32px;
+      padding: 0;
+      border-radius: 7px;
+      font-size: 1rem;
+      line-height: 1;
+    }
+    .guide-wrap { padding: 14px 16px 16px; }
+    .guide-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .79rem;
+    }
+    .guide-table th,
+    .guide-table td {
+      border: 1px solid var(--line-subtle);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .guide-table th {
+      color: #eaf1ff;
+      background: rgba(255,255,255,.03);
+      font-size: .73rem;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+    .guide-table td:first-child {
+      width: 170px;
+      font-weight: 700;
+      color: #d7e2f5;
+    }
+    .screen-motivation .field--with-action {
+      grid-column: auto;
+    }
+    .screen-motivation .field-control-combo {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-items: center;
+    }
+    .screen-motivation .monthly-grid > .monthly-field {
+      align-self: start;
+    }
+    .screen-motivation .field-control-combo input {
+      padding-right: 52px;
+    }
+    .screen-motivation .field-control-combo .btn {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 34px;
+      min-width: 34px;
+      height: 34px;
+      min-height: 34px;
+      padding: 0;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+    }
+    .screen-motivation .btn.is-loading {
+      opacity: .76;
+      cursor: wait;
+    }
+    .screen-motivation .btn.is-loading .btn-icon {
+      opacity: 0;
+    }
+    .screen-motivation .btn.is-loading::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 12px;
+      height: 12px;
+      margin: -6px 0 0 -6px;
+      border: 2px solid currentColor;
+      border-right-color: transparent;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    .screen-motivation .table-wrap {
+      max-height: none;
+      overflow: visible;
+    }
+    .screen-motivation .table th,
+    .screen-motivation .table td {
+      padding: 9px 10px;
+    }
+    .screen-motivation .table {
+      font-size: .84rem;
+    }
+    .screen-motivation .table input {
+      min-height: 34px;
+      padding: 6px 8px;
+    }
+    .screen-motivation .groups-meta {
+      gap: 8px 14px;
+      font-size: .84rem;
+    }
+    .screen-motivation .summary-item h4,
+    .screen-motivation .hints h4,
+    .screen-motivation .card h3,
+    .screen-motivation .summary-section > h3 {
+      font-size: .98rem;
+    }
+    .screen-motivation .mini-table {
+      font-size: .83rem;
+    }
+    .screen-motivation .mini-table td {
+      padding: 8px 0;
+    }
+    .screen-motivation .total {
+      margin-top: 8px;
+      padding-top: 10px;
+      font-size: 1rem;
+    }
+    .screen-motivation .summary-item--total .total .mono {
+      font-size: 1.34rem;
+    }
+    .screen-motivation .actions-summary .btn {
+      min-width: 160px;
+    }
+    .screen-motivation .actions-quarter {
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+    .screen-motivation .actions-quarter-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+    }
+    .screen-motivation .actions-quarter-head h3 {
+      margin: 0;
+      font-size: .98rem;
+    }
+    .screen-motivation .actions-quarter-head .status {
+      margin: 0;
+      text-align: right;
+      min-height: 1.4em;
+      justify-self: end;
+    }
+    .screen-motivation .actions-quarter-top {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .screen-motivation .actions-quarter-bottom {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .screen-motivation .actions-quarter .btn {
+      width: 100%;
+      min-width: 0;
+      min-height: 42px;
+      padding: 0 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      line-height: 1.2;
+      font-weight: 700;
+    }
+    .screen-motivation .actions-quarter .btn .btn-icon {
+      width: 14px;
+      height: 14px;
+      opacity: .68;
+      flex: 0 0 14px;
+    }
+    .screen-motivation .hint-list {
+      gap: 8px;
+      font-size: .84rem;
+    }
+    .screen-motivation .disclaimer {
+      padding: 14px 16px;
+      font-size: .84rem;
+    }
+    .screen-motivation .card,
+    .screen-motivation .summary-item,
+    .screen-motivation .hints,
+    .screen-motivation .monthly-check,
+    .screen-motivation .table-wrap,
+    .screen-motivation .disclaimer {
+      transition: border-color .18s ease, box-shadow .22s ease, background-color .18s ease, transform .18s ease;
+    }
+    .screen-motivation .card:hover,
+    .screen-motivation .summary-item:hover,
+    .screen-motivation .hints:hover {
+      border-color: #42506a;
+      box-shadow: 0 10px 22px rgba(7,10,16,.18);
+    }
+    .screen-motivation .monthly-check:hover,
+    .screen-motivation .table-wrap:hover,
+    .screen-motivation .disclaimer:hover {
+      border-color: #42506a;
+    }
+    .screen-motivation .table tbody tr {
+      transition: background-color .16s ease;
+    }
+    .screen-motivation .table tbody tr:hover {
+      background: rgba(255,255,255,.025);
+    }
+    .screen-motivation .hint-list li {
+      transition: transform .16s ease, color .16s ease;
+    }
+    .screen-motivation .hint-list li:hover {
+      transform: translateX(2px);
+    }
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: .9rem;
+      font-weight: 700;
+      color: #e5e8ef;
+      line-height: 1.4;
+    }
+    .check input {
+      width: 16px;
+      height: 16px;
+      min-height: auto;
+      margin-top: 2px;
+      accent-color: #8fbaff;
+    }
+    .monthly-check {
+      min-height: 92px;
+      border: 1px solid #404b60;
+      border-radius: 8px;
+      background: var(--surface-strong);
+      padding: 14px 16px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+    .monthly-check .check { margin: 0; }
+    #refreshRate {
+      margin-top: 0;
+    }
+    #refreshRate .btn-icon {
+      width: 16px;
+      height: 16px;
+      display: block;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .87rem;
+      color: var(--text-soft);
+    }
+    .table th,
+    .table td {
+      border-bottom: 1px solid #30394b;
+      padding: 11px 14px;
+      text-align: left;
+      vertical-align: middle;
+    }
+    .table th {
+      background: rgba(17,25,40,.9);
+      position: sticky;
+      top: 0;
+      color: var(--muted);
+      font-weight: 700;
+      z-index: 1;
+    }
+    .table td:last-child,
+    .table th:last-child {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .table-wrap {
+      overflow: visible;
+      max-height: none;
+      border: 1px solid rgba(103,127,164,.24);
+      border-radius: 10px;
+      background: rgba(12,18,30,.74);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 14px 28px rgba(0,0,0,.14);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .table .mono { color: var(--text-soft); }
+    .table input {
+      min-height: 36px;
+      padding: 7px 10px;
+      text-align: center;
+      background: #12161d;
+    }
+    .pill-ok,
+    .pill-no,
+    .pill-near {
+      padding: 0;
+      border-radius: 0;
+      font-size: .82rem;
+      font-weight: 700;
+      background: transparent;
+      display: inline;
+    }
+    .pill-ok { color: var(--ok); }
+    .pill-no { color: #ff6d73; }
+    .pill-near { color: var(--warn); }
+    .group-row.done { background: rgba(28,244,136,.035); }
+    .group-row.near { background: rgba(255,179,36,.04); }
+    .group-row.fail { background: transparent; }
+    .progress-track {
+      height: 8px;
+      border-radius: 999px;
+      background: #181d26;
+      overflow: hidden;
+      min-width: 96px;
+      box-shadow: inset 0 1px 1px rgba(255,255,255,.03);
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4b5565 0%, #596373 100%);
+      transition: width .24s ease, background .24s ease;
+    }
+    .groups-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      align-items: center;
+      font-size: .88rem;
+      color: var(--muted);
+      margin: 0 0 2px;
+      line-height: 1.45;
+    }
+    .groups-meta strong { color: #eef2f8; }
+    .summary-grid {
+      display: grid;
+      gap: 18px;
+    }
+    .sticky-total {
+      position: fixed;
+      left: 50%;
+      bottom: 12px;
+      transform: translateX(-50%);
+      z-index: 30;
+      width: min(560px, calc(100% - 26px));
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(110,168,255,.2);
+      background: rgba(10, 17, 29, .86);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-size: .82rem;
+      color: #d6e2f7;
+      box-shadow: 0 10px 28px rgba(0,0,0,.24);
+    }
+    .sticky-total .mono {
+      font-size: 1rem;
+      color: #f4f8ff;
+      font-weight: 800;
+    }
+    .summary-grid--hints {
+      grid-template-columns: repeat(2,minmax(0,1fr));
+    }
+    .summary-item {
+      padding: 20px 24px;
+      transition: box-shadow .25s ease, border-color .25s ease;
+    }
+    .summary-item.flash {
+      box-shadow: 0 0 0 3px rgba(110,168,255,.14), 0 0 24px rgba(110,168,255,.12);
+      border-color: rgba(143,190,255,.4);
+    }
+    .summary-item--total .total .mono {
+      color: var(--accent);
+      font-size: 1.54rem;
+      letter-spacing: -.02em;
+      text-shadow: 0 0 18px rgba(110,168,255,.14);
+    }
+    .summary-item h4 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      color: #eef2f8;
+      text-transform: uppercase;
+      letter-spacing: -.01em;
+    }
+    .summary-mini-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .summary-mini-head h4 { margin: 0; }
+    .btn-cat-toggle {
+      min-height: 28px;
+      padding: 0 10px;
+      font-size: .72rem;
+      border-radius: 999px;
+      opacity: .85;
+    }
+    .btn-cat-toggle.is-off {
+      border-color: rgba(255,98,102,.38);
+      color: #ffb8bc;
+    }
+    .summary-note {
+      margin: -4px 0 2px;
+      color: var(--muted);
+      font-size: .77rem;
+      line-height: 1.45;
+    }
+    .summary-item.is-empty .summary-note {
+      color: #d8c08b;
+    }
+    .summary-item.has-success {
+      border-color: rgba(57,169,107,.34);
+      box-shadow: 0 0 0 1px rgba(57,169,107,.14), 0 18px 32px rgba(15,39,27,.18), 0 0 20px rgba(57,169,107,.08);
+    }
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .86rem;
+    }
+    .mini-table td {
+      border-bottom: 1px solid #354056;
+      padding: 10px 0;
+      color: var(--text-soft);
+    }
+    .mini-table td:last-child {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      color: #f0f3f8;
+      font-weight: 700;
+    }
+    .mini-table tr.row-penalty td:first-child,
+    .mini-table tr.row-penalty td:last-child {
+      color: #ff6d73;
+    }
+    .total {
+      margin-top: 12px;
+      padding-top: 14px;
+      border-top: 1px solid #354056;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 18px;
+      font-weight: 800;
+      font-size: 1.08rem;
+      color: #f4f6fb;
+    }
+    .total .mono { color: #f5f7fb; }
+    .is-positive { color: #f4f6fb; }
+    .is-negative { color: #ff6d73; }
+    .is-neutral { color: var(--text-soft); }
+    .row-changed { animation: rowPulse .55s ease; }
+    .error-summary {
+      border: 1px solid rgba(140,58,66,.55);
+      background: rgba(95,36,42,.32);
+      color: #ff9ca0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: .82rem;
+      line-height: 1.4;
+    }
+    .hints {
+      padding: 20px 24px;
+      min-height: 100%;
+    }
+    .hints h4 {
+      margin: 0 0 12px;
+      font-size: 1rem;
+      text-transform: uppercase;
+      color: #eef2f8;
+      letter-spacing: -.01em;
+    }
+    .actions-summary .btn {
+      min-width: 176px;
+    }
+    #clearAll {
+      color: #ff6d73;
+      border-color: #604049;
+    }
+    #clearAll:hover {
+      background: #2a1d24;
+      border-color: #7b4b56;
+    }
+    .hint-list {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 12px;
+      font-size: .88rem;
+      line-height: 1.45;
+    }
+    .hint-list li::marker { color: currentColor; }
+    .hint-list li.info { color: var(--text-soft); }
+    .hint-list li.success { color: var(--ok); }
+    .hint-list li.warn { color: var(--warn); }
+    .summary-mini {
+      padding: 14px 16px;
+      gap: 8px;
+    }
+    .summary-mini h4 {
+      margin: 0;
+      font-size: .76rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .summary-mini.is-celebrating {
+      border-color: rgba(57,169,107,.32);
+      box-shadow: 0 0 0 1px rgba(57,169,107,.14), 0 12px 24px rgba(10,35,22,.18), 0 0 16px rgba(57,169,107,.1);
+    }
+    .easter-egg-strip {
+      position: relative;
+      min-height: 96px;
+      border: 1px dashed rgba(110,136,178,.34);
+      border-radius: 12px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.018), rgba(255,255,255,.004)),
+        rgba(15,21,34,.5);
+      overflow: hidden;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.015);
+      contain: layout paint;
+    }
+    .easter-egg-strip::after {
+      content: "";
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 17px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255,255,255,.04), rgba(110,168,255,.18), rgba(255,179,36,.14), rgba(255,255,255,.04));
+    }
+    .easter-cat {
+      position: absolute;
+      left: 16px;
+      bottom: 14px;
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 10px;
+      background: transparent;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      color: inherit;
+      animation: catRoam 20s ease-in-out infinite alternate;
+      transition: transform .18s ease, filter .18s ease;
+      will-change: transform;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+    .easter-cat:hover {
+      filter: brightness(1.06);
+    }
+    .easter-cat:focus-visible {
+      outline: none;
+      filter: drop-shadow(0 0 0.35rem rgba(122,151,202,.4));
+    }
+    .easter-cat.is-paused {
+      animation-play-state: paused;
+    }
+    .easter-cat.is-paused .easter-cat-body,
+    .easter-cat.is-paused .easter-cat-tail {
+      animation-play-state: paused;
+    }
+    .easter-cat.is-sleeping {
+      filter: saturate(.72) brightness(.92);
+      opacity: .88;
+    }
+    .easter-cat.is-disabled {
+      animation: none !important;
+      pointer-events: none;
+      opacity: .55;
+      filter: grayscale(.25);
+    }
+    .easter-cat.is-lite {
+      animation-duration: 30s;
+    }
+    .easter-cat.is-lite .easter-cat-body,
+    .easter-cat.is-lite .easter-cat-tail {
+      animation: none;
+    }
+    .field.cat-focus {
+      border-radius: 8px;
+      box-shadow: 0 0 0 2px rgba(110,168,255,.22), 0 0 18px rgba(110,168,255,.14);
+      transition: box-shadow .22s ease;
+    }
+    .easter-cat-bubble {
+      position: relative;
+      margin-bottom: 26px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(73,86,111,.72);
+      background: rgba(24,29,38,.92);
+      color: #ecf1fa;
+      font-size: .78rem;
+      line-height: 1.2;
+      white-space: nowrap;
+      box-shadow: 0 10px 20px rgba(0,0,0,.18);
+    }
+    .easter-cat-bubble::after {
+      content: "";
+      position: absolute;
+      width: 9px;
+      height: 9px;
+      right: 14px;
+      bottom: -5px;
+      background: rgba(24,29,38,.92);
+      border-right: 1px solid rgba(73,86,111,.72);
+      border-bottom: 1px solid rgba(73,86,111,.72);
+      transform: rotate(45deg);
+    }
+    .easter-cat-body {
+      position: relative;
+      width: 66px;
+      height: 42px;
+      border: 1px solid rgba(255,191,98,.34);
+      border-radius: 22px 24px 16px 18px;
+      background: linear-gradient(180deg, #ffbf62, #f49c34);
+      box-shadow: 0 8px 18px rgba(244,156,52,.18);
+      animation: softBob 3.2s ease-in-out infinite;
+      will-change: transform;
+    }
+    .easter-cat-body::before,
+    .easter-cat-body::after {
+      content: "";
+      position: absolute;
+      top: -10px;
+      width: 14px;
+      height: 14px;
+      background: #ffbf62;
+      border-top: 1px solid rgba(255,191,98,.34);
+    }
+    .easter-cat-body::before {
+      left: 10px;
+      clip-path: polygon(0 100%, 50% 0, 100% 100%);
+    }
+    .easter-cat-body::after {
+      left: 28px;
+      clip-path: polygon(0 100%, 50% 0, 100% 100%);
+    }
+    .easter-cat-face {
+      position: absolute;
+      top: 10px;
+      left: 14px;
+      width: 30px;
+      height: 16px;
+    }
+    .easter-cat-face::before,
+    .easter-cat-face::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #2d2318;
+      box-shadow: 0 0 0 2px rgba(255,255,255,.14);
+    }
+    .easter-cat-face::before { left: 4px; }
+    .easter-cat-face::after { right: 4px; }
+    .easter-cat-nose {
+      position: absolute;
+      left: 50%;
+      top: 7px;
+      width: 7px;
+      height: 5px;
+      margin-left: -3.5px;
+      border-radius: 55% 55% 70% 70%;
+      background: #9a5f46;
+    }
+    .easter-cat-paws {
+      position: absolute;
+      left: 13px;
+      right: 10px;
+      bottom: -7px;
+      height: 12px;
+      background:
+        radial-gradient(circle at 10% 50%, #f2b054 0 5px, transparent 5px),
+        radial-gradient(circle at 38% 50%, #f2b054 0 5px, transparent 5px),
+        radial-gradient(circle at 67% 50%, #f2b054 0 5px, transparent 5px),
+        radial-gradient(circle at 95% 50%, #f2b054 0 5px, transparent 5px);
+    }
+    .easter-cat-tail {
+      position: absolute;
+      right: -12px;
+      top: 7px;
+      width: 20px;
+      height: 18px;
+      border: 4px solid transparent;
+      border-top-color: #ffbf62;
+      border-right-color: #ffbf62;
+      border-radius: 0 18px 0 0;
+      transform: rotate(24deg);
+      transform-origin: left bottom;
+      animation: tailWiggle 3.6s ease-in-out infinite;
+      will-change: transform;
+    }
+    .disclaimer {
+      margin: 0;
+      padding: 18px 20px;
+      border: 1px solid rgba(102, 58, 20, .62);
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(98, 61, 22, .28), rgba(68, 42, 18, .32));
+      color: #f2d775;
+      font-size: .9rem;
+      line-height: 1.55;
+    }
+    .pdf-report {
+      display: none;
+      gap: 18px;
+      color: #10131a;
+      background: #fff;
+      padding: 0;
+    }
+    .pdf-report-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-end;
+      border-bottom: 2px solid #d5dbe6;
+      padding-bottom: 12px;
+    }
+    .pdf-report-head h2 {
+      margin: 0;
+      font-size: 1.26rem;
+      color: #131722;
+      letter-spacing: -.02em;
+    }
+    .pdf-report-head p,
+    .pdf-report-meta {
+      margin: 0;
+      color: #5a6478;
+      font-size: .86rem;
+      line-height: 1.45;
+    }
+    .pdf-report-meta {
+      text-align: right;
+      white-space: nowrap;
+    }
+    .pdf-key-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .pdf-metric {
+      border: 1px solid #d6dce6;
+      border-radius: 12px;
+      background: #f7f9fc;
+      padding: 12px 14px;
+      display: grid;
+      gap: 6px;
+    }
+    .pdf-metric-label {
+      font-size: .74rem;
+      font-weight: 700;
+      color: #5a6478;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .pdf-metric-value {
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: #111621;
+    }
+    .pdf-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .pdf-summary-card {
+      border: 1px solid #d6dce6;
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+      display: grid;
+      gap: 10px;
+    }
+    .pdf-summary-card h3 {
+      margin: 0;
+      color: #151a25;
+      font-size: .96rem;
+      text-transform: uppercase;
+      letter-spacing: -.01em;
+    }
+    .pdf-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .82rem;
+      color: #243043;
+    }
+    .pdf-table td {
+      padding: 6px 0;
+      border-bottom: 1px solid #e2e7ef;
+    }
+    .pdf-table td:last-child {
+      text-align: right;
+      font-weight: 700;
+      color: #111621;
+    }
+    .pdf-total {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 8px;
+      border-top: 1px solid #cfd6e2;
+      font-weight: 800;
+      color: #111621;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes rowPulse { from { background: rgba(255,171,23,.12); } to { background: transparent; } }
+    @keyframes fadeInFast { from { opacity: .4; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes softFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
+    }
+    @keyframes softBob {
+      0%, 100% { transform: translate3d(0, 0, 0); }
+      50% { transform: translate3d(0, -1px, 0); }
+    }
+    @keyframes catRoam {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(min(14vw, 180px), 0, 0); }
+    }
+    @keyframes tailWiggle {
+      0%, 100% { transform: rotate(14deg); }
+      50% { transform: rotate(22deg); }
+    }
+    @keyframes successGlow {
+      0%, 100% { box-shadow: 0 0 0 1px rgba(57,169,107,.14), 0 16px 30px rgba(15,39,27,.18); }
+      50% { box-shadow: 0 0 0 1px rgba(57,169,107,.24), 0 18px 34px rgba(19,58,36,.24), 0 0 24px rgba(57,169,107,.14); }
+    }
+    .mono { font-variant-numeric: tabular-nums; }
+    .screen,
+    .result-box,
+    .card,
+    .summary-item,
+    .hints,
+    .disclaimer,
+    .actions-quarter {
+      animation: riseIn .48s ease both;
+    }
+    .workspace > *:first-child,
+    .motivation-column--left > *:nth-child(1),
+    .motivation-column--right > *:nth-child(1) { animation-delay: .03s; }
+    .result-col,
+    .motivation-column--left > *:nth-child(2),
+    .motivation-column--right > *:nth-child(2) { animation-delay: .08s; }
+    .motivation-column--left > *:nth-child(3),
+    .motivation-column--right > *:nth-child(3),
+    .summary-section { animation-delay: .12s; }
+    .summary-item--total .total .mono { animation: softFloat 4.2s ease-in-out infinite; }
+    .summary-item--total.has-success {
+      animation: successGlow 3.4s ease-in-out infinite;
+    }
+    @media (min-width: 1320px) {
+      .summary-item--total { position: sticky; top: 18px; }
+    }
+    @media (max-width: 1320px) {
+      .workspace,
+      .screen-motivation .motivation-columns,
+      .summary-grid--hints,
+      .pdf-summary-grid,
+      .pdf-key-metrics { grid-template-columns: 1fr; }
+      .form-col {
+        border-right: 0;
+        border-bottom: 1px solid var(--line-subtle);
+      }
+      .summary-item--total { position: static; }
+    }
+    @media (max-width: 920px) {
+      .page { width: min(100%, calc(100% - 32px)); }
+      .screen-head,
+      .form-col,
+      .result-col,
+      .motivation-body { padding-left: 20px; padding-right: 20px; }
+      .card,
+      .result-box,
+      .summary-item,
+      .hints { padding: 18px; }
+      .monthly-grid,
+      .fields-2,
+      .fields-3,
+      .fields-4,
+      .screen-motivation .motivation-columns { grid-template-columns: 1fr; gap: 16px; }
+      .summary-mini { padding: 14px; }
+      .easter-cat { animation-duration: 12s; }
+      .easter-cat-bubble {
+        max-width: min(52vw, 250px);
+        white-space: normal;
+      }
+      .status:not(:empty) { width: 100%; }
+      .screen-motivation .actions-quarter-head { align-items: flex-start; }
+      .screen-motivation .field--with-action { grid-column: auto; }
+      .screen-motivation .field-control-combo { grid-template-columns: 1fr; }
+      .screen-motivation .actions-quarter-top { grid-template-columns: 1fr; }
+      .screen-motivation .actions-quarter-bottom { grid-template-columns: 1fr; }
+      .actions { display: grid; grid-template-columns: 1fr; }
+      .btn { width: 100%; }
+      #refreshRate { width: 34px; }
+      .table-wrap { max-height: none; }
+      .sticky-total {
+        width: calc(100% - 16px);
+        bottom: 8px;
+        padding: 9px 10px;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+      .easter-cat { transform: none !important; }
+    }
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 8mm;
+      }
+      html { background: #fff; }
+      body {
+        background: #fff;
+        zoom: .92;
+      }
+      body::before, body::after { display: none !important; }
+      .page > :not(.pdf-report) { display: none !important; }
+      .pdf-report { display: grid !important; }
+      .page {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        gap: 8px;
+      }
+      .pdf-report,
+      .pdf-summary-card,
+      .pdf-metric {
+        box-shadow: none !important;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      .pdf-report-head { gap: 6px; margin-bottom: 4px; }
+      .pdf-report-head h2 { font-size: 13.2pt; }
+      .pdf-report-head p,
+      .pdf-report-meta,
+      .pdf-metric-label,
+      .pdf-table,
+      .pdf-total { font-size: 8.4pt; }
+      .pdf-metric-value { font-size: 11.6pt; }
+      .pdf-key-metrics { gap: 6px; }
+      .pdf-metric { padding: 6px 8px; gap: 4px; border-radius: 8px; }
+      .pdf-summary-grid { gap: 8px; }
+      .pdf-summary-card { padding: 8px; gap: 6px; border-radius: 8px; }
+      .pdf-summary-card h3 { font-size: .82rem; }
+      .pdf-table td { padding: 3.5px 0; }
+      .pdf-total { padding-top: 5px; }
+      .status,
+      .status.ok,
+      .status.draft,
+      .status.error {
+        color: #111621 !important;
+        opacity: 1 !important;
+      }
+      .sticky-total { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+<main class="page">
+  <div style="display:flex;justify-content:flex-end;">
+    <a class="btn btn-secondary" href="./index.html" style="text-decoration:none;display:inline-flex;align-items:center;">← На головне меню</a>
+  </div>
+  <section class="screen" aria-labelledby="delayTitle">
+    <div class="screen-head"><h1 id="delayTitle">Калькулятор середнього відтермінування</h1><p>Базовий розрахунок коефіцієнта і строку відтермінування.</p></div>
+    <div class="workspace">
+      <div class="form-col">
+        <form id="calcForm" class="section-grid" novalidate>
+          <div class="fields-3">
+            <div class="field"><label for="debt">Борг</label><input id="debt" type="number" value="58617" data-example="58617" class="is-example" /></div>
+            <div class="field"><label for="turnover">Сума оборота</label><input id="turnover" type="number" value="155775" data-example="155775" class="is-example" /></div>
+            <div class="field"><label for="days">Кількість днів</label><input id="days" type="number" value="31" data-example="31" class="is-example" /></div>
+          </div>
+          <p class="hint">Формула: <strong>коефіцієнт = борг / сума оборота</strong>, <strong>дні відтермінування = коефіцієнт × кількість днів у місяці</strong>.</p>
+          <div class="actions"><button type="submit" class="btn btn-primary">Розрахувати</button><button type="button" id="clearBtn" class="btn btn-secondary">Очистити</button><button type="button" id="copyBtn" class="btn btn-secondary">Скопіювати результат</button></div>
+        </form>
+      </div>
+      <aside class="result-col" aria-live="polite" aria-atomic="true"><section class="result-box"><h2 class="result-title">Результат</h2><p id="coefOut" class="result-line">Коефіцієнт: —</p><p id="daysOut" class="result-line">Середнє відтермінування: —</p><p id="status" class="status" role="status"></p></section><p class="example">Приклад: борг 58 617, оборот 155 775, днів 31 → 0.3763 та 11.67 днів.</p></aside>
+    </div>
+  </section>
+
+  <section class="screen screen-motivation" aria-labelledby="motivationTitle">
+    <div class="screen-head"><h2 id="motivationTitle">Розрахунок мотивації / ЗП</h2><p>Окремо: місячна мотивація, квартальний бонус, загальний підсумок.</p></div>
+    <div class="motivation-body">
+      <div class="motivation-columns">
+        <div class="motivation-column motivation-column--left">
+          <section class="card">
+            <h3>Місячна мотивація</h3>
+            <div class="monthly-grid">
+              <div class="field monthly-field"><label for="planTurnover">Плановий оборот (факт)</label><input id="planTurnover" type="number" value="0" /><p class="field-hint">До 50 тис: 10 000; 50–150 тис: 20 000; понад 150 тис: 25 000.</p><p class="field-msg" data-msg-for="planTurnover"></p></div>
+              <div class="field monthly-field"><label for="planPercent">Виконання плану продажів, %</label><input id="planPercent" type="number" value="0" min="0" max="200" /><p class="field-hint">90%+: +1000/1%, 100%+: +1500/1%, 110%+: +500/1%; знижка ≥27.5% зменшує плановий бонус на 50%.</p><p class="field-msg" data-msg-for="planPercent"></p></div>
+              <div class="field monthly-field"><label>CRM</label><div class="monthly-check"><label class="check"><input id="crmDone" type="checkbox" /> CRM виконано на 100% (20 дзвінків або 5 зустрічей)</label><p class="field-hint">Якщо позначено, бонус CRM = 10 000.</p></div></div>
+              <div class="field monthly-field"><label for="avgDiscount">Середня знижка, %</label><input id="avgDiscount" type="number" value="0" step="0.1" /><p class="field-hint">При 27.5% і вище бонус за план зменшується на 50%.</p><p class="field-msg" data-msg-for="avgDiscount"></p></div>
+              <div class="field monthly-field"><label for="avgDelayFact">Середнє відтермінування (факт), днів</label><input id="avgDelayFact" type="number" value="0" step="0.1" /><p class="field-hint">До 7 днів: 6000, до 14: 3000, більше 14: 0.</p><p class="field-msg" data-msg-for="avgDelayFact"></p></div>
+              <div class="field monthly-field field--with-action"><label for="eurRate">Курс EUR → бонусна валюта</label><div class="field-control-combo"><input id="eurRate" type="number" value="45" step="0.01" /><button type="button" id="refreshRate" class="btn btn-secondary" aria-label="Оновити курс EUR" title="Оновити курс EUR"><svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div><p class="field-hint">Якщо автокурс недоступний, введіть вручну.</p><p class="field-msg" data-msg-for="eurRate"></p></div>
+              <div class="field monthly-field"><label for="overdue1">Прострочка 1–10 днів (EUR)</label><input id="overdue1" type="number" value="0" /><p class="field-hint">Штраф 0.5% від цієї суми.</p><p class="field-msg" data-msg-for="overdue1"></p></div>
+              <div class="field monthly-field"><label for="overdue2">Прострочка 11–20 днів (EUR)</label><input id="overdue2" type="number" value="0" /><p class="field-hint">Штраф 1.0% від цієї суми.</p><p class="field-msg" data-msg-for="overdue2"></p></div>
+              <div class="field monthly-field"><label for="overdue3">Прострочка 20+ днів (EUR)</label><input id="overdue3" type="number" value="0" /><p class="field-hint">Штраф 2.0% від цієї суми.</p><p class="field-msg" data-msg-for="overdue3"></p></div>
+            </div>
+            <p id="rateStatus" class="status"></p>
+          </section>
+
+          <div class="summary-item" id="monthlySummaryCard"><h4>Підсумок місяця</h4><p id="monthSummaryNote" class="summary-note">Поки спокійно: оберіть сценарій або введіть дані, щоб побачити важелі впливу.</p><table class="mini-table" id="monthlyBreakdown"></table><div class="total"><span>Підсумок місяця</span><span id="monthTotal" class="mono">0 ₴</span></div></div>
+          <div class="summary-item summary-item--total" id="totalSummaryCard"><h4>Загальний підсумок</h4><p id="totalSummaryNote" class="summary-note">Звідси видно сумарний ефект місяця й кварталу разом.</p><table class="mini-table" id="totalBreakdown"></table><div class="total"><span>Загальна сума</span><span id="allTotal" class="mono">0 ₴</span></div></div>
+          <section class="summary-item summary-mini" aria-label="Маленька пасхалка з котиком">
+            <div class="summary-mini-head">
+              <h4>Пухнастий ревізор</h4>
+              <button type="button" id="toggleCatBtn" class="btn btn-secondary btn-cat-toggle" aria-pressed="false">Без кота</button>
+            </div>
+            <div class="easter-egg-strip">
+              <button type="button" id="easterCat" class="easter-cat" aria-label="Погладити котика">
+                <span id="easterCatBubble" class="easter-cat-bubble">Мрр. Я рахую бонуси лапками.</span>
+                <span class="easter-cat-body" aria-hidden="true">
+                  <span class="easter-cat-face">
+                    <span class="easter-cat-nose"></span>
+                  </span>
+                  <span class="easter-cat-paws"></span>
+                  <span class="easter-cat-tail"></span>
+                </span>
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <div class="motivation-column motivation-column--right">
+          <section class="card">
+            <h3>Квартальна мотивація</h3>
+            <div class="fields-2">
+              <label class="check"><input id="tiresMinMet" type="checkbox" checked /> Мінімальний план шин виконано</label>
+              <div class="field"><label for="tiresOver">Шин понад мінімальний план, шт</label><input id="tiresOver" type="number" value="0" /><p class="field-hint">Кожна шина понад мінімум: +300.</p><p class="field-msg" data-msg-for="tiresOver"></p></div>
+            </div>
+            <p class="groups-meta"><span><strong id="groupsDoneCount">Виконано 0 з 12 груп</strong></span><span id="groupsNextHint">До бонусного порогу потрібно щонайменше 7 груп.</span><span>Група виконується, якщо середнє за квартал ≥ 95%.</span></p>
+            <div class="table-wrap">
+              <table class="table" id="groupsTable"><thead><tr><th>Група</th><th>М1 %</th><th>М2 %</th><th>М3 %</th><th>Середнє</th><th>Прогрес до 95%</th><th>Статус</th></tr></thead><tbody></tbody></table>
+            </div>
+          </section>
+
+          <p id="printMeta" class="field-hint" style="display:none;">Дата друку: —</p>
+          <div class="summary-item" id="quarterSummaryCard"><h4>Підсумок кварталу</h4><p id="quarterSummaryNote" class="summary-note">Ключ до кварталу тут: групи й шини найсильніше рухають підсумок.</p><table class="mini-table" id="quarterBreakdown"></table><div class="total"><span>Підсумок кварталу</span><span id="quarterTotal" class="mono">0 ₴</span></div></div>
+          <div class="actions-quarter">
+            <div class="actions-quarter-head">
+              <h3>Підсумки</h3>
+              <p id="motivationStatus" class="status" role="status" aria-live="polite"></p>
+            </div>
+            <div class="actions-quarter-top">
+              <button type="button" id="recalcMotivation" class="btn btn-primary">Перерахувати</button>
+              <button type="button" id="clearAll" class="btn btn-secondary">Очистити все</button>
+            </div>
+            <div class="actions-quarter-bottom">
+              <button type="button" id="openMotivationGuide" class="btn btn-secondary btn-quiet"><svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.8A1.8 1.8 0 0 1 6.8 3h10.4A1.8 1.8 0 0 1 19 4.8v14.4a1.8 1.8 0 0 1-1.8 1.8H6.8A1.8 1.8 0 0 1 5 19.2z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 7.8h8M8 11.8h8M8 15.8h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>Умови мотивації</button>
+              <button type="button" id="downloadPdf" class="btn btn-secondary"><svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10m0 0 3.2-3.2M12 13 8.8 9.8M5 15.5v2.7A1.8 1.8 0 0 0 6.8 20h10.4a1.8 1.8 0 0 0 1.8-1.8v-2.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Завантажити PDF</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section class="card summary-section">
+        <div id="errorSummary" class="error-summary" role="alert" hidden></div>
+        <div class="summary-grid summary-grid--hints">
+          <section class="hints">
+            <h4>Підказки: місяць</h4>
+            <ul id="monthlyHints" class="hint-list"></ul>
+          </section>
+          <section class="hints">
+            <h4>Підказки: квартал</h4>
+            <ul id="quarterHints" class="hint-list"></ul>
+          </section>
+        </div>
+        <p class="disclaimer">Увага: розрахунок має інформаційний характер і може відрізнятися від фактичного нарахування. Підсумкові значення залежать від внутрішніх правил компанії, актуального курсу валют і фінального підтвердження.</p>
+      </section>
+    </div>
+  </section>
+
+  <section id="pdfReport" class="pdf-report" aria-hidden="true">
+    <div class="pdf-report-head">
+      <div>
+        <h2>Короткий звіт по підсумках</h2>
+        <p>Стисла версія для PDF: тільки ключові показники та фінальні підсумки.</p>
+      </div>
+      <p id="pdfTimestamp" class="pdf-report-meta">Сформовано: —</p>
+    </div>
+    <div id="pdfKeyMetrics" class="pdf-key-metrics"></div>
+    <div class="pdf-summary-grid">
+      <section class="pdf-summary-card">
+        <h3>Підсумок місяця</h3>
+        <table id="pdfMonthlyBreakdown" class="pdf-table"></table>
+        <div class="pdf-total"><span>Підсумок місяця</span><span id="pdfMonthTotal" class="mono">0 ₴</span></div>
+      </section>
+      <section class="pdf-summary-card">
+        <h3>Підсумок кварталу</h3>
+        <table id="pdfQuarterBreakdown" class="pdf-table"></table>
+        <div class="pdf-total"><span>Підсумок кварталу</span><span id="pdfQuarterTotal" class="mono">0 ₴</span></div>
+      </section>
+      <section class="pdf-summary-card">
+        <h3>Загальний підсумок</h3>
+        <table id="pdfTotalBreakdown" class="pdf-table"></table>
+        <div class="pdf-total"><span>Загальна сума</span><span id="pdfAllTotal" class="mono">0 ₴</span></div>
+      </section>
+    </div>
+  </section>
+</main>
+
+<div id="motivationGuideModal" class="modal" hidden aria-hidden="true">
+  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="motivationGuideTitle">
+    <div class="modal-head">
+      <h3 id="motivationGuideTitle">Умови мотивації (довідка)</h3>
+      <button type="button" id="closeMotivationGuide" class="btn btn-secondary modal-close" aria-label="Закрити довідку">✕</button>
+    </div>
+    <div class="guide-wrap">
+      <table class="guide-table">
+        <thead><tr><th>Блок</th><th>Умова</th><th>Результат</th></tr></thead>
+        <tbody>
+          <tr><td>Місячні бонуси</td><td>Бонус ТП залежить від факту обороту</td><td>&lt;50k: 10 000; 50k–150k: 20 000; &gt;150k: 25 000</td></tr>
+          <tr><td>CRM</td><td>Позначка «CRM виконано на 100%»</td><td>+10 000</td></tr>
+          <tr><td>Виконання плану</td><td>Відсоток виконання плану продажів</td><td>90%+: +1000/1%; 100%+: +1500/1%; 110%+: +500/1%</td></tr>
+          <tr><td>Знижка</td><td>Середня знижка ≥27.5%</td><td>Плановий бонус зменшується на 50%</td></tr>
+          <tr><td>Відтермінування</td><td>Середнє відтермінування</td><td>≤7 днів: +6000; ≤14: +3000; &gt;14: 0</td></tr>
+          <tr><td>Прострочка</td><td>EUR-прострочка по кошиках</td><td>1–10: 0.5%; 11–20: 1.0%; 20+: 2.0% (утримання)</td></tr>
+          <tr><td>Квартал</td><td>Шини + групи</td><td>Підсумок = шини + бонус за групи + бонус за всі групи</td></tr>
+          <tr><td>Групи</td><td>Група «виконана» при середньому ≥95%</td><td>7: 12k; 8: 16k; 9: 22k; 10+: 30k; всі 12: +10k</td></tr>
+          <tr><td>Шини</td><td>Мін. план виконано / перевиконання</td><td>Не виконано: −5000; кожна шина понад мінімум: +300</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+<div id="stickyTotalBar" class="sticky-total" aria-live="polite" aria-atomic="true"><span>Загальна сума</span><strong id="stickyAllTotal" class="mono">0 ₴</strong></div>
+
+<script>
+(function () {
+  const groupNames = ['АВТОХІМІЯ І ОЛИВИ','АМОРТИЗАЦІЯ','ГАЛЬМІВНА СИСТЕМА','ДВИГУН','ЕЛЕКТРИКА','ОХОЛОДЖЕННЯ','ПІДВІСКА','ПНЕВМАТИКА','СИСТЕМА ЗЧЕПЛЕННЯ','ТРАНСМІСІЯ','ФІЛЬТР','PROFIT / JOKER'];
+  const groupsBody = document.querySelector('#groupsTable tbody');
+  const groupCells = [];
+  const groupInputs = [];
+  groupNames.forEach((name, i) => {
+    const tr = document.createElement('tr');
+    tr.className = 'group-row fail';
+    tr.innerHTML = `<td>${name}</td>
+      <td><input type="number" min="0" max="200" step="0.1" data-g="${i}" data-m="1" value="0"></td>
+      <td><input type="number" min="0" max="200" step="0.1" data-g="${i}" data-m="2" value="0"></td>
+      <td><input type="number" min="0" max="200" step="0.1" data-g="${i}" data-m="3" value="0"></td>
+      <td class="mono" data-avg="${i}">0.00%</td>
+      <td data-progress="${i}"><div class="progress-track"><div class="progress-fill" style="width:0%"></div></div></td>
+      <td data-ok="${i}"><span class="pill-no">Не виконано</span></td>`;
+    groupsBody.appendChild(tr);
+    groupInputs.push(...tr.querySelectorAll('input'));
+    groupCells.push({
+      avg: tr.querySelector(`[data-avg="${i}"]`),
+      ok: tr.querySelector(`[data-ok="${i}"]`),
+      progress: tr.querySelector('.progress-fill'),
+      row: tr
+    });
+  });
+
+  const byId = (id) => document.getElementById(id);
+  const money = (v) => `${new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(v)} ₴`;
+  const eur = (v) => `${new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(v)} EUR`;
+  const num = (id) => { const v = parseFloat(byId(id).value); return Number.isFinite(v) ? v : 0; };
+  const clamp = (n,min,max) => Math.max(min, Math.min(max, n));
+
+  // Delay calculator (existing)
+  const form = byId('calcForm'), debtInput = byId('debt'), turnoverInput = byId('turnover'), daysInput = byId('days');
+  const coefOut = byId('coefOut'), daysOut = byId('daysOut'), status = byId('status'), clearBtn = byId('clearBtn'), copyBtn = byId('copyBtn');
+  const exampleInputs = [debtInput, turnoverInput, daysInput];
+  let lastResult = '';
+  function setStatus(msg, type){ status.textContent = msg || ''; status.className = 'status' + (type ? ' ' + type : ''); }
+  function parseNumber(v){ return Number(String(v).replace(',', '.')); }
+  function refreshExampleState(input){ input.classList.toggle('is-example', Boolean(input.dataset.example && input.value.trim() === input.dataset.example)); }
+  function calculateDelay(){
+    const debt = parseNumber(debtInput.value.trim()), turnover = parseNumber(turnoverInput.value.trim()), days = parseNumber(daysInput.value.trim());
+    if (!debtInput.value.trim() || !turnoverInput.value.trim() || !daysInput.value.trim()) return setStatus('Будь ласка, заповніть усі поля.', 'error');
+    if ([debt, turnover, days].some(Number.isNaN) || turnover === 0 || days <= 0 || debt < 0 || turnover < 0) { coefOut.textContent='Коефіцієнт: —'; daysOut.textContent='Середнє відтермінування: —'; return setStatus('Перевірте значення полів.', 'error'); }
+    const c = debt / turnover, d = c * days;
+    coefOut.textContent = `Коефіцієнт: ${c.toFixed(4)}`; daysOut.textContent = `Середнє відтермінування: ${d.toFixed(2)} днів`;
+    lastResult = `${coefOut.textContent}\n${daysOut.textContent}`; setStatus('Розрахунок виконано успішно.', 'ok'); saveCalculatorState();
+  }
+  form.addEventListener('submit', (e)=>{ e.preventDefault(); calculateDelay(); });
+  form.addEventListener('keydown', (e)=>{ if (e.key==='Enter'){ e.preventDefault(); calculateDelay(); }});
+  exampleInputs.forEach((i)=>i.addEventListener('input', ()=>{ refreshExampleState(i); saveCalculatorState(); }));
+  clearBtn.addEventListener('click', ()=>{ debtInput.value=''; turnoverInput.value=''; daysInput.value=''; exampleInputs.forEach(i=>i.classList.remove('is-example')); coefOut.textContent='Коефіцієнт: —'; daysOut.textContent='Середнє відтермінування: —'; setStatus('Поля очищено.','ok'); saveCalculatorState(); });
+  copyBtn.addEventListener('click', async (e)=>{
+    if(!lastResult) return setStatus('Немає результату для копіювання.','error');
+    const ok = await copyToClipboard(lastResult);
+    if (ok) { setStatus('✓ Скопійовано', 'ok'); blinkCopied(e.currentTarget); }
+    else { setStatus('Не вдалося скопіювати. Спробуйте ще раз.', 'error'); }
+  });
+
+  // Motivation calculator
+  const monthlyTable = byId('monthlyBreakdown'), quarterTable = byId('quarterBreakdown'), totalTable = byId('totalBreakdown');
+  const monthTotalEl = byId('monthTotal'), quarterTotalEl = byId('quarterTotal'), allTotalEl = byId('allTotal');
+  const motivationStatus = byId('motivationStatus'), rateStatus = byId('rateStatus');
+  const monthlyHintsEl = byId('monthlyHints'), quarterHintsEl = byId('quarterHints');
+  const printMeta = byId('printMeta');
+  const easterCat = byId('easterCat');
+  const easterCatBubble = byId('easterCatBubble');
+  const toggleCatBtn = byId('toggleCatBtn');
+  const groupsDoneCount = byId('groupsDoneCount'), groupsNextHint = byId('groupsNextHint');
+  const errorSummary = byId('errorSummary');
+  const summaryItems = Array.from(document.querySelectorAll('.summary-item'));
+  const monthlySummaryCard = byId('monthlySummaryCard');
+  const quarterSummaryCard = byId('quarterSummaryCard');
+  const totalSummaryCard = byId('totalSummaryCard');
+  const monthSummaryNote = byId('monthSummaryNote');
+  const quarterSummaryNote = byId('quarterSummaryNote');
+  const totalSummaryNote = byId('totalSummaryNote');
+  const pdfKeyMetrics = byId('pdfKeyMetrics');
+  const pdfMonthlyBreakdown = byId('pdfMonthlyBreakdown');
+  const pdfQuarterBreakdown = byId('pdfQuarterBreakdown');
+  const pdfTotalBreakdown = byId('pdfTotalBreakdown');
+  const pdfMonthTotal = byId('pdfMonthTotal');
+  const pdfQuarterTotal = byId('pdfQuarterTotal');
+  const pdfAllTotal = byId('pdfAllTotal');
+  const pdfTimestamp = byId('pdfTimestamp');
+  const stickyAllTotal = byId('stickyAllTotal');
+  const motivationGuideModal = byId('motivationGuideModal');
+  const openMotivationGuideBtn = byId('openMotivationGuide');
+  const closeMotivationGuideBtn = byId('closeMotivationGuide');
+  const summaryMiniCard = document.querySelector('.summary-mini');
+  const touched = new Set();
+  const priorityFields = new Set();
+  const hintsMarkupCache = new WeakMap();
+  const storageKey = 'cargo-calculator-state-v2';
+  let previousSnapshot = null;
+  let previousProgressSnapshot = null;
+  let previousPdfSnapshot = '';
+  let lastSavedStateRaw = '';
+  let autosaveTimer = null;
+  let motivationFrameId = 0;
+  let catCycleTimer = null;
+  let catResumeTimer = null;
+  let catVisible = true;
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const catLiteMode = prefersReducedMotion.matches || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+  const catFacts = [
+    'Факт: бонус за групи стартує з 7 виконаних груп.',
+    'Факт: середнє відтермінування до 7 днів дає максимум.',
+    'Факт: знижка 27.5%+ ріже бонус за план на 50%.'
+  ];
+  const catContextLines = [
+    'Контекст: дивлюсь на підсвічені поля — там головний вплив.',
+    'Контекст: зараз найцікавіше біля квартального блоку.',
+    'Контекст: якщо щось червоне, почни з нього.'
+  ];
+  const catActionLines = [
+    'Лапка в роботі: підсвічую поле, яке найкраще рухне результат.',
+    'Дія: клікай підсвічене поле, воно зараз пріоритетне.',
+    'Я зробив підказку лапкою — далі твій хід.'
+  ];
+  const catSleepLines = [
+    'Тсс... я дрімаю. Розбуди мене кліком.',
+    'Сплю. Без різких рухів, будь ласка.',
+    'Дрімота mode on. Одним кліком повертаюсь.'
+  ];
+  const catLines = [
+    'Мрр. Я рахую бонуси лапками.',
+    'Якщо що, я за зелені progress bar.',
+    'Погладь ще раз і я принесу +1 до настрою.',
+    'Сьогодні я чергую біля підказок.',
+    'Не чіпаю розрахунки. Лише ходжу красиво.',
+    'Бонуси пахнуть рибкою, перевірив.',
+    'Мяу. Я тут відповідальний за настрій звіту.',
+    'Обережно, лапа може натиснути “Перерахувати”.',
+    'Я офіційно за план 110% і дрімоту після.',
+    'Якщо цифри сумні — я підмуркну підтримку.',
+    'Поки ти рахуєш, я охороняю “Загальну суму”.'
+  ];
+  const celebrationCatLines = [
+    'Мяу. Усі групи вже в зеленій зоні.',
+    'Пухнасто схвалюю: квартал сяє.',
+    'Лапками підписую цей зелений результат.',
+    'Уррра! Тепер можна премію і ковбаску.',
+    'Квартал топ. Я вже святкую хвостом.'
+  ];
+  let catLineIndex = 0;
+  let catState = 'context';
+
+  function nextCatLineFrom(collection){
+    const index = Math.floor(Math.random() * collection.length);
+    return collection[index];
+  }
+
+  function setCatState(state){
+    catState = state;
+    if (!easterCat) return;
+    easterCat.classList.toggle('is-sleeping', state === 'sleep');
+    easterCat.classList.toggle('is-disabled', state === 'off');
+    if (state === 'off') stopCatCycle();
+  }
+
+  function toggleCatVisibility(){
+    if (!easterCat || !toggleCatBtn) return;
+    const isOff = catState === 'off';
+    if (isOff) {
+      setCatState('context');
+      easterCat.hidden = false;
+      toggleCatBtn.textContent = 'Без кота';
+      toggleCatBtn.classList.remove('is-off');
+      toggleCatBtn.setAttribute('aria-pressed', 'false');
+      setCatLine(catLineIndex + 1, false);
+      scheduleCatCycle(7000);
+      return;
+    }
+    setCatState('off');
+    easterCat.hidden = true;
+    toggleCatBtn.textContent = 'Повернути кота';
+    toggleCatBtn.classList.add('is-off');
+    toggleCatBtn.setAttribute('aria-pressed', 'true');
+  }
+
+  function row(label, value, rowClass = ''){ return `<tr class="${rowClass}"><td>${label}</td><td class="mono">${value}</td></tr>`; }
+  function setMStatus(msg, type){ motivationStatus.textContent = msg || ''; motivationStatus.className = 'status' + (type ? ' ' + type : ''); }
+  function setRateStatus(msg, type){ rateStatus.textContent = msg || ''; rateStatus.className = 'status' + (type ? ' ' + type : ''); }
+  async function copyToClipboard(text){
+    if (!text) return false;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (_) {}
+
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '-9999px';
+      ta.style.left = '-9999px';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, ta.value.length);
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return Boolean(ok);
+    } catch (_) {
+      return false;
+    }
+  }
+  function blinkCopied(btn){
+    if (!btn) return;
+    btn.classList.add('copied');
+    setTimeout(() => btn.classList.remove('copied'), 1100);
+  }
+  function collectCalculatorState(){
+    return {
+      delay: {
+        debt: debtInput.value,
+        turnover: turnoverInput.value,
+        days: daysInput.value
+      },
+      motivation: {
+        planTurnover: byId('planTurnover').value,
+        planPercent: byId('planPercent').value,
+        avgDiscount: byId('avgDiscount').value,
+        avgDelayFact: byId('avgDelayFact').value,
+        overdue1: byId('overdue1').value,
+        overdue2: byId('overdue2').value,
+        overdue3: byId('overdue3').value,
+        eurRate: byId('eurRate').value,
+        tiresOver: byId('tiresOver').value,
+        crmDone: byId('crmDone').checked,
+        tiresMinMet: byId('tiresMinMet').checked,
+        groups: Array.from(groupsBody.querySelectorAll('input')).map((input) => input.value)
+      }
+    };
+  }
+  function persistCalculatorState(){
+    try {
+      const nextRaw = JSON.stringify(collectCalculatorState());
+      if (nextRaw === lastSavedStateRaw) return;
+      localStorage.setItem(storageKey, nextRaw);
+      lastSavedStateRaw = nextRaw;
+    } catch (_) {}
+  }
+  function saveCalculatorState(options = {}){
+    const immediate = Boolean(options.immediate);
+    clearTimeout(autosaveTimer);
+    if (immediate) {
+      persistCalculatorState();
+      return;
+    }
+    autosaveTimer = setTimeout(() => {
+      persistCalculatorState();
+    }, 260);
+  }
+  function restoreCalculatorState(){
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (!raw) return false;
+      lastSavedStateRaw = raw;
+      const saved = JSON.parse(raw);
+      if (saved.delay) {
+        debtInput.value = saved.delay.debt ?? debtInput.value;
+        turnoverInput.value = saved.delay.turnover ?? turnoverInput.value;
+        daysInput.value = saved.delay.days ?? daysInput.value;
+      }
+      if (saved.motivation) {
+        ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','eurRate','tiresOver'].forEach((id) => {
+          if (saved.motivation[id] !== undefined) byId(id).value = saved.motivation[id];
+        });
+        if (typeof saved.motivation.crmDone === 'boolean') byId('crmDone').checked = saved.motivation.crmDone;
+        if (typeof saved.motivation.tiresMinMet === 'boolean') byId('tiresMinMet').checked = saved.motivation.tiresMinMet;
+        if (Array.isArray(saved.motivation.groups)) {
+          groupsBody.querySelectorAll('input').forEach((input, idx) => {
+            if (saved.motivation.groups[idx] !== undefined) input.value = saved.motivation.groups[idx];
+          });
+        }
+      }
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+  function clearSavedCalculatorState(){
+    clearTimeout(autosaveTimer);
+    try {
+      localStorage.removeItem(storageKey);
+      lastSavedStateRaw = '';
+    } catch (_) {}
+  }
+  function setCatLine(nextIndex, paused){
+    if (!easterCatBubble) return;
+    const lineByState = {
+      context: () => nextCatLineFrom(catContextLines),
+      action: () => nextCatLineFrom(catActionLines),
+      fact: () => nextCatLineFrom(catFacts),
+      sleep: () => nextCatLineFrom(catSleepLines),
+      off: () => ''
+    };
+    catLineIndex = nextIndex % catLines.length;
+    const nextLine = lineByState[catState] ? lineByState[catState]() : catLines[catLineIndex];
+    if (easterCatBubble.textContent !== nextLine) easterCatBubble.textContent = nextLine;
+    easterCat.classList.toggle('is-paused', Boolean(paused));
+  }
+  function stopCatCycle(){
+    clearTimeout(catCycleTimer);
+    catCycleTimer = null;
+  }
+  function scheduleCatCycle(delay = 12000){
+    if (!easterCat || !catVisible || document.hidden) return;
+    stopCatCycle();
+    catCycleTimer = setTimeout(() => {
+      if (!easterCat.classList.contains('is-paused')) setCatLine(catLineIndex + 1, false);
+      scheduleCatCycle(12000);
+    }, delay);
+  }
+  function pauseCatTemporarily(duration = 1600){
+    if (!easterCat) return;
+    clearTimeout(catResumeTimer);
+    stopCatCycle();
+    easterCat.classList.add('is-paused');
+    catResumeTimer = setTimeout(() => {
+      easterCat.classList.remove('is-paused');
+      if (catState === 'action') setCatState('context');
+      scheduleCatCycle();
+    }, duration);
+  }
+  function catPointToPriorityField(){
+    if (!priorityFields.size) return false;
+    const prioritized = Array.from(priorityFields);
+    const targetField = prioritized.find((field) => field.classList.contains('is-priority-high')) || prioritized[0];
+    if (!targetField) return false;
+    targetField.classList.add('cat-focus');
+    const targetInput = targetField.querySelector('input, select');
+    if (targetInput) targetInput.focus({ preventScroll: true });
+    setTimeout(() => targetField.classList.remove('cat-focus'), 1800);
+    return true;
+  }
+  function toneClass(value){ return value > 0 ? 'is-positive' : value < 0 ? 'is-negative' : 'is-neutral'; }
+  function setFieldMessage(id, msg, kind){
+    const input = byId(id);
+    const field = input && input.closest('.field');
+    const msgEl = document.querySelector(`[data-msg-for="${id}"]`);
+    if (!field || !msgEl) return;
+    field.classList.remove('invalid', 'valid');
+    msgEl.className = 'field-msg';
+    msgEl.textContent = msg || '';
+    if (msg && kind === 'error') { field.classList.add('invalid'); msgEl.classList.add('error'); }
+    if (msg && kind === 'ok') { field.classList.add('valid'); msgEl.classList.add('ok'); }
+  }
+  function validateField(id){
+    const val = parseFloat(byId(id).value);
+    const finite = Number.isFinite(val);
+    if (!touched.has(id)) { setFieldMessage(id, '', ''); return true; }
+    const rules = {
+      planTurnover: () => !finite || val < 0 ? 'Введіть число ≥ 0.' : '',
+      planPercent: () => !finite || val < 0 || val > 200 ? 'Діапазон: 0–200%.' : '',
+      avgDiscount: () => !finite || val < 0 || val > 200 ? 'Діапазон: 0–200%.' : '',
+      avgDelayFact: () => !finite || val < 0 ? 'Значення має бути ≥ 0.' : '',
+      overdue1: () => !finite || val < 0 ? 'Сума EUR має бути ≥ 0.' : '',
+      overdue2: () => !finite || val < 0 ? 'Сума EUR має бути ≥ 0.' : '',
+      overdue3: () => !finite || val < 0 ? 'Сума EUR має бути ≥ 0.' : '',
+      eurRate: () => !finite || val <= 0 ? 'Курс має бути > 0.' : '',
+      tiresOver: () => !finite || val < 0 || !Number.isInteger(val) ? 'Вкажіть ціле число ≥ 0.' : ''
+    };
+    const err = rules[id] ? rules[id]() : '';
+    if (err) { setFieldMessage(id, err, 'error'); return false; }
+    setFieldMessage(id, '✓', 'ok');
+    return true;
+  }
+  function validateAllInputs(){
+    const ids = ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','eurRate','tiresOver'];
+    ids.forEach((id) => touched.add(id));
+    const invalid = ids.filter((id) => !validateField(id));
+    if (invalid.length) {
+      errorSummary.hidden = false;
+      errorSummary.textContent = `Перевірте заповнення полів (${invalid.length}). Наприклад: ${invalid.slice(0,3).join(', ')}.`;
+      return false;
+    }
+    errorSummary.hidden = true;
+    return true;
+  }
+  function animateSummaryCards(){
+    summaryItems.forEach((el)=>el.classList.remove('flash'));
+    requestAnimationFrame(() => {
+      summaryItems.forEach((el)=>{ el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'), 360); });
+    });
+  }
+  function animateNumber(el, from, to, formatter){
+    if (from === to) { el.textContent = formatter(to); return; }
+    const reduced = prefersReducedMotion.matches;
+    if (reduced) { el.textContent = formatter(to); return; }
+    const duration = 280;
+    const start = performance.now();
+    function tick(now){
+      const p = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = formatter(from + (to - from) * eased);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function planBonusByPercent(percent){
+    const p = clamp(percent,0,200);
+    if (p <= 90) return 0;
+    return Math.max(0, Math.min(p,100)-90)*1000 + Math.max(0, Math.min(p,110)-100)*1500 + Math.max(0, p-110)*500;
+  }
+
+  function mixHexColor(from, to, weight){
+    const t = clamp(weight, 0, 1);
+    const start = from.replace('#', '');
+    const end = to.replace('#', '');
+    const channels = [0, 2, 4].map((offset) => {
+      const a = parseInt(start.slice(offset, offset + 2), 16);
+      const b = parseInt(end.slice(offset, offset + 2), 16);
+      return Math.round(a + (b - a) * t).toString(16).padStart(2, '0');
+    });
+    return `#${channels.join('')}`;
+  }
+
+  function progressGradient(avg){
+    const value = clamp(avg, 0, 100);
+    const low = '#4b5565';
+    const lowHi = '#5b6676';
+    const mid = '#c89a3d';
+    const midHi = '#d7aa52';
+    const success = '#39a96b';
+    const successHi = '#53b87c';
+
+    if (value < 70) {
+      const blend = value / 70;
+      return `linear-gradient(90deg, ${mixHexColor(low, lowHi, blend * .45)} 0%, ${mixHexColor(lowHi, mid, blend * .55)} 100%)`;
+    }
+    if (value < 95) {
+      const blend = (value - 70) / 25;
+      return `linear-gradient(90deg, ${mixHexColor(lowHi, mid, blend * .65)} 0%, ${mixHexColor(mid, midHi, .45 + blend * .35)} 100%)`;
+    }
+    const blend = (value - 95) / 5;
+    return `linear-gradient(90deg, ${mixHexColor(midHi, success, blend * .55)} 0%, ${mixHexColor(success, successHi, .35 + blend * .45)} 100%)`;
+  }
+
+  function setPriority(id, tone, label = ''){
+    const input = byId(id);
+    const field = input && input.closest('.field');
+    if (!field) return;
+    const fieldLabel = field.querySelector('label');
+    field.classList.add('is-priority');
+    priorityFields.add(field);
+    field.classList.toggle('is-priority-high', tone === 'high');
+    field.classList.toggle('is-priority-soft', tone !== 'high');
+    if (fieldLabel) {
+      if (label) fieldLabel.dataset.priority = label;
+      else delete fieldLabel.dataset.priority;
+    }
+  }
+
+  function resetPriorities(){
+    priorityFields.forEach((field) => {
+      field.classList.remove('is-priority', 'is-priority-high', 'is-priority-soft');
+      const fieldLabel = field.querySelector('label');
+      if (fieldLabel) delete fieldLabel.dataset.priority;
+    });
+    priorityFields.clear();
+  }
+
+  function updateFieldPriorities(monthly, quarter){
+    resetPriorities();
+    if (monthly.avgDelay > 7) setPriority('avgDelayFact', monthly.avgDelay > 14 ? 'high' : 'soft');
+    if (monthly.avgDiscount >= 24) setPriority('avgDiscount', monthly.avgDiscount >= 27.5 ? 'high' : 'soft');
+    if (!byId('crmDone').checked) setPriority('planTurnover', 'soft');
+    const overdueMap = [
+      { id: 'overdue1', value: monthly.overdue1 },
+      { id: 'overdue2', value: monthly.overdue2 },
+      { id: 'overdue3', value: monthly.overdue3 }
+    ].sort((a, b) => b.value - a.value);
+    if (overdueMap[0].value > 0) setPriority(overdueMap[0].id, 'high');
+    if (!byId('tiresMinMet').checked || quarter.doneCount < 7) setPriority('tiresOver', quarter.doneCount < 7 ? 'high' : 'soft');
+  }
+
+  function updateSummaryNotes(monthly, quarter, total){
+    const isEmpty = monthly.total === 0 && quarter.total === 0 && monthly.planPercent === 0 && quarter.doneCount === 0;
+    monthlySummaryCard.classList.toggle('is-empty', isEmpty);
+    quarterSummaryCard.classList.toggle('is-empty', isEmpty);
+    totalSummaryCard.classList.toggle('is-empty', isEmpty);
+
+    monthSummaryNote.textContent = isEmpty
+      ? 'Внесіть фактичні дані, щоб тут зʼявився зрозумілий розклад по важелях.'
+      : monthly.planPercent < 100
+        ? `Найбільший резерв зараз у виконанні плану: до 100% бракує ${(100 - monthly.planPercent).toFixed(1)}%.`
+        : monthly.avgDelay > 7
+          ? `План уже тримається добре; наступний сильний важіль — відтермінування (${monthly.avgDelay.toFixed(1)} дн.).`
+          : 'Місячний блок виглядає зібрано: основні важелі вже працюють у плюс.';
+
+    quarterSummaryNote.textContent = isEmpty
+      ? 'Квартальний бонус ще порожній: групи й шини почнуть рухати його одразу після перших значень.'
+      : quarter.doneCount < 7
+        ? `Щоб увімкнути квартальний бонус, залишилося добрати ${7 - quarter.doneCount} груп(и) до порогу.`
+        : quarter.doneCount < groupNames.length
+          ? `Квартал уже активний. Ще ${groupNames.length - quarter.doneCount} груп(и) залишаються поза зеленою зоною.`
+          : 'Усі групи в зеленій зоні — квартальний блок працює на максимум.';
+
+    totalSummaryNote.textContent = isEmpty
+      ? 'Загальний результат зʼявиться тут після першого сценарію або ручного вводу.'
+      : total > 0
+        ? `Разом зараз ${money(total)}. Найбільший приріст дадуть підсвічені поля з пріоритетом.`
+        : 'Підсумок поки стриманий: перегляньте підсвічені поля, вони найсильніше впливають на фінал.';
+  }
+
+  function updateRewardState(monthly, quarter){
+    const allGreen = quarter.doneCount === groupNames.length;
+    [monthlySummaryCard, quarterSummaryCard, totalSummaryCard].forEach((card) => card.classList.toggle('has-success', allGreen));
+    const miniCard = document.querySelector('.summary-mini');
+    if (miniCard) miniCard.classList.toggle('is-celebrating', allGreen);
+    if (allGreen && easterCatBubble && !easterCat.classList.contains('is-paused')) {
+      setCatState('fact');
+      const celebrationLine = celebrationCatLines[quarter.doneCount % celebrationCatLines.length];
+      if (easterCatBubble.textContent !== celebrationLine) easterCatBubble.textContent = celebrationLine;
+    }
+  }
+
+  function renderPdfReport(monthly, quarter){
+    const keyMetricsMarkup = [
+      `<div class="pdf-metric"><span class="pdf-metric-label">Загальна сума</span><span class="pdf-metric-value mono">${money(monthly.total + quarter.total)}</span></div>`,
+      `<div class="pdf-metric"><span class="pdf-metric-label">План продажів</span><span class="pdf-metric-value mono">${monthly.planPercent.toFixed(1)}%</span></div>`,
+      `<div class="pdf-metric"><span class="pdf-metric-label">Виконано груп</span><span class="pdf-metric-value mono">${quarter.doneCount} / ${groupNames.length}</span></div>`,
+      `<div class="pdf-metric"><span class="pdf-metric-label">Середнє відтермінування</span><span class="pdf-metric-value mono">${monthly.avgDelay.toFixed(1)} дн.</span></div>`
+    ].join('');
+    const snapshot = [
+      keyMetricsMarkup,
+      monthlyTable.innerHTML,
+      quarterTable.innerHTML,
+      totalTable.innerHTML,
+      monthly.total,
+      quarter.total,
+      monthly.total + quarter.total
+    ].join('|');
+    if (snapshot === previousPdfSnapshot) return;
+    previousPdfSnapshot = snapshot;
+    pdfKeyMetrics.innerHTML = keyMetricsMarkup;
+
+    pdfMonthlyBreakdown.innerHTML = monthlyTable.innerHTML;
+    pdfQuarterBreakdown.innerHTML = quarterTable.innerHTML;
+    pdfTotalBreakdown.innerHTML = totalTable.innerHTML;
+    pdfMonthTotal.textContent = money(monthly.total);
+    pdfQuarterTotal.textContent = money(quarter.total);
+    pdfAllTotal.textContent = money(monthly.total + quarter.total);
+  }
+
+  function calcMonthly(){
+    const planTurnover = num('planTurnover');
+    const crmBonus = byId('crmDone').checked ? 10000 : 0;
+    const planPercent = clamp(num('planPercent'),0,200);
+    const avgDiscount = num('avgDiscount');
+    const avgDelay = num('avgDelayFact');
+    const overdue1 = Math.max(0, num('overdue1'));
+    const overdue2 = Math.max(0, num('overdue2'));
+    const overdue3 = Math.max(0, num('overdue3'));
+    const rate = Math.max(0, num('eurRate'));
+
+    const tpBonus = planTurnover < 50000 ? 10000 : planTurnover > 150000 ? 25000 : 20000;
+    const planBase = planBonusByPercent(planPercent);
+    const discountReduce = avgDiscount >= 27.5 ? planBase * 0.5 : 0;
+    const planFinal = planBase - discountReduce;
+    const delayBonus = avgDelay <= 7 ? 6000 : avgDelay <= 14 ? 3000 : 0;
+
+    const overdueEur = overdue1*0.005 + overdue2*0.01 + overdue3*0.02;
+    const overdueLocal = overdueEur * rate;
+
+    const total = tpBonus + crmBonus + planFinal + delayBonus - overdueLocal;
+
+    return { tpBonus, crmBonus, planBase, discountReduce, planFinal, delayBonus, overdueEur, rate, overdueLocal, total, planPercent, avgDelay, avgDiscount, overdue1, overdue2, overdue3 };
+  }
+
+  function groupsBonusByCount(count){
+    if (count < 7) return 0;
+    if (count === 7) return 12000;
+    if (count === 8) return 16000;
+    if (count === 9) return 22000;
+    return 30000;
+  }
+
+  function calcQuarter(){
+    const tiresOver = Math.max(0, num('tiresOver'));
+    const tiresAdj = (byId('tiresMinMet').checked ? 0 : -5000) + tiresOver*300;
+
+    const results = groupNames.map((name, idx)=>{
+      const inputOffset = idx * 3;
+      const m1 = clamp(parseFloat(groupInputs[inputOffset].value) || 0,0,200);
+      const m2 = clamp(parseFloat(groupInputs[inputOffset + 1].value) || 0,0,200);
+      const m3 = clamp(parseFloat(groupInputs[inputOffset + 2].value) || 0,0,200);
+      const avg = (m1+m2+m3)/3;
+      const done = avg >= 95;
+      return { name, avg, done };
+    });
+
+    const doneCount = results.filter(r=>r.done).length;
+    const doneNames = results.filter(r=>r.done).map(r=>r.name);
+    const groupBonus = groupsBonusByCount(doneCount);
+    const allGroupsBonus = doneCount === groupNames.length ? 10000 : 0;
+    const total = tiresAdj + groupBonus + allGroupsBonus;
+
+    const nextProgressSnapshot = [];
+    results.forEach((r, idx)=>{
+      const ui = groupCells[idx];
+      const avgText = `${r.avg.toFixed(2)}%`;
+      if (ui.avg.textContent !== avgText) ui.avg.textContent = avgText;
+      const near = !r.done && r.avg >= 85;
+      const rowClass = r.done ? 'done' : near ? 'near' : 'fail';
+      if (!ui.row.classList.contains(rowClass) || ui.row.classList.length > 1) {
+        ui.row.classList.remove('done', 'near', 'fail');
+        ui.row.classList.add(rowClass);
+      }
+      const okHtml = r.done ? '<span class="pill-ok">Виконано</span>' : near ? '<span class="pill-near">Близько</span>' : '<span class="pill-no">Не виконано</span>';
+      if (ui.ok.innerHTML !== okHtml) ui.ok.innerHTML = okHtml;
+      const p = Math.max(0, Math.min(100, (r.avg / 95) * 100));
+      const progressWidth = `${p}%`;
+      const progressBg = progressGradient(r.avg);
+      nextProgressSnapshot.push(`${progressWidth}|${progressBg}`);
+      if (!previousProgressSnapshot || previousProgressSnapshot[idx] !== nextProgressSnapshot[idx]) {
+        ui.progress.style.width = progressWidth;
+        ui.progress.style.background = progressBg;
+      }
+    });
+    previousProgressSnapshot = nextProgressSnapshot;
+
+    groupsDoneCount.textContent = `Виконано ${doneCount} з ${groupNames.length} груп`;
+    const nextThreshold = [7,8,9,10].find((t) => doneCount < t);
+    groupsNextHint.textContent = doneCount >= 10
+      ? (doneCount === groupNames.length ? 'Виконано максимум: діє додатковий бонус за всі групи.' : 'До наступного рівня бонусу за групи залишився статус “10+”.')
+      : `Ще ${nextThreshold - doneCount} груп(и) до бонусу ${groupsBonusByCount(nextThreshold)}.`;
+
+    return { tiresAdj, doneCount, doneNames, groupBonus, allGroupsBonus, total, results };
+  }
+
+  function renderBreakdown(monthly, quarter){
+    const penaltyClass = (hasPenalty) => hasPenalty ? 'row-penalty' : '';
+    monthlyTable.innerHTML = [
+      row('Бонус ТП', money(monthly.tpBonus)),
+      row('Бонус CRM', money(monthly.crmBonus)),
+      row('Бонус за виконання плану', money(monthly.planBase)),
+      row('Зменшення через знижку', `- ${money(monthly.discountReduce)}`, penaltyClass(monthly.discountReduce !== 0)),
+      row('Бонус за відтермінування', money(monthly.delayBonus)),
+      row('Штраф за прострочку (EUR)', eur(monthly.overdueEur), penaltyClass(monthly.overdueEur !== 0)),
+      row('Курс EUR', monthly.rate.toFixed(4)),
+      row('Штраф в бонусній валюті', `- ${money(monthly.overdueLocal)}`, penaltyClass(monthly.overdueLocal !== 0))
+    ].join('');
+
+    quarterTable.innerHTML = [
+      row('Штраф/бонус по шинам', money(quarter.tiresAdj), penaltyClass(quarter.tiresAdj < 0)),
+      row('Кількість виконаних груп', String(quarter.doneCount)),
+      row('Бонус за групи', money(quarter.groupBonus)),
+      row('Додатковий бонус за всі групи', money(quarter.allGroupsBonus)),
+      row('Виконані групи', quarter.doneNames.length ? quarter.doneNames.join(', ') : '—')
+    ].join('');
+
+    totalTable.innerHTML = [
+      row('Місячна мотивація', money(monthly.total)),
+      row('Квартальний бонус', money(quarter.total)),
+      row('Курс EUR', monthly.rate.toFixed(4)),
+      row('Виконані квартальні групи', `${quarter.doneCount} / ${groupNames.length}`)
+    ].join('');
+    const nextSnapshot = {
+      month: monthly.total,
+      quarter: quarter.total,
+      total: monthly.total + quarter.total
+    };
+
+    const prev = previousSnapshot || nextSnapshot;
+    animateNumber(monthTotalEl, prev.month, nextSnapshot.month, money);
+    animateNumber(quarterTotalEl, prev.quarter, nextSnapshot.quarter, money);
+    animateNumber(allTotalEl, prev.total, nextSnapshot.total, money);
+
+    [monthTotalEl, quarterTotalEl, allTotalEl].forEach((el, idx) => {
+      const value = idx === 0 ? nextSnapshot.month : idx === 1 ? nextSnapshot.quarter : nextSnapshot.total;
+      el.classList.remove('is-positive', 'is-negative', 'is-neutral');
+      el.classList.add(toneClass(value));
+    });
+
+    const tables = [monthlyTable, quarterTable, totalTable];
+    tables.forEach((table) => {
+      table.querySelectorAll('tr').forEach((tr) => {
+        const key = tr.children[0]?.textContent || '';
+        const val = tr.children[1]?.textContent || '';
+        if (previousSnapshot && previousSnapshot.rows && previousSnapshot.rows[key] !== undefined && previousSnapshot.rows[key] !== val) {
+          tr.classList.add('row-changed');
+          setTimeout(() => tr.classList.remove('row-changed'), 620);
+        }
+      });
+    });
+
+    const rowsMap = {};
+    tables.forEach((table) => table.querySelectorAll('tr').forEach((tr) => {
+      const key = tr.children[0]?.textContent || '';
+      const val = tr.children[1]?.textContent || '';
+      if (key) rowsMap[key] = val;
+    }));
+    const shouldAnimateSummary = !previousSnapshot || prev.total !== nextSnapshot.total || prev.month !== nextSnapshot.month || prev.quarter !== nextSnapshot.quarter;
+    previousSnapshot = { ...nextSnapshot, rows: rowsMap };
+    if (stickyAllTotal) stickyAllTotal.textContent = money(nextSnapshot.total);
+    if (shouldAnimateSummary) animateSummaryCards();
+  }
+
+  function renderHints(el, items) {
+    const nextMarkup = items.slice(0, 6).map((i) => `<li class="${i.type}">${i.text}</li>`).join('');
+    if (hintsMarkupCache.get(el) === nextMarkup) return;
+    el.innerHTML = nextMarkup;
+    hintsMarkupCache.set(el, nextMarkup);
+  }
+
+  function buildMonthlyHints(monthly) {
+    const hints = [];
+    if (monthly.planPercent < 90) hints.push({ type: 'warn', text: `До старту бонусу за план залишилось +${(90 - monthly.planPercent).toFixed(1)}%.` });
+    else if (monthly.planPercent < 100) hints.push({ type: 'info', text: `До наступного порогу 100% залишилось +${(100 - monthly.planPercent).toFixed(1)}%.` });
+    else if (monthly.planPercent < 110) hints.push({ type: 'info', text: `До порогу 110% залишилось +${(110 - monthly.planPercent).toFixed(1)}%.` });
+    else hints.push({ type: 'success', text: 'План перевищує 110% — бонус на максимальному базовому порозі.' });
+
+    if (monthly.avgDelay > 14) hints.push({ type: 'warn', text: `Щоб отримати 3000, зменшіть відтермінування ще на ${(monthly.avgDelay - 14).toFixed(1)} дн.` });
+    else if (monthly.avgDelay > 7) hints.push({ type: 'info', text: `Щоб отримати 6000, зменшіть відтермінування ще на ${(monthly.avgDelay - 7).toFixed(1)} дн.` });
+    else hints.push({ type: 'success', text: 'Максимальний бонус за відтермінування вже досягнуто.' });
+
+    hints.push(byId('crmDone').checked
+      ? { type: 'success', text: 'CRM-бонус активний.' }
+      : { type: 'info', text: 'Виконання CRM на 100% додасть +10000.' });
+
+    hints.push(monthly.avgDiscount >= 27.5
+      ? { type: 'warn', text: 'Середня знижка зменшує бонус за план на 50%.' }
+      : { type: 'info', text: 'Поточна знижка ще не впливає на бонус за план.' });
+    if (monthly.avgDiscount < 27.5 && monthly.avgDiscount >= 25.5) {
+      hints.push({ type: 'warn', text: `До порогу знижки 27.5% залишилось ${(27.5 - monthly.avgDiscount).toFixed(1)}%.` });
+    }
+
+    const overdueMax = Math.max(monthly.overdue1, monthly.overdue2, monthly.overdue3);
+    if (monthly.overdueEur <= 0) hints.push({ type: 'success', text: 'Прострочення відсутнє — утримання немає.' });
+    else {
+      const worst = overdueMax === monthly.overdue3 ? '20+ днів' : overdueMax === monthly.overdue2 ? '11–20 днів' : '1–10 днів';
+      hints.push({ type: 'warn', text: `Найбільше утримання дає прострочка ${worst}. Загалом: ${eur(monthly.overdueEur)} / ${money(monthly.overdueLocal)}.` });
+    }
+    return hints;
+  }
+
+  function buildQuarterHints(quarter) {
+    const hints = [];
+    if (quarter.doneCount < 7) hints.push({ type: 'warn', text: `До мінімального квартального бонусу не вистачає ${7 - quarter.doneCount} груп(и).` });
+    else if (quarter.doneCount < 8) hints.push({ type: 'info', text: 'Ще 1 група — і бонус зросте до 16000.' });
+    else if (quarter.doneCount < 9) hints.push({ type: 'info', text: 'Ще 1 група — і бонус зросте до 22000.' });
+    else if (quarter.doneCount < 10) hints.push({ type: 'info', text: 'До порогу 30000 залишилась 1 група.' });
+    else hints.push({ type: 'success', text: 'Базовий максимум по групах досягнуто.' });
+
+    if (quarter.doneCount >= 10 && quarter.doneCount < groupNames.length) hints.push({ type: 'info', text: 'Якщо виконати всі 12 груп, додатково буде +10000.' });
+    if (quarter.doneCount === groupNames.length) hints.push({ type: 'success', text: 'Додатковий бонус за всі 12 груп активовано.' });
+
+    hints.push(byId('tiresMinMet').checked
+      ? { type: 'info', text: 'Кожна шина понад мінімум додає +300.' }
+      : { type: 'warn', text: 'Мінімальний план шин не виконано: штраф -5000.' });
+
+    const weakest = quarter.results.filter((r) => !r.done).sort((a, b) => a.avg - b.avg).slice(0, 2);
+    weakest.forEach((r) => hints.push({ type: 'warn', text: `${r.name}: не вистачає +${(95 - r.avg).toFixed(1)}% до 95%.` }));
+    const nearDone = quarter.results
+      .filter((r) => !r.done && (95 - r.avg) <= 2)
+      .sort((a, b) => a.avg - b.avg)
+      .slice(0, 2);
+    nearDone.forEach((r) => hints.push({ type: 'info', text: `${r.name}: майже готово, лишилось ${(95 - r.avg).toFixed(1)}% до порогу 95%.` }));
+    if (!weakest.length) hints.push({ type: 'success', text: 'Усі квартальні групи вже виконуються.' });
+
+    return hints;
+  }
+
+  function scheduleMotivationCalculation(){
+    if (motivationFrameId) return;
+    motivationFrameId = requestAnimationFrame(() => {
+      motivationFrameId = 0;
+      calculateMotivation();
+    });
+  }
+
+  function setGuideModalOpen(isOpen){
+    if (!motivationGuideModal) return;
+    motivationGuideModal.hidden = !isOpen;
+    motivationGuideModal.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+    if (isOpen) closeMotivationGuideBtn?.focus({ preventScroll: true });
+    else openMotivationGuideBtn?.focus({ preventScroll: true });
+  }
+
+  function calculateMotivation(){
+    const monthly = calcMonthly();
+    const quarter = calcQuarter();
+    renderBreakdown(monthly, quarter);
+    renderHints(monthlyHintsEl, buildMonthlyHints(monthly));
+    renderHints(quarterHintsEl, buildQuarterHints(quarter));
+    updateFieldPriorities(monthly, quarter);
+    updateSummaryNotes(monthly, quarter, monthly.total + quarter.total);
+    updateRewardState(monthly, quarter);
+    renderPdfReport(monthly, quarter);
+    saveCalculatorState();
+    return { monthly, quarter, total: monthly.total + quarter.total };
+  }
+
+  function parseMinfinRateFromHtml(html){
+    if (!html) return null;
+    const normalized = String(html)
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/\s+/g, ' ');
+
+    const patterns = [
+      /Курс НБУ[^0-9]{0,40}(\d{1,3}[.,]\d{2,4})/i,
+      /Валюта[^]*?EUR[^0-9]{1,20}\d{1,3}[.,]\d{2,4}[^0-9]{1,20}\d{1,3}[.,]\d{2,4}[^0-9]{1,20}(\d{1,3}[.,]\d{2,4})/i,
+      /EUR\/UAH[^0-9]{0,20}1\s*EUR[^0-9]{0,20}(\d{1,3}[.,]\d{2,4})/i,
+      /"ask"\s*:\s*"(\d{1,3}[.,]\d{2,4})"/i,
+      /"sale"\s*:\s*"(\d{1,3}[.,]\d{2,4})"/i
+    ];
+
+    for (const pattern of patterns) {
+      const match = normalized.match(pattern);
+      if (!match) continue;
+      const value = Number(String(match[1]).replace(',', '.'));
+      if (Number.isFinite(value) && value > 0) return value;
+    }
+
+    return null;
+  }
+
+  async function fetchMinfinRate(){
+    const minfinUrl = 'https://minfin.com.ua/currency/eur/';
+    const sources = [
+      { url: minfinUrl, parser: (res) => res.text() },
+      { url: `https://api.allorigins.win/raw?url=${encodeURIComponent(minfinUrl)}`, parser: (res) => res.text() },
+      { url: `https://r.jina.ai/http://minfin.com.ua/currency/eur/`, parser: (res) => res.text() }
+    ];
+
+    for (const source of sources) {
+      try {
+        const res = await fetch(source.url, { cache: 'no-store' });
+        if (!res.ok) continue;
+        const payload = await source.parser(res);
+        const rate = parseMinfinRateFromHtml(payload);
+        if (rate) return { rate, source: 'minfin' };
+      } catch (_) {}
+    }
+
+    return null;
+  }
+
+  async function fetchFallbackRate(){
+    try {
+      const res = await fetch('https://api.frankfurter.app/latest?from=EUR&to=UAH', { cache: 'no-store' });
+      if (!res.ok) throw new Error('bad status');
+      const data = await res.json();
+      const rate = data && data.rates && data.rates.UAH;
+      if (!rate) throw new Error('no rate');
+      return { rate: Number(rate), source: 'fallback' };
+    } catch (_) {
+      return null;
+    }
+  }
+
+  async function refreshRate(){
+    const btn = byId('refreshRate');
+    btn.disabled = true;
+    btn.classList.add('is-loading');
+    setRateStatus('', '');
+
+    try {
+      const result = await fetchMinfinRate() || await fetchFallbackRate();
+      if (!result || !Number.isFinite(result.rate) || result.rate <= 0) throw new Error('no rate');
+
+      byId('eurRate').value = Number(result.rate).toFixed(4);
+      touched.add('eurRate');
+      validateField('eurRate');
+      calculateMotivation();
+      setRateStatus(
+        result.source === 'minfin'
+          ? `Автокурс оновлено з Minfin: 1 EUR = ${Number(result.rate).toFixed(4)}`
+          : `Minfin недоступний, використано резервне джерело: 1 EUR = ${Number(result.rate).toFixed(4)}`,
+        'ok'
+      );
+    } catch (e) {
+      setRateStatus('Не вдалося отримати курс. Введіть значення вручну.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove('is-loading');
+    }
+  }
+
+  function bindRecalc(){
+    const ids = ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','eurRate','tiresOver'];
+    ids.forEach((id)=>{
+      byId(id).addEventListener('blur', () => { touched.add(id); validateField(id); });
+      byId(id).addEventListener('input', () => { if (touched.has(id)) validateField(id); scheduleMotivationCalculation(); });
+    });
+    ['crmDone','tiresMinMet'].forEach(id=>byId(id).addEventListener('change', scheduleMotivationCalculation));
+    groupInputs.forEach((input)=>input.addEventListener('input', scheduleMotivationCalculation));
+  }
+
+  byId('refreshRate').addEventListener('click', refreshRate);
+  openMotivationGuideBtn?.addEventListener('click', () => setGuideModalOpen(true));
+  closeMotivationGuideBtn?.addEventListener('click', () => setGuideModalOpen(false));
+  motivationGuideModal?.addEventListener('click', (event) => {
+    if (event.target === motivationGuideModal) setGuideModalOpen(false);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && motivationGuideModal && !motivationGuideModal.hidden) setGuideModalOpen(false);
+  });
+  byId('recalcMotivation').addEventListener('click', ()=>{ if (!validateAllInputs()) { setMStatus('Виправте помилки перед перерахунком.', 'error'); return; } calculateMotivation(); setMStatus('Розрахунок оновлено.', 'ok'); });
+  byId('downloadPdf').addEventListener('click', ()=>{ const stamp = new Date().toLocaleString('uk-UA'); printMeta.textContent = `Дата друку: ${stamp}`; pdfTimestamp.textContent = `Сформовано: ${stamp}`; setMStatus('Підготовлено короткий PDF-звіт.', 'ok'); window.print(); });
+  byId('clearAll').addEventListener('click', ()=>{
+    debtInput.value='58617'; turnoverInput.value='155775'; daysInput.value='31'; exampleInputs.forEach(refreshExampleState);
+    ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','tiresOver'].forEach(id=>byId(id).value='0');
+    byId('eurRate').value='45'; byId('crmDone').checked=false; byId('tiresMinMet').checked=true;
+    groupsBody.querySelectorAll('input').forEach(i=>i.value='0');
+    ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','eurRate','tiresOver'].forEach((id)=>{ touched.delete(id); setFieldMessage(id, '', ''); });
+    errorSummary.hidden = true;
+    clearSavedCalculatorState();
+    calculateDelay(); calculateMotivation(); setMStatus('Усі поля очищено.', 'ok');
+  });
+  if (easterCat) {
+    if (catLiteMode) easterCat.classList.add('is-lite');
+    easterCat.addEventListener('click', () => {
+      if (catState === 'off') return;
+      const didPoint = catPointToPriorityField();
+      setCatState(didPoint ? 'action' : 'fact');
+      setCatLine(catLineIndex + 1, true);
+      pauseCatTemporarily(didPoint ? 1700 : 1400);
+    });
+    if ('IntersectionObserver' in window && summaryMiniCard) {
+      const catObserver = new IntersectionObserver(([entry]) => {
+        catVisible = Boolean(entry && entry.isIntersecting);
+        if (!catVisible) {
+          stopCatCycle();
+          easterCat.classList.add('is-paused');
+          return;
+        }
+        easterCat.classList.remove('is-paused');
+        scheduleCatCycle(9000);
+      }, { threshold: 0.15 });
+      catObserver.observe(summaryMiniCard);
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stopCatCycle();
+        setCatState('sleep');
+        easterCat.classList.add('is-paused');
+        return;
+      }
+      setCatState('context');
+      easterCat.classList.remove('is-paused');
+      scheduleCatCycle(9000);
+    });
+    easterCat.addEventListener('dblclick', () => {
+      if (catState === 'off') return;
+      setCatState('sleep');
+      setCatLine(catLineIndex + 1, true);
+      pauseCatTemporarily(2600);
+    });
+    scheduleCatCycle(9000);
+  }
+  if (toggleCatBtn) toggleCatBtn.addEventListener('click', toggleCatVisibility);
+
+  bindRecalc();
+  const restoredState = restoreCalculatorState();
+  exampleInputs.forEach(refreshExampleState);
+  calculateDelay();
+  calculateMotivation();
+  if (!restoredState) refreshRate();
+})();
+
+</script>
+</body>
+</html>

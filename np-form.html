@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Форма НП</title>
+  <style>
+    :root {
+      --bg: #09101a;
+      --surface: rgba(14, 22, 36, .84);
+      --line: rgba(100, 124, 161, .22);
+      --text: #f4f7fd;
+      --muted: #9ba9c1;
+      --accent: #6ea8ff;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text);
+      background: linear-gradient(180deg, #09101a 0%, #07111c 52%, #081019 100%);
+      padding: 20px;
+    }
+    .page {
+      width: min(980px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 14px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+    }
+    h1, h2 { margin: 0; }
+    p { margin: 0; color: var(--muted); line-height: 1.45; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .field { display: grid; gap: 6px; }
+    label { font-size: .85rem; color: var(--muted); font-weight: 700; }
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid rgba(118,150,197,.35);
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(10, 16, 28, .92);
+      color: var(--text);
+      font-size: .95rem;
+    }
+    select { min-height: 40px; }
+    textarea { min-height: 90px; resize: vertical; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .actions > .btn,
+    .actions > .btn-link {
+      flex: 1 1 220px;
+      justify-content: center;
+    }
+    .btn {
+      border: 1px solid rgba(143,190,255,.5);
+      background: var(--accent);
+      color: #08111d;
+      border-radius: 8px;
+      min-height: 40px;
+      padding: 0 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn[disabled] { opacity: .65; cursor: not-allowed; }
+    .btn-copy {
+      background: rgba(34,48,71,.64);
+      color: #d7e2f5;
+      border-color: rgba(118,150,197,.34);
+    }
+    .btn-link {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      color: #d7e2f5;
+      background: rgba(34,48,71,.64);
+      border: 1px solid rgba(118,150,197,.34);
+      border-radius: 8px;
+      min-height: 40px;
+      padding: 0 14px;
+    }
+    .hint { font-size: .8rem; color: var(--muted); margin: 0; }
+    .print-sheet { display: none; }
+    .hidden { display: none !important; }
+    .grid.bn-mode #edrpouField { order: 2; }
+    .grid.bn-mode #contactField { order: 1; }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    @media print {
+      @page { size: A4 portrait; margin: 10mm; }
+      body { padding: 0; background: #fff; color: #111; }
+      .card { display: none !important; }
+      .print-sheet {
+        display: block;
+        border: 1px solid #999;
+        border-radius: 8px;
+        padding: 14px;
+        font-size: 11pt;
+        line-height: 1.35;
+      }
+      .print-sheet h1 {
+        margin: 0 0 10px;
+        font-size: 15pt;
+      }
+      .print-row {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        gap: 10px;
+        padding: 6px 0;
+        border-bottom: 1px solid #ddd;
+      }
+      .print-row:last-child { border-bottom: 0; }
+      .print-label { font-weight: 700; }
+      .print-value { word-break: break-word; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="card">
+      <h1>Форма шаблону відправки НП</h1>
+      <p>Заповніть шаблон. Потім натисніть “Завантажити PDF (A4)”.</p>
+      <div class="actions">
+        <a class="btn-link" href="./index.html">← На головний екран</a>
+        <button class="btn btn-copy" id="copyRequestBtn" type="button">Скопіювати текст заявки</button>
+        <button class="btn btn-copy" id="saveHistoryBtn" type="button">Зберегти в історію</button>
+        <button class="btn btn-copy" id="loadHistoryBtn" type="button">Підставити з історії</button>
+        <button class="btn btn-copy" id="clearFormBtn" type="button">Очистити форму / Новий бланк</button>
+        <button class="btn" id="printPdfBtn" type="button">Завантажити PDF (A4)</button>
+      </div>
+      <div class="field">
+        <label for="historySelect">Останні 5 заявок</label>
+        <select id="historySelect">
+          <option value="">— оберіть заявку —</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Дані для відправки</h2>
+      <div class="grid">
+        <div class="field">
+          <label for="address">Адреса</label>
+          <input id="address" type="text" placeholder="Київська обл., м. Васильків" />
+        </div>
+        <div class="field">
+          <label for="department">Відділення</label>
+          <input id="department" type="text" placeholder="НП №2 / Поштомат №1488" />
+        </div>
+        <div class="field">
+          <label for="receiver">Одержувач</label>
+          <input id="receiver" type="text" placeholder="ТОВ ЯСЕНСВІТ / ФОП Олександр Мудрий" />
+        </div>
+        <div class="field">
+          <label for="paymentType">Оплата</label>
+          <select id="paymentType">
+            <option value="НАЛ">НАЛ</option>
+            <option value="БН">БН</option>
+          </select>
+          <p class="hint">Якщо БН — обов’язково вкажіть ЄДРПОУ.</p>
+        </div>
+      </div>
+      <div class="grid" id="contactEdrpouGrid">
+        <div class="field hidden" id="edrpouField">
+          <label for="edrpou">ЄДРПОУ</label>
+          <input id="edrpou" type="text" inputmode="numeric" placeholder="12345678" />
+        </div>
+        <div class="field" id="contactField">
+          <label for="contact">Контакт</label>
+          <input id="contact" type="text" placeholder="Джефрі – (095) 786 16-65" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="comment">Коментарій</label>
+        <textarea id="comment" placeholder="Документи / товар на рекл / інше"></textarea>
+      </div>
+    </section>
+
+    <section id="printSheet" class="print-sheet" aria-hidden="true">
+      <h1>Шаблон відправки НП</h1>
+      <div class="print-row"><div class="print-label">Адреса:</div><div id="printAddress" class="print-value">—</div></div>
+      <div class="print-row"><div class="print-label">Відділення:</div><div id="printDepartment" class="print-value">—</div></div>
+      <div class="print-row"><div class="print-label">Одержувач:</div><div id="printReceiver" class="print-value">—</div></div>
+      <div class="print-row"><div class="print-label">Оплата:</div><div id="printPayment" class="print-value">—</div></div>
+      <div id="printEdrpouRow" class="print-row hidden"><div class="print-label">ЄДРПОУ:</div><div id="printEdrpou" class="print-value">—</div></div>
+      <div class="print-row"><div class="print-label">Контакт:</div><div id="printContact" class="print-value">—</div></div>
+      <div class="print-row"><div class="print-label">Коментарій:</div><div id="printComment" class="print-value">—</div></div>
+    </section>
+  </main>
+  <script>
+    (function () {
+      const byId = (id) => document.getElementById(id);
+      const storageKey = 'np-form-draft-v1';
+      const historyKey = 'np-form-history-v1';
+      const paymentType = byId('paymentType');
+      const edrpouField = byId('edrpouField');
+      const edrpouInput = byId('edrpou');
+      const contactEdrpouGrid = byId('contactEdrpouGrid');
+      const contactInput = byId('contact');
+      const fieldIds = ['address', 'department', 'receiver', 'paymentType', 'edrpou', 'contact', 'comment'];
+
+      function syncPaymentState() {
+        const isBn = paymentType.value === 'БН';
+        edrpouField.classList.toggle('hidden', !isBn);
+        edrpouInput.required = isBn;
+        contactEdrpouGrid.classList.toggle('bn-mode', isBn);
+      }
+
+      function formatPhoneUa(rawValue) {
+        const digits = String(rawValue).replace(/\D/g, '');
+        let local = digits.startsWith('380') ? digits.slice(3) : digits;
+        if (local.startsWith('0')) local = local.slice(1);
+        local = local.slice(0, 9);
+        const p1 = local.slice(0, 2);
+        const p2 = local.slice(2, 5);
+        const p3 = local.slice(5, 7);
+        const p4 = local.slice(7, 9);
+        let out = '+380';
+        if (p1) out += ` (${p1}`;
+        if (p1.length === 2) out += ')';
+        if (p2) out += ` ${p2}`;
+        if (p3) out += `-${p3}`;
+        if (p4) out += `-${p4}`;
+        return out;
+      }
+
+      function collectData() {
+        return {
+          address: byId('address').value.trim(),
+          department: byId('department').value.trim(),
+          receiver: byId('receiver').value.trim(),
+          payment: paymentType.value,
+          edrpou: byId('edrpou').value.trim(),
+          contact: byId('contact').value.trim(),
+          comment: byId('comment').value.trim()
+        };
+      }
+
+      function fillPrintSheet() {
+        const data = collectData();
+        byId('printAddress').textContent = data.address || '—';
+        byId('printDepartment').textContent = data.department || '—';
+        byId('printReceiver').textContent = data.receiver || '—';
+        byId('printPayment').textContent = data.payment || '—';
+        byId('printContact').textContent = data.contact || '—';
+        byId('printComment').textContent = data.comment || '—';
+        const isBn = data.payment === 'БН';
+        byId('printEdrpouRow').classList.toggle('hidden', !isBn);
+        byId('printEdrpou').textContent = data.edrpou || '—';
+      }
+
+      function buildRequestText() {
+        const data = collectData();
+        const lines = [
+          `Адреса: ${data.address || '—'}`,
+          `Відділення: ${data.department || '—'}`,
+          `Одержувач: ${data.receiver || '—'}`,
+          `Оплата: ${data.payment || '—'}`,
+          `Контакт: ${data.contact || '—'}`
+        ];
+        if (data.payment === 'БН') lines.push(`ЄДРПОУ: ${data.edrpou || '—'}`);
+        lines.push(`Коментарій: ${data.comment || '—'}`);
+        return lines.join('\n');
+      }
+
+      async function copyRequestText() {
+        const text = buildRequestText();
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+            return true;
+          }
+        } catch (_) {}
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          const ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          return Boolean(ok);
+        } catch (_) {
+          return false;
+        }
+      }
+
+      function saveDraft() {
+        try {
+          const payload = {};
+          fieldIds.forEach((id) => { payload[id] = byId(id).value; });
+          localStorage.setItem(storageKey, JSON.stringify(payload));
+        } catch (_) {}
+      }
+
+      function clearForm() {
+        fieldIds.forEach((id) => { byId(id).value = id === 'paymentType' ? 'НАЛ' : ''; });
+        syncPaymentState();
+        saveDraft();
+      }
+
+      function getHistory() {
+        try {
+          const raw = localStorage.getItem(historyKey);
+          const parsed = raw ? JSON.parse(raw) : [];
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (_) {
+          return [];
+        }
+      }
+
+      function saveHistory(history) {
+        try {
+          localStorage.setItem(historyKey, JSON.stringify(history.slice(0, 5)));
+        } catch (_) {}
+      }
+
+      function renderHistoryOptions() {
+        const select = byId('historySelect');
+        const current = getHistory();
+        select.innerHTML = '<option value=\"\">— оберіть заявку —</option>';
+        current.forEach((entry, idx) => {
+          const option = document.createElement('option');
+          option.value = String(idx);
+          option.textContent = `${entry.receiver || 'Без одержувача'} · ${entry.department || 'Без відділення'}`;
+          select.appendChild(option);
+        });
+      }
+
+      function saveCurrentToHistory() {
+        const next = collectData();
+        const current = getHistory();
+        const deduped = current.filter((entry) => JSON.stringify(entry) !== JSON.stringify(next));
+        saveHistory([next, ...deduped]);
+        renderHistoryOptions();
+      }
+
+      function loadFromHistory() {
+        const idx = Number(byId('historySelect').value);
+        if (!Number.isInteger(idx) || idx < 0) return;
+        const entry = getHistory()[idx];
+        if (!entry) return;
+        byId('address').value = entry.address || '';
+        byId('department').value = entry.department || '';
+        byId('receiver').value = entry.receiver || '';
+        byId('paymentType').value = entry.payment || 'НАЛ';
+        byId('edrpou').value = entry.edrpou || '';
+        byId('contact').value = entry.contact || '';
+        byId('comment').value = entry.comment || '';
+        syncPaymentState();
+        saveDraft();
+      }
+
+      function restoreDraft() {
+        try {
+          const raw = localStorage.getItem(storageKey);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          fieldIds.forEach((id) => {
+            if (parsed[id] !== undefined) byId(id).value = parsed[id];
+          });
+        } catch (_) {}
+      }
+
+      byId('printPdfBtn').addEventListener('click', () => {
+        syncPaymentState();
+        fillPrintSheet();
+        window.print();
+      });
+      byId('copyRequestBtn').addEventListener('click', async (event) => {
+        const ok = await copyRequestText();
+        const btn = event.currentTarget;
+        const original = btn.textContent;
+        btn.textContent = ok ? 'Скопійовано ✓' : 'Не вдалося скопіювати';
+        setTimeout(() => { btn.textContent = original; }, 1400);
+      });
+      byId('saveHistoryBtn').addEventListener('click', () => {
+        saveCurrentToHistory();
+      });
+      byId('loadHistoryBtn').addEventListener('click', () => {
+        loadFromHistory();
+      });
+      byId('clearFormBtn').addEventListener('click', () => {
+        clearForm();
+      });
+      contactInput.addEventListener('input', () => {
+        const next = formatPhoneUa(contactInput.value);
+        contactInput.value = next;
+        saveDraft();
+      });
+      fieldIds
+        .filter((id) => id !== 'contact')
+        .forEach((id) => byId(id).addEventListener('input', saveDraft));
+
+      paymentType.addEventListener('change', () => {
+        syncPaymentState();
+        saveDraft();
+      });
+      renderHistoryOptions();
+      restoreDraft();
+      syncPaymentState();
+    })();
+  </script>
+</body>
+</html>
