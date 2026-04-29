@@ -32,9 +32,9 @@
       --warn: #ffb324;
       --radius: 18px;
       --shadow: 0 0 0 1px rgba(83, 106, 142, .18);
-      --surface-l1: rgba(10, 16, 28, .9);
-      --surface-l2: rgba(14, 22, 36, .92);
-      --surface-l3: rgba(24, 36, 56, .86);
+      --surface-l1: rgba(8, 13, 23, .96);
+      --surface-l2: rgba(18, 28, 44, .94);
+      --surface-l3: rgba(30, 44, 67, .9);
     }
     * { box-sizing: border-box; }
     html { background: var(--bg); }
@@ -105,6 +105,9 @@
     .embedded .sidebar { display: none; }
     .embedded .app-shell { grid-template-columns: 1fr; width: 100%; margin: 0; }
     .embedded .page { width: min(var(--container-page-max), calc(100% - 20px)); margin: 10px auto 20px; }
+    .panel-head { display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:46px; padding:8px 14px; border:1px solid var(--line); border-radius:var(--radius-md); background:rgba(15,22,34,.95); }
+    .panel-head-meta { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .meta-chip { padding:6px 10px; border-radius:999px; border:1px solid rgba(118,150,197,.28); background:var(--surface-l3); color:#d7e2f5; font-size:.74rem; line-height:1; }
     .screen {
       position: relative;
       background:
@@ -137,7 +140,7 @@
     .screen-head h1,
     .screen-head h2 {
       margin: 0;
-      font-size: 1.08rem;
+      font-size: var(--font-title);
       line-height: 1.25;
       letter-spacing: .01em;
       color: #f7f8fb;
@@ -147,7 +150,7 @@
     .screen-head p {
       margin: 8px 0 0;
       color: var(--muted);
-      font-size: .82rem;
+      font-size: var(--font-body);
       line-height: 1.45;
     }
     .workspace {
@@ -303,11 +306,11 @@
       background: var(--accent);
       color: #08111d;
       border-color: rgba(143,190,255,.58);
-      box-shadow: 0 10px 20px rgba(110,168,255,.18), 0 0 0 1px rgba(143,190,255,.14);
+      box-shadow: 0 6px 14px rgba(110,168,255,.14), 0 0 0 1px rgba(143,190,255,.12);
     }
     .btn-primary:hover {
       background: var(--accent-hover);
-      box-shadow: 0 12px 24px rgba(110,168,255,.22), 0 0 16px rgba(110,168,255,.12);
+      box-shadow: 0 8px 16px rgba(110,168,255,.17), 0 0 10px rgba(110,168,255,.1);
     }
     .btn-secondary {
       background: linear-gradient(180deg, rgba(34,48,71,.64), rgba(17,24,38,.76));
@@ -796,10 +799,7 @@
     }
     .screen-motivation .card:hover,
     .screen-motivation .summary-item:hover,
-    .screen-motivation .hints:hover {
-      border-color: #42506a;
-      box-shadow: 0 10px 22px rgba(7,10,16,.18);
-    }
+    .screen-motivation .hints:hover { border-color: #42506a; box-shadow: none; }
     .screen-motivation .monthly-check:hover,
     .screen-motivation .table-wrap:hover,
     .screen-motivation .disclaimer:hover {
@@ -808,9 +808,7 @@
     .screen-motivation .table tbody tr {
       transition: background-color .16s ease;
     }
-    .screen-motivation .table tbody tr:hover {
-      background: rgba(255,255,255,.025);
-    }
+    .screen-motivation .table tbody tr:hover { background: rgba(110,168,255,.08); }
     .screen-motivation .hint-list li {
       transition: transform .16s ease, color .16s ease;
     }
@@ -862,6 +860,7 @@
     .table td {
       border-bottom: 1px solid #30394b;
       padding: 11px 14px;
+      height: 44px;
       text-align: left;
       vertical-align: middle;
     }
@@ -885,9 +884,7 @@
       z-index: 2;
       background: var(--surface-l1);
     }
-    #groupsTable tbody tr:nth-child(even) {
-      background: rgba(255,255,255,.018);
-    }
+    #groupsTable tbody tr:nth-child(even) { background: rgba(255,255,255,.03); }
     .table-wrap {
       overflow: visible;
       max-height: none;
@@ -1580,6 +1577,16 @@
     </nav>
   </aside>
   <div class="page">
+  <section class="panel-head" aria-label="Системна панель">
+    <div class="panel-head-meta">
+      <span class="meta-chip">Режим: Dashboard</span>
+      <span class="meta-chip">Сервіс: Cargodebitday</span>
+    </div>
+    <div class="panel-head-meta">
+      <span class="meta-chip" id="panelTime">UTC: --:--</span>
+      <span class="meta-chip">Курс: manual/auto</span>
+    </div>
+  </section>
   <section class="screen" aria-labelledby="delayTitle">
     <div class="screen-head"><h1 id="delayTitle">Калькулятор середнього відтермінування</h1><p>Базовий розрахунок коефіцієнта і строку відтермінування.</p></div>
     <div class="workspace">
@@ -1811,6 +1818,7 @@
   const pdfAllTotal = byId('pdfAllTotal');
   const pdfTimestamp = byId('pdfTimestamp');
   const stickyAllTotal = byId('stickyAllTotal');
+  const panelTime = byId('panelTime');
   const motivationGuideModal = byId('motivationGuideModal');
   const openMotivationGuideBtn = byId('openMotivationGuide');
   const closeMotivationGuideBtn = byId('closeMotivationGuide');
@@ -2520,6 +2528,7 @@
   });
   bindRecalc();
   const restoredState = restoreCalculatorState();
+  if (panelTime) panelTime.textContent = `UTC: ${new Date().toISOString().slice(11,16)}`;
   exampleInputs.forEach(refreshExampleState);
   calculateDelay();
   calculateMotivation();
