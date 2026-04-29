@@ -24,8 +24,9 @@
   });
 
   const byId = (id) => document.getElementById(id);
-  const money = (v) => `${new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(v)} ₴`;
-  const eur = (v) => `${new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(v)} EUR`;
+  const safeNum = (v) => Number.isFinite(Number(v)) ? Number(v) : 0;
+  const money = (v) => `${new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(safeNum(v))} ₴`;
+  const eur = (v) => `${new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(safeNum(v))} EUR`;
   const num = (id) => { const v = parseNumber(byId(id).value); return Number.isFinite(v) ? v : 0; };
   const clamp = (n,min,max) => Math.max(min, Math.min(max, n));
 
@@ -86,7 +87,33 @@
   const pdfAllTotal = byId('pdfAllTotal');
   const pdfTimestamp = byId('pdfTimestamp');
   const stickyAllTotal = byId('stickyAllTotal');
+  const stickyMonthTotal = byId('stickyMonthTotal');
+  const stickyQuarterTotal = byId('stickyQuarterTotal');
   const summaryMiniCard = document.querySelector('.summary-mini');
+  const panelTime = byId('panelTime');
+  const panelRate = byId('panelRate');
+  const panelRateUpdated = byId('panelRateUpdated');
+
+  function syncPanelTime(){
+    if (!panelTime) return;
+    panelTime.textContent = `Київ: ${new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Kyiv' })}`;
+  }
+
+  function syncPanelRate(state = 'muted'){
+    if (!panelRate) return;
+    const rate = parseNumber(byId('eurRate')?.value || '');
+    panelRate.classList.remove('is-ok', 'is-muted', 'is-error');
+    const tone = state === 'error' ? 'is-error' : state === 'ok' ? 'is-ok' : 'is-muted';
+    panelRate.classList.add(tone);
+    panelRate.textContent = Number.isFinite(rate) && rate > 0
+      ? `Курс EUR/UAH: ${rate.toFixed(4)}`
+      : 'Курс EUR/UAH: --';
+    if (panelRateUpdated) {
+      panelRateUpdated.classList.remove('is-ok', 'is-muted', 'is-error');
+      panelRateUpdated.classList.add(tone);
+      panelRateUpdated.textContent = `Оновлено: ${new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Europe/Kyiv' })}`;
+    }
+  }
   const touched = new Set();
   const priorityFields = new Set();
   const hintsMarkupCache = new WeakMap();
@@ -127,8 +154,10 @@
   const diagnosticsEl = byId('diagnostics');
 
   function row(label, value){ return `<tr><td>${label}</td><td class="mono">${value}</td></tr>`; }
-  function setMStatus(msg, type){ motivationStatus.textContent = msg || ''; motivationStatus.className = 'status' + (type ? ' ' + type : ''); }
-  function setRateStatus(msg, type){ rateStatus.textContent = msg || ''; rateStatus.className = 'status' + (type ? ' ' + type : ''); }
+  let motivationStatusTimer = null;
+  let rateStatusTimer = null;
+  function setMStatus(msg, type){ motivationStatus.textContent = msg || ''; motivationStatus.className = 'status' + (type ? ' ' + type : ''); clearTimeout(motivationStatusTimer); if (msg && type && type !== 'error') motivationStatusTimer = setTimeout(() => { motivationStatus.textContent = ''; motivationStatus.className = 'status'; }, 5200); }
+  function setRateStatus(msg, type){ rateStatus.textContent = msg || ''; rateStatus.className = 'status' + (type ? ' ' + type : ''); clearTimeout(rateStatusTimer); if (msg && type && type !== 'error') rateStatusTimer = setTimeout(() => { rateStatus.textContent = ''; rateStatus.className = 'status'; }, 5200); }
   async function copyToClipboard(text){
     if (!text) return false;
     try {
@@ -627,7 +656,9 @@
     }));
     const shouldAnimateSummary = !previousSnapshot || prev.total !== nextSnapshot.total || prev.month !== nextSnapshot.month || prev.quarter !== nextSnapshot.quarter;
     previousSnapshot = { ...nextSnapshot, rows: rowsMap };
-    if (stickyAllTotal) stickyAllTotal.textContent = money(nextSnapshot.total);
+    if (stickyAllTotal) stickyAllTotal.textContent = money(safeNum(nextSnapshot.total));
+    if (stickyMonthTotal) stickyMonthTotal.textContent = money(safeNum(nextSnapshot.month));
+    if (stickyQuarterTotal) stickyQuarterTotal.textContent = money(safeNum(nextSnapshot.quarter));
     if (shouldAnimateSummary) animateSummaryCards();
   }
 
@@ -701,6 +732,7 @@
     motivationFrameId = requestAnimationFrame(() => {
       motivationFrameId = 0;
       calculateMotivation();
+      syncPanelRate(result.source === 'minfin' ? 'ok' : 'muted');
     });
   }
 
@@ -799,6 +831,7 @@
       touched.add('eurRate');
       validateField('eurRate');
       calculateMotivation();
+      syncPanelRate();
       setRateStatus(
         result.source === 'minfin'
           ? `Автокурс оновлено з Minfin: 1 EUR = ${Number(result.rate).toFixed(4)}`
@@ -806,6 +839,7 @@
         'ok'
       );
     } catch (e) {
+      syncPanelRate('error');
       setRateStatus('Не вдалося отримати курс. Введіть значення вручну.', 'error');
     } finally {
       btn.disabled = false;
@@ -817,7 +851,7 @@
     const ids = ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','eurRate','tiresOver'];
     ids.forEach((id)=>{
       byId(id).addEventListener('blur', () => { touched.add(id); validateField(id); });
-      byId(id).addEventListener('input', () => { if (touched.has(id)) validateField(id); scheduleMotivationCalculation(); });
+      byId(id).addEventListener('input', () => { if (touched.has(id)) validateField(id); scheduleMotivationCalculation(); if (id === 'eurRate') syncPanelRate(); });
     });
     ['crmDone','tiresMinMet'].forEach(id=>byId(id).addEventListener('change', scheduleMotivationCalculation));
     groupInputs.forEach((input)=>input.addEventListener('input', scheduleMotivationCalculation));
@@ -830,6 +864,7 @@
     debtInput.value='58617'; turnoverInput.value='155775'; daysInput.value='31'; exampleInputs.forEach(refreshExampleState);
     ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','tiresOver'].forEach(id=>byId(id).value='0');
     byId('eurRate').value='45'; byId('crmDone').checked=false; byId('tiresMinMet').checked=true;
+    syncPanelRate();
     groupsBody.querySelectorAll('input').forEach(i=>i.value='0');
     ['planTurnover','planPercent','avgDiscount','avgDelayFact','overdue1','overdue2','overdue3','eurRate','tiresOver'].forEach((id)=>{ touched.delete(id); setFieldMessage(id, '', ''); });
     errorSummary.hidden = true;
@@ -872,5 +907,8 @@
   exampleInputs.forEach(refreshExampleState);
   calculateDelay();
   calculateMotivation();
+  syncPanelTime();
+  syncPanelRate();
+  setInterval(syncPanelTime, 60000);
   if (!restoredState) refreshRate();
 })();
