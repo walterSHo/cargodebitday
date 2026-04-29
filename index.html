@@ -3,14 +3,48 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Перенаправлення…</title>
-  <script>
-    window.location.replace('./calculator.html');
-  </script>
+  <title>Dashboard</title>
+  <style>
+    :root { --bg:#09101a; --surface:rgba(14,22,36,.86); --line:rgba(100,124,161,.24); --text:#f4f7fd; }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; font-family:"Segoe UI",Roboto,Arial,sans-serif; color:var(--text); background:linear-gradient(180deg,#09101a 0%,#07111c 52%,#081019 100%); }
+    .shell { width:min(1860px, calc(100% - 20px)); margin:10px auto; display:grid; grid-template-columns:220px minmax(0,1fr); gap:14px; }
+    .sidebar { border:1px solid var(--line); border-radius:14px; background:rgba(19,30,47,.84); padding:12px; align-self:start; position:sticky; top:10px; }
+    .sidebar h1 { margin:0 0 10px; font-size:.9rem; text-transform:uppercase; color:#9ba9c1; }
+    .tab-link { display:block; text-decoration:none; color:#d9e4f7; border:1px solid transparent; border-radius:8px; padding:10px 11px; margin-bottom:8px; }
+    .tab-link:hover { background:rgba(110,168,255,.12); border-color:rgba(143,190,255,.24); }
+    .tab-link.is-active { background:rgba(110,168,255,.22); border-color:rgba(143,190,255,.42); color:#fff; }
+    .workspace { border:1px solid var(--line); border-radius:14px; overflow:hidden; min-height:calc(100vh - 20px); }
+    iframe { width:100%; height:calc(100vh - 20px); border:0; display:block; background:transparent; }
+    @media (max-width: 980px){ .shell{grid-template-columns:1fr; width:calc(100% - 12px); margin:6px auto;} .sidebar{position:static;} iframe{height:calc(100vh - 130px);} .workspace{min-height:calc(100vh - 130px);} }
+  </style>
 </head>
 <body>
-  <noscript>
-    <p>Переходимо до калькулятора: <a href="./calculator.html">відкрити</a>.</p>
-  </noscript>
+  <main class="shell">
+    <aside class="sidebar">
+      <h1>Меню</h1>
+      <nav aria-label="Основна навігація">
+        <a class="tab-link is-active" data-src="./calculator.html" href="#calculator">Калькулятор</a>
+        <a class="tab-link" data-src="./np-form.html" href="#np-form">Шаблон НП</a>
+        <a class="tab-link" data-src="./storage-form.html" href="#storage-form">Шаблон зберігання</a>
+      </nav>
+    </aside>
+    <section class="workspace"><iframe id="appFrame" src="./calculator.html" title="Робоча область"></iframe></section>
+  </main>
+  <script>
+    const frame = document.getElementById('appFrame');
+    const links = Array.from(document.querySelectorAll('.tab-link'));
+    function activateByHash() {
+      const key = location.hash || '#calculator';
+      const active = links.find((l) => l.getAttribute('href') === key) || links[0];
+      links.forEach((l) => l.classList.toggle('is-active', l === active));
+      if (frame.getAttribute('src') !== active.dataset.src) frame.setAttribute('src', active.dataset.src);
+      document.title = `${active.textContent.trim()} — Dashboard`;
+    }
+    links.forEach((link) => link.addEventListener('click', (e) => { e.preventDefault(); history.pushState(null, '', link.getAttribute('href')); activateByHash(); }));
+    window.addEventListener('popstate', activateByHash);
+    window.addEventListener('hashchange', activateByHash);
+    activateByHash();
+  </script>
 </body>
 </html>
