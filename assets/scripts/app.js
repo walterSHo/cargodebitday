@@ -35,7 +35,11 @@
   const exampleInputs = [debtInput, turnoverInput, daysInput];
   let lastResult = '';
   function setStatus(msg, type){ status.textContent = msg || ''; status.className = 'status' + (type ? ' ' + type : ''); }
-  function parseNumber(v){ return Number(String(v).replace(',', '.')); }
+  function parseNumber(v){
+    const normalized = String(v).replace(/[\s\u00A0]/g, '').replace(/,/g, '.');
+    const value = Number(normalized);
+    return Number.isFinite(value) ? value : Number.NaN;
+  }
   function refreshExampleState(input){ input.classList.toggle('is-example', Boolean(input.dataset.example && input.value.trim() === input.dataset.example)); }
   function calculateDelay(){
     const debt = parseNumber(debtInput.value.trim()), turnover = parseNumber(turnoverInput.value.trim()), days = parseNumber(daysInput.value.trim());

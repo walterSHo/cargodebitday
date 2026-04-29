@@ -250,7 +250,12 @@
   <script>
     (function () {
       const panelTime = document.getElementById('panelTime');
-      if (panelTime) panelTime.textContent = `UTC: ${new Date().toISOString().slice(11,16)}`;
+      function syncPanelTime(){
+      if (!panelTime) return;
+      panelTime.textContent = `Київ: ${new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Kyiv' })}`;
+    }
+    syncPanelTime();
+    setInterval(syncPanelTime, 60000);
       const byId = (id) => document.getElementById(id);
       const storageKey = 'np-form-draft-v1';
       const historyKey = 'np-form-history-v1';
