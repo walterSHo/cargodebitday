@@ -13,3 +13,4 @@
 ## Collaboration
 
 - Default delivery flow is branch -> commit -> pull request into `main`; direct pushes to `main` should be avoided.
+- Current operator preference (April 29, 2026): keep delivery on `main` only and do not create additional branches for routine updates.

@@ -26,7 +26,7 @@
   const byId = (id) => document.getElementById(id);
   const money = (v) => `${new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(v)} ₴`;
   const eur = (v) => `${new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(v)} EUR`;
-  const num = (id) => { const v = parseFloat(byId(id).value); return Number.isFinite(v) ? v : 0; };
+  const num = (id) => { const v = parseNumber(byId(id).value); return Number.isFinite(v) ? v : 0; };
   const clamp = (n,min,max) => Math.max(min, Math.min(max, n));
 
   // Delay calculator (existing)
