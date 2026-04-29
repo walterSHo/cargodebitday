@@ -1,0 +1,35 @@
+:root {
+  --container-shell-max: 1860px;
+  --container-page-max: 1620px;
+  --container-form-max: 980px;
+
+  --space-2xs: 4px;
+  --space-xs: 6px;
+  --space-sm: 10px;
+  --space-md: 14px;
+  --space-lg: 18px;
+
+  --control-h-sm: 34px;
+  --control-h-md: 38px;
+  --btn-h-sm: 34px;
+  --btn-h-md: 40px;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+
+  --font-caption: .72rem;
+  --font-body: .92rem;
+  --font-label: .79rem;
+  --font-section: .98rem;
+  --font-title: 1.08rem;
+}
+
+@media (max-width: 1180px) {
+  :root {
+    --space-sm: 9px;
+    --space-md: 12px;
+    --space-lg: 16px;
+    --control-h-sm: 32px;
+    --control-h-md: 36px;
+  }
+}

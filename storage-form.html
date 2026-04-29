@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Зберігання товару (склад)</title>
+  <link rel="stylesheet" href="./assets/styles/tokens.css" />
   <script>
     if (window.self !== window.top) document.documentElement.classList.add('embedded');
   </script>
@@ -15,7 +16,9 @@
       --text: #f4f7fd;
       --muted: #9ba9c1;
       --accent: #6ea8ff;
-      --radius: 14px;
+      --radius: 8px;
+      --surface-l1: rgba(10, 16, 28, .92);
+      --surface-l2: rgba(18, 30, 48, .88);
     }
     * { box-sizing: border-box; }
     body {
@@ -25,9 +28,10 @@
       color: var(--text);
       background: linear-gradient(180deg, #09101a 0%, #07111c 52%, #081019 100%);
       padding: 20px;
+      overflow-y: scroll;
     }
-    .page { width: min(980px, 100%); margin: 0 auto; display: grid; gap: 14px; }
-    .app-shell { width: min(1320px, 100%); margin: 0 auto; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; }
+    .page { width: min(var(--container-page-max), calc(100% - 56px)); margin: 0 auto; display: grid; gap: 14px; }
+    .app-shell { width: min(var(--container-shell-max), calc(100% - 32px)); margin: 16px auto; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; }
     .sidebar { background: rgba(19, 30, 47, .84); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; align-self: start; position: sticky; top: 20px; }
     .sidebar h2 { margin: 0 0 10px; font-size: .9rem; text-transform: uppercase; color: var(--muted); }
     .menu-link { display:block; padding:10px 11px; border-radius:8px; color:#d9e4f7; text-decoration:none; border:1px solid transparent; margin-bottom:8px; }
@@ -35,14 +39,17 @@
     .menu-link.is-active { background: rgba(110,168,255,.22); border-color: rgba(143,190,255,.42); color:#fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); }
     .embedded .sidebar { display: none; }
     .embedded .app-shell { grid-template-columns: 1fr; width: 100%; margin: 0; }
-    .embedded .page { width: min(980px, calc(100% - 20px)); margin: 10px auto 20px; }
+    .embedded .page { width: min(var(--container-page-max), calc(100% - 20px)); margin: 10px auto 20px; }
+    .panel-head { display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:46px; padding:8px 14px; border:1px solid var(--line); border-radius:var(--radius-sm); background:rgba(15,22,34,.95); }
+    .panel-head-meta { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .meta-chip { padding:0; border:0; background:transparent; color:#d7e2f5; font-size:.8rem; line-height:1.2; }
     .card {
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      padding: 18px;
+      padding: var(--space-md);
       display: grid;
-      gap: 12px;
+      gap: var(--space-sm);
     }
     h1, h2 { margin: 0; }
     p { margin: 0; color: var(--muted); }
@@ -52,11 +59,11 @@
     input, textarea {
       width: 100%;
       border: 1px solid rgba(118,150,197,.35);
-      border-radius: 8px;
-      padding: 10px 12px;
-      background: rgba(10, 16, 28, .92);
+      border-radius: var(--radius-sm);
+      padding: 8px var(--space-sm);
+      background: var(--surface-l1);
       color: var(--text);
-      font-size: .95rem;
+      font-size: .92rem;
     }
     input[type="file"] {
       border: 1px dashed rgba(118,150,197,.45);
@@ -67,15 +74,30 @@
     .hint { margin: 0; color: var(--muted); font-size: .82rem; }
     .actions { display: flex; gap: 10px; flex-wrap: wrap; }
     .btn, .btn-link {
-      min-height: 40px;
-      padding: 0 14px;
-      border-radius: 8px;
-      font-weight: 700;
+      min-height: var(--control-h-md);
+      padding: 0 var(--space-sm);
+      border-radius: var(--radius-sm);
+      font-weight: 600;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
+      gap: 8px;
       border: 1px solid rgba(143,190,255,.5);
     }
+    .btn, .btn-link {
+      border-radius: var(--radius-sm);
+      min-height: var(--btn-h-md);
+      padding: 0 16px;
+    }
+    .btn:focus-visible,
+    .btn-link:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(143,190,255,.28);
+    }
+    .btn-icon-ui { width: 14px; height: 14px; flex: 0 0 14px; opacity: .84; }
+    .btn-md { min-height: var(--btn-h-md); }
+    .btn-sm { min-height: var(--btn-h-sm); font-size: .88rem; padding: 0 12px; }
     .btn { background: var(--accent); color: #08111d; cursor: pointer; }
     .btn-link { color: #d7e2f5; border-color: rgba(118,150,197,.34); }
     .print-sheet { display: none; }
@@ -85,7 +107,10 @@
       @page { size: A4 portrait; margin: 10mm; }
       body { background: #fff; color: #111; padding: 0; }
       .card { display: none !important; }
-      .print-sheet { display: block; border: 1px solid #999; border-radius: 8px; padding: 12px; font-size: 11pt; }
+      .print-sheet { display: block; border: 1px solid #999; border-radius: 2px; padding: 12px; font-size: 11pt; }
+      .app-shell,
+      .page { width: 100%; margin: 0; }
+      .sidebar { display: none !important; }
       .row { display: grid; grid-template-columns: 170px 1fr; gap: 10px; border-bottom: 1px solid #ddd; padding: 6px 0; }
       .row:last-child { border-bottom: 0; }
       .key { font-weight: 700; }
@@ -105,11 +130,12 @@
     </nav>
   </aside>
   <div class="page">
+  <section class="panel-head"><div class="panel-head-meta"><span class="meta-chip">Режим: Склад</span></div><div class="panel-head-meta"><span class="meta-chip" id="panelTime">UTC: --:--</span></div></section>
   <section class="card">
     <h1>Зберігання товару (склад)</h1>
     <p>Форма для випадків, коли товар передано без документів на повернення.</p>
     <div class="actions">
-      <button type="button" class="btn" id="printStorageBtn">Завантажити PDF (A4)</button>
+      <button type="button" class="btn btn-md" id="printStorageBtn"><svg class="btn-icon-ui" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10m0 0 3.2-3.2M12 13 8.8 9.8M5 15.5v2.7A1.8 1.8 0 0 0 6.8 20h10.4a1.8 1.8 0 0 0 1.8-1.8v-2.7" fill="none" stroke="currentColor" stroke-width="1.75"/></svg>Завантажити PDF (A4)</button>
     </div>
   </section>
 
@@ -156,6 +182,8 @@
 </main>
 <script>
 (function () {
+  const panelTime = document.getElementById('panelTime');
+  if (panelTime) panelTime.textContent = `UTC: ${new Date().toISOString().slice(11,16)}`;
   const byId = (id) => document.getElementById(id);
   const photosInput = byId('storagePhotos');
   const photosHint = byId('storagePhotosHint');
