@@ -123,6 +123,8 @@
     'Квартал топ. Я вже святкую хвостом.'
   ];
   let catLineIndex = 0;
+  const diagnosticsMode = new URLSearchParams(window.location.search).get('debug') === '1';
+  const diagnosticsEl = byId('diagnostics');
 
   function row(label, value){ return `<tr><td>${label}</td><td class="mono">${value}</td></tr>`; }
   function setMStatus(msg, type){ motivationStatus.textContent = msg || ''; motivationStatus.className = 'status' + (type ? ' ' + type : ''); }
@@ -702,6 +704,13 @@
     });
   }
 
+  function renderDiagnostics(monthly, quarter, total){
+    if (!diagnosticsMode || !diagnosticsEl) return;
+    const payload = { monthly, quarter: { ...quarter, results: quarter.results.map(({ name, avg, done }) => ({ name, avg, done })) }, total };
+    diagnosticsEl.hidden = false;
+    diagnosticsEl.textContent = JSON.stringify(payload, null, 2);
+  }
+
   function calculateMotivation(){
     const monthly = calcMonthly();
     const quarter = calcQuarter();
@@ -712,8 +721,10 @@
     updateSummaryNotes(monthly, quarter, monthly.total + quarter.total);
     updateRewardState(monthly, quarter);
     renderPdfReport(monthly, quarter);
+    const total = monthly.total + quarter.total;
+    renderDiagnostics(monthly, quarter, total);
     saveCalculatorState();
-    return { monthly, quarter, total: monthly.total + quarter.total };
+    return { monthly, quarter, total };
   }
 
   function parseMinfinRateFromHtml(html){
