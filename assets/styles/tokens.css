@@ -3,6 +3,21 @@
   --container-page-max: 1620px;
   --container-form-max: 980px;
 
+  --color-bg: #09101a;
+  --color-bg-grad-mid: #07111c;
+  --color-bg-grad-end: #081019;
+  --color-surface: rgba(14, 22, 36, .84);
+  --color-line: rgba(100, 124, 161, .22);
+  --color-text: #f4f7fd;
+  --color-muted: #9ba9c1;
+  --color-accent: #6ea8ff;
+
+  --radius-lg: 18px;
+  --sidebar-w: 220px;
+  --shell-gap: 16px;
+  --shell-pad: 12px;
+  --menu-radius: 14px;
+
   --space-2xs: 4px;
   --space-xs: 6px;
   --space-sm: 10px;

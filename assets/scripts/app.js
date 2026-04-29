@@ -26,7 +26,7 @@
   const byId = (id) => document.getElementById(id);
   const money = (v) => `${new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(v)} ₴`;
   const eur = (v) => `${new Intl.NumberFormat('uk-UA',{maximumFractionDigits:2}).format(v)} EUR`;
-  const num = (id) => { const v = parseFloat(byId(id).value); return Number.isFinite(v) ? v : 0; };
+  const num = (id) => { const v = parseNumber(byId(id).value); return Number.isFinite(v) ? v : 0; };
   const clamp = (n,min,max) => Math.max(min, Math.min(max, n));
 
   // Delay calculator (existing)
@@ -35,7 +35,11 @@
   const exampleInputs = [debtInput, turnoverInput, daysInput];
   let lastResult = '';
   function setStatus(msg, type){ status.textContent = msg || ''; status.className = 'status' + (type ? ' ' + type : ''); }
-  function parseNumber(v){ return Number(String(v).replace(',', '.')); }
+  function parseNumber(v){
+    const normalized = String(v).replace(/[\s\u00A0]/g, '').replace(/,/g, '.');
+    const value = Number(normalized);
+    return Number.isFinite(value) ? value : Number.NaN;
+  }
   function refreshExampleState(input){ input.classList.toggle('is-example', Boolean(input.dataset.example && input.value.trim() === input.dataset.example)); }
   function calculateDelay(){
     const debt = parseNumber(debtInput.value.trim()), turnover = parseNumber(turnoverInput.value.trim()), days = parseNumber(daysInput.value.trim());
@@ -119,6 +123,8 @@
     'Квартал топ. Я вже святкую хвостом.'
   ];
   let catLineIndex = 0;
+  const diagnosticsMode = new URLSearchParams(window.location.search).get('debug') === '1';
+  const diagnosticsEl = byId('diagnostics');
 
   function row(label, value){ return `<tr><td>${label}</td><td class="mono">${value}</td></tr>`; }
   function setMStatus(msg, type){ motivationStatus.textContent = msg || ''; motivationStatus.className = 'status' + (type ? ' ' + type : ''); }
@@ -698,6 +704,13 @@
     });
   }
 
+  function renderDiagnostics(monthly, quarter, total){
+    if (!diagnosticsMode || !diagnosticsEl) return;
+    const payload = { monthly, quarter: { ...quarter, results: quarter.results.map(({ name, avg, done }) => ({ name, avg, done })) }, total };
+    diagnosticsEl.hidden = false;
+    diagnosticsEl.textContent = JSON.stringify(payload, null, 2);
+  }
+
   function calculateMotivation(){
     const monthly = calcMonthly();
     const quarter = calcQuarter();
@@ -708,8 +721,10 @@
     updateSummaryNotes(monthly, quarter, monthly.total + quarter.total);
     updateRewardState(monthly, quarter);
     renderPdfReport(monthly, quarter);
+    const total = monthly.total + quarter.total;
+    renderDiagnostics(monthly, quarter, total);
     saveCalculatorState();
-    return { monthly, quarter, total: monthly.total + quarter.total };
+    return { monthly, quarter, total };
   }
 
   function parseMinfinRateFromHtml(html){
